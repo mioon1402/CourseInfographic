@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Python 튜토리얼 환경 설정</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f0f4f8; /* Light blue-gray background */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .container {
+            background-color: #ffffff;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            padding: 30px;
+            max-width: 900px;
+            width: 100%;
+            display: grid;
+            gap: 20px;
+            grid-template-columns: repeat(1, 1fr); /* Single column for mobile */
+        }
+        @media (min-width: 768px) {
+            .container {
+                grid-template-columns: repeat(2, 1fr); /* Two columns for tablet and desktop */
+            }
+        }
+        .card {
+            background-color: #e2f0f9; /* Lighter blue for cards */
+            border-radius: 15px;
+            padding: 25px;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+            transition: transform 0.3s ease-in-out;
+            min-height: 200px; /* Ensure cards have a minimum height */
+        }
+        .card:hover {
+            transform: translateY(-5px);
+        }
+        .card-icon {
+            font-size: 3rem; /* Large icon size */
+            margin-bottom: 15px;
+            color: #3b82f6; /* Blue icon color */
+        }
+        .card-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #1e3a8a; /* Darker blue for titles */
+            margin-bottom: 10px;
+        }
+        .card-text {
+            font-size: 1rem;
+            color: #4a5568; /* Grayish text color */
+            line-height: 1.6;
+        }
+        .header-section {
+            grid-column: 1 / -1; /* Span full width */
+            text-align: center;
+            padding-bottom: 20px;
+        }
+        .header-title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: #1e3a8a;
+            margin-bottom: 10px;
+        }
+        .header-subtitle {
+            font-size: 1.2rem;
+            color: #4a5568;
+        }
+        .code-snippet {
+            background-color: #1a202c; /* Dark background for code */
+            color: #a0aec0; /* Light gray text for code */
+            padding: 10px 15px;
+            border-radius: 8px;
+            font-family: monospace;
+            font-size: 0.9rem;
+            overflow-x: auto;
+            white-space: pre-wrap; /* Allows wrapping of long lines */
+            word-break: break-all; /* Breaks words if necessary */
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header Section -->
+        <div class="header-section">
+            <h1 class="header-title">Python 튜토리얼 첫걸음: Google Colab 환경 설정</h1>
+            <p class="header-subtitle">시계열 분석을 위한 파이썬 개발 환경 준비하기</p>
+        </div>
+
+        <!-- Welcome & Environment -->
+        <div class="card">
+            <span class="card-icon">🐍</span>
+            <h2 class="card-title">환영합니다!</h2>
+            <p class="card-text">
+                파이썬 튜토리얼에 오신 것을 환영합니다. 이번 시간에는 Google Colaboratory (Colab) 환경을 설정하고, 시간 흐름에 따른 데이터 분석을 위한 모든 준비를 마칠 것입니다.
+            </p>
+        </div>
+
+        <!-- Accessing Materials -->
+        <div class="card">
+            <span class="card-icon">📁</span>
+            <h2 class="card-title">학습 자료 접근</h2>
+            <p class="card-text">
+                모든 학습 자료는 Google Drive에 저장되어 있으며, 강의 자료(3-4강) 또는 웹사이트에서 다운로드 버튼을 통해 접근할 수 있습니다.
+            </p>
+        </div>
+
+        <!-- Google Colab Setup -->
+        <div class="card">
+            <span class="card-icon">📝</span>
+            <h2 class="card-title">Google Colab 시작</h2>
+            <p class="card-text">
+                새로운 Colab 노트북을 생성하고, 파일 이름을 **'Introduction to Time Series Analysis'**로 변경하세요.
+                좌측 패널에서 **목차(Table of Contents)**, **파일(Files)** 섹션을 확인하세요.
+            </p>
+        </div>
+
+        <!-- Mounting Google Drive -->
+        <div class="card">
+            <span class="card-icon">☁️</span>
+            <h2 class="card-title">Google Drive 마운트</h2>
+            <p class="card-text">
+                Colab에서 Google Drive에 연결하려면, 좌측 파일 아이콘을 클릭하여 드라이브를 마운트하거나 다음 코드를 실행합니다:
+                <div class="code-snippet">
+                    from google.colab import drive<br>drive.mount('/content/drive')
+                </div>
+                마운트가 완료되면 'drive' 폴더가 보일 것입니다.
+            </p>
+        </div>
+
+        <!-- Setting Directory -->
+        <div class="card">
+            <span class="card-icon">📂</span>
+            <h2 class="card-title">작업 디렉토리 설정</h2>
+            <p class="card-text">
+                데이터셋이 있는 특정 폴더로 이동합니다. Colab에서 디렉토리를 변경하려면 다음 명령어를 사용하고, 드라이브에서 해당 폴더의 **경로를 복사하여 붙여넣으세요**:
+                <div class="code-snippet">
+                    %cd [복사한 경로]
+                </div>
+                이제 CSV 데이터 파일에 쉽게 접근할 수 있습니다.
+            </p>
+        </div>
+
+        <!-- Importing Libraries & Loading Data -->
+        <div class="card" style="grid-column: 1 / -1; background-color: #d1e7dd;"> <!-- Span full width, lighter green -->
+            <span class="card-icon">🚀</span>
+            <h2 class="card-title">라이브러리 임포트 및 데이터 로드</h2>
+            <p class="card-text">
+                필요한 라이브러리를 임포트하고, 비트코인 가격 데이터셋을 로드합니다. `df.head()`를 사용하여 데이터의 첫 5행을 미리 볼 수 있습니다.
+                <div class="code-snippet">
+                    import pandas as pd<br>import matplotlib.pyplot as plt<br><br>df = pd.read_csv('bitcoin_price.csv')<br>df.head()
+                </div>
+                데이터는 날짜, 시가, 고가, 저가, 종가, 조정 종가, 거래량으로 구성됩니다.
+            </p>
+        </div>
+    </div>
+</body>
+</html>
