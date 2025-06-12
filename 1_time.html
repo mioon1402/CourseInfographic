@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>시계열 데이터 인포그래픽</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f0f4f8; /* Light blue-gray background */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .container {
+            background-color: #ffffff;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            padding: 30px;
+            max-width: 900px;
+            width: 100%;
+            display: grid;
+            gap: 20px;
+            grid-template-columns: repeat(1, 1fr); /* Single column for mobile */
+        }
+        @media (min-width: 768px) {
+            .container {
+                grid-template-columns: repeat(2, 1fr); /* Two columns for tablet and desktop */
+            }
+        }
+        .card {
+            background-color: #e2f0f9; /* Lighter blue for cards */
+            border-radius: 15px;
+            padding: 25px;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+            transition: transform 0.3s ease-in-out;
+            min-height: 200px; /* Ensure cards have a minimum height */
+        }
+        .card:hover {
+            transform: translateY(-5px);
+        }
+        .card-icon {
+            font-size: 3rem; /* Large icon size */
+            margin-bottom: 15px;
+            color: #3b82f6; /* Blue icon color */
+        }
+        .card-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #1e3a8a; /* Darker blue for titles */
+            margin-bottom: 10px;
+        }
+        .card-text {
+            font-size: 1rem;
+            color: #4a5568; /* Grayish text color */
+            line-height: 1.6;
+        }
+        .header-section {
+            grid-column: 1 / -1; /* Span full width */
+            text-align: center;
+            padding-bottom: 20px;
+        }
+        .header-title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: #1e3a8a;
+            margin-bottom: 10px;
+        }
+        .header-subtitle {
+            font-size: 1.2rem;
+            color: #4a5568;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header Section -->
+        <div class="header-section">
+            <h1 class="header-title">시계열 데이터 분석 첫걸음</h1>
+            <p class="header-subtitle">비트코인 가격 데이터를 통해 배우는 시계열의 모든 것</p>
+        </div>
+
+        <!-- What is Time Series Data? -->
+        <div class="card">
+            <span class="card-icon">⏳</span>
+            <h2 class="card-title">시계열 데이터란?</h2>
+            <p class="card-text">
+                시간순서에 따라 정렬된 데이터 포인트들의 이야기입니다. 각 데이터는 시간 속의 한 순간이며, 일간, 주간, 월간 등 일관된 간격으로 기록됩니다.
+            </p>
+        </div>
+
+        <!-- Intriguing Dataset: Bitcoin Price Data -->
+        <div class="card">
+            <span class="card-icon">₿</span>
+            <h2 class="card-title">핵심 데이터셋: 비트코인 가격</h2>
+            <p class="card-text">
+                2014년부터 2023년까지 거의 10년간의 일별 비트코인 가격 데이터는 높은 변동성, 빠른 가격 변화, 그리고 중요한 추세를 보여주어 시계열 분석에 매우 적합합니다.
+            </p>
+        </div>
+
+        <!-- Wide-Ranging Applications -->
+        <div class="card">
+            <span class="card-icon">📈</span>
+            <h2 class="card-title">광범위한 적용 분야</h2>
+            <p class="card-text">
+                금융 외에도 날씨 예측(강수량, 기온), 경제학(GDP 성장 분석), 의료(환자 심박수 모니터링) 등 다양한 분야에서 시계열 데이터가 활용됩니다.
+            </p>
+        </div>
+
+        <!-- Unique Statistical Tools -->
+        <div class="card">
+            <span class="card-icon">📊</span>
+            <h2 class="card-title">고유한 통계 도구</h2>
+            <p class="card-text">
+                <b>자기 상관(Autocorrelation):</b> 데이터 포인트가 과거 데이터와 얼마나 관련이 있는지 이해합니다.
+                <b>계절성(Seasonality):</b> 시간 경과에 따라 반복되는 패턴을 식별합니다. 이 개념들은 정확한 예측과 추세 분석의 핵심입니다.
+            </p>
+        </div>
+
+        <!-- Call to Action -->
+        <div class="card" style="grid-column: 1 / -1; background-color: #d1e7dd;"> <!-- Span full width, lighter green for CTA -->
+            <span class="card-icon">💡</span>
+            <h2 class="card-title">여러분의 프로젝트에 어떻게 적용할 수 있을까요?</h2>
+            <p class="card-text">
+                배운 지식이 여러분의 프로젝트를 어떻게 향상시킬 수 있을지 고민해 보세요. 궁금한 점이 있다면 언제든지 질문해 주세요!
+            </p>
+        </div>
+    </div>
+</body>
+</html>
