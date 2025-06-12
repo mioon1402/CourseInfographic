@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>시계열 데이터 자기 상관(Autocorrelation)</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f0f4f8; /* Light blue-gray background */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .container {
+            background-color: #ffffff;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            padding: 30px;
+            max-width: 900px;
+            width: 100%;
+            display: grid;
+            gap: 20px;
+            grid-template-columns: repeat(1, 1fr); /* Single column for mobile */
+        }
+        @media (min-width: 768px) {
+            .container {
+                grid-template-columns: repeat(2, 1fr); /* Two columns for tablet and desktop */
+            }
+        }
+        .card {
+            background-color: #e2f0f9; /* Lighter blue for cards */
+            border-radius: 15px;
+            padding: 25px;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+            transition: transform 0.3s ease-in-out;
+            min-height: 200px; /* Ensure cards have a minimum height */
+        }
+        .card:hover {
+            transform: translateY(-5px);
+        }
+        .card-icon {
+            font-size: 3rem; /* Large icon size */
+            margin-bottom: 15px;
+            color: #3b82f6; /* Blue icon color */
+        }
+        .card-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #1e3a8a; /* Darker blue for titles */
+            margin-bottom: 10px;
+        }
+        .card-text {
+            font-size: 1rem;
+            color: #4a5568; /* Grayish text color */
+            line-height: 1.6;
+        }
+        .header-section {
+            grid-column: 1 / -1; /* Span full width */
+            text-align: center;
+            padding-bottom: 20px;
+        }
+        .header-title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: #1e3a8a;
+            margin-bottom: 10px;
+        }
+        .header-subtitle {
+            font-size: 1.2rem;
+            color: #4a5568;
+        }
+        .code-snippet {
+            background-color: #1a202c; /* Dark background for code */
+            color: #a0aec0; /* Light gray text for code */
+            padding: 10px 15px;
+            border-radius: 8px;
+            font-family: monospace;
+            font-size: 0.9rem;
+            overflow-x: auto;
+            white-space: pre-wrap; /* Allows wrapping of long lines */
+            word-break: break-all; /* Breaks words if necessary */
+            text-align: left; /* Align code left */
+        }
+        .syntax-section {
+            grid-column: 1 / -1; /* Span full width */
+            padding-top: 30px;
+            border-top: 2px solid #cbd5e0; /* Separator line */
+            margin-top: 20px;
+        }
+        .syntax-title {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #1e3a8a;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        .syntax-item {
+            background-color: #e2f0f9;
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 15px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.03);
+            text-align: left;
+        }
+        .syntax-item h3 {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: #3b82f6;
+            margin-bottom: 5px;
+        }
+        .syntax-item p {
+            font-size: 0.95rem;
+            color: #4a5568;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header Section -->
+        <div class="header-section">
+            <h1 class="header-title">자기 상관 (Autocorrelation): 과거가 미래를 말해줄까?</h1>
+            <p class="header-subtitle">시계열 데이터에서 과거 정보의 영향력을 파악하는 방법</p>
+        </div>
+
+        <!-- What is Autocorrelation? -->
+        <div class="card">
+            <span class="card-icon">🤔</span>
+            <h2 class="card-title">자기 상관이란?</h2>
+            <p class="card-text">
+                <b>자기 상관(Autocorrelation)</b>은 시계열 데이터의 현재 값이 과거의 값들과 얼마나 관련이 있는지를 측정하는 개념입니다. 즉, 과거 정보가 미래를 예측하는 데 얼마나 유용한지 알아내는 도구입니다.
+            </p>
+        </div>
+
+        <!-- How is it Calculated? -->
+        <div class="card">
+            <span class="card-icon">➕➖</span>
+            <h2 class="card-title">어떻게 계산하나요?</h2>
+            <p class="card-text">
+                자기 상관은 시계열 데이터를 <b>자신을 일정 기간만큼 지연시킨(lagged) 값</b>과 상관관계를 계산하여 파악합니다.
+                <br><br>
+                <b>예시:</b>
+                <br><b>Lag 1:</b> $Y_t$ (현재 값)와 $Y_{t-1}$ (1기간 전 값)의 상관관계
+                <br><b>Lag 2:</b> $Y_t$ (현재 값)와 $Y_{t-2}$ (2기간 전 값)의 상관관계
+                <br>... 이런 식으로 각 '지연(lag)'에 대한 상관관계를 계산합니다.
+            </p>
+        </div>
+
+        <!-- Autocorrelation Plot (ACF Plot) -->
+        <div class="card" style="grid-column: 1 / -1; background-color: #d1e7dd;">
+            <span class="card-icon">📉</span>
+            <h2 class="card-title">자기 상관 플롯 (ACF Plot)</h2>
+            <p class="card-text">
+                자기 상관 플롯(Autocorrelation Function Plot, ACF Plot)은 각 지연(lag)에 대한 상관 계수 값을 시각적으로 보여줍니다.
+                <br><b>- Y축:</b> 상관 계수 값 (보통 -1에서 1 사이)
+                <br><b>- X축:</b> 지연(Lag)의 수 (과거로 얼마나 멀리 떨어져 있는지)
+                <br><br>
+                일반적으로 지연이 커질수록(과거로 멀어질수록) 상관 계수 값은 0에 가까워지거나 음수로 변하는 경향을 보입니다. 이는 과거 정보가 멀어질수록 현재에 미치는 영향이 줄어든다는 것을 의미합니다.
+                <br><br>
+                <b>해석:</b> 이 플롯을 통해 과거의 정보가 현재에 얼마나 오래 영향을 미치는지, 그리고 그 영향의 강도가 얼마나 되는지 파악할 수 있습니다.
+            </p>
+        </div>
+
+        <!-- Why Autocorrelation Matters -->
+        <div class="card" style="grid-column: 1 / -1;">
+            <span class="card-icon">🔮</span>
+            <h2 class="card-title">자기 상관이 중요한 이유</h2>
+            <p class="card-text">
+                자기 상관을 이해하는 것은 시계열 데이터의 예측 모델을 구축하는 데 필수적입니다. 과거의 패턴이 미래에 반복될 가능성을 파악하고, 모델에 어떤 지연 변수(lagged variables)를 포함할지 결정하는 데 중요한 단서가 됩니다.
+            </p>
+        </div>
+
+        <!-- Python Syntax for ACF Plot -->
+        <div class="card" style="grid-column: 1 / -1;">
+            <span class="card-icon">🐍</span>
+            <h2 class="card-title">Python에서 자기 상관 플롯 그리기</h2>
+            <p class="card-text">
+                `statsmodels` 라이브러리의 `plot_acf` 함수를 사용하여 자기 상관 플롯을 쉽게 생성할 수 있습니다.
+                <div class="code-snippet">
+                    from statsmodels.graphics.tsa.graphics import plot_acf<br>import matplotlib.pyplot as plt<br><br># 비트코인 'Close' 가격의 자기 상관 플롯<br># lags=30은 최대 30기간 전까지의 상관관계를 보여줌<br># alpha=0.05는 신뢰 구간(confidence interval)을 95%로 설정 (음영 처리된 영역)<br>plot_acf(df['Close'], lags=30, alpha=0.05)<br>plt.title('Autocorrelation Function (ACF) Plot for Bitcoin Close Price')<br>plt.xlabel('Number of Lags')<br>plt.ylabel('Autocorrelation Coefficient')<br>plt.grid(True)<br>plt.show()
+                </div>
+            </p>
+        </div>
+
+        <!-- Syntax Breakdown Section -->
+        <div class="syntax-section">
+            <h2 class="syntax-title">🌟 파이썬 데이터 분석 핵심 문법 🌟</h2>
+            <p class="card-text" style="text-align: center; margin-bottom: 30px;">
+                이번 인포그래픽에서 다룬 자기 상관 분석과 관련된 주요 문법들을 다시 한번 정리해봅시다.
+            </p>
+
+            <div class="syntax-item">
+                <h3>`from statsmodels.graphics.tsa.graphics import plot_acf`</h3>
+                <p><code>statsmodels</code> 라이브러리의 <code>graphics.tsa.graphics</code> 모듈에서 자기 상관 플롯을 그리는 <code>plot_acf</code> 함수를 임포트합니다.</p>
+            </div>
+            <div class="syntax-item">
+                <h3>`plot_acf(x, lags=N, alpha=A)`</h3>
+                <p>
+                    주어진 시계열 데이터(<code>x</code>)에 대한 자기 상관 함수(ACF) 플롯을 생성합니다.<br>
+                    - <code>x</code>: 자기 상관을 계산할 Pandas Series 객체 (날짜/시간 인덱스를 가짐).<br>
+                    - <code>lags</code>: 플롯에 표시할 최대 지연(lag)의 개수를 지정합니다. (예: <code>lags=30</code>은 최대 30기간 전까지의 자기 상관을 계산).<br>
+                    - <code>alpha</code>: 신뢰 구간(confidence interval)을 설정하는 유의 수준(significance level)입니다. 기본값은 <code>0.05</code> (95% 신뢰 수준)입니다. 파란색 음영으로 표시되는 영역이 신뢰 구간이며, 이 영역을 벗어나는 막대는 통계적으로 유의미한 자기 상관을 나타냅니다.
+                </p>
+            </div>
+            <div class="syntax-item">
+                <h3>`plt.title('Title')`</h3>
+                <p>현재 Matplotlib 플롯의 제목을 설정합니다.</p>
+            </div>
+            <div class="syntax-item">
+                <h3>`plt.xlabel('Label')`, `plt.ylabel('Label')`</h3>
+                <p>현재 Matplotlib 플롯의 X축과 Y축 레이블을 설정합니다.</p>
+            </div>
+            <div class="syntax-item">
+                <h3>`plt.grid(True)`</h3>
+                <p>현재 Matplotlib 플롯에 그리드(격자)를 추가하여 데이터 포인트나 추세를 더 쉽게 읽을 수 있도록 합니다.</p>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
