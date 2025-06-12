@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>시계열 데이터 조작: 결측값 처리 & 핵심 문법</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f0f4f8; /* Light blue-gray background */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .container {
+            background-color: #ffffff;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            padding: 30px;
+            max-width: 900px;
+            width: 100%;
+            display: grid;
+            gap: 20px;
+            grid-template-columns: repeat(1, 1fr); /* Single column for mobile */
+        }
+        @media (min-width: 768px) {
+            .container {
+                grid-template-columns: repeat(2, 1fr); /* Two columns for tablet and desktop */
+            }
+        }
+        .card {
+            background-color: #e2f0f9; /* Lighter blue for cards */
+            border-radius: 15px;
+            padding: 25px;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+            transition: transform 0.3s ease-in-out;
+            min-height: 200px; /* Ensure cards have a minimum height */
+        }
+        .card:hover {
+            transform: translateY(-5px);
+        }
+        .card-icon {
+            font-size: 3rem; /* Large icon size */
+            margin-bottom: 15px;
+            color: #3b82f6; /* Blue icon color */
+        }
+        .card-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #1e3a8a; /* Darker blue for titles */
+            margin-bottom: 10px;
+        }
+        .card-text {
+            font-size: 1rem;
+            color: #4a5568; /* Grayish text color */
+            line-height: 1.6;
+        }
+        .header-section {
+            grid-column: 1 / -1; /* Span full width */
+            text-align: center;
+            padding-bottom: 20px;
+        }
+        .header-title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: #1e3a8a;
+            margin-bottom: 10px;
+        }
+        .header-subtitle {
+            font-size: 1.2rem;
+            color: #4a5568;
+        }
+        .code-snippet {
+            background-color: #1a202c; /* Dark background for code */
+            color: #a0aec0; /* Light gray text for code */
+            padding: 10px 15px;
+            border-radius: 8px;
+            font-family: monospace;
+            font-size: 0.9rem;
+            overflow-x: auto;
+            white-space: pre-wrap; /* Allows wrapping of long lines */
+            word-break: break-all; /* Breaks words if necessary */
+            text-align: left; /* Align code left */
+        }
+        .syntax-section {
+            grid-column: 1 / -1; /* Span full width */
+            padding-top: 30px;
+            border-top: 2px solid #cbd5e0; /* Separator line */
+            margin-top: 20px;
+        }
+        .syntax-title {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #1e3a8a;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        .syntax-item {
+            background-color: #e2f0f9;
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 15px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.03);
+            text-align: left;
+        }
+        .syntax-item h3 {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: #3b82f6;
+            margin-bottom: 5px;
+        }
+        .syntax-item p {
+            font-size: 0.95rem;
+            color: #4a5568;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header Section -->
+        <div class="header-section">
+            <h1 class="header-title">시계열 데이터 조작: 결측값 처리</h1>
+            <p class="header-subtitle">데이터 분석의 필수 단계: 결측값 찾아내고 채우기</p>
+        </div>
+
+        <!-- Importance of Missing Values -->
+        <div class="card">
+            <span class="card-icon">🚫</span>
+            <h2 class="card-title">결측값 (Missing Values)의 중요성</h2>
+            <p class="card-text">
+                시계열 데이터에서 결측값은 분석 모델의 정확도를 떨어뜨릴 수 있어 매우 중요하게 다뤄야 합니다. 데이터의 연속성을 유지하고, 예측 성능을 높이는 데 필수적인 과정입니다.
+            </p>
+        </div>
+
+        <!-- Identify Missing Values -->
+        <div class="card">
+            <span class="card-icon">🧐</span>
+            <h2 class="card-title">결측값 식별</h2>
+            <p class="card-text">
+                데이터프레임의 각 컬럼에 결측값이 얼마나 있는지 확인하는 것은 데이터 정리의 첫걸음입니다. `.isnull().sum()`을 사용하면 컬럼별 결측값의 개수를 쉽게 알 수 있습니다.
+                <div class="code-snippet">
+                    df.isnull().sum()
+                </div>
+            </p>
+        </div>
+
+        <!-- Fill Missing Values: bfill() -->
+        <div class="card">
+            <span class="card-icon">➡️</span>
+            <h2 class="card-title">결측값 채우기: Bfill (Backward Fill)</h2>
+            <p class="card-text">
+                `bfill()`은 **다음 유효한 관측값**으로 결측값을 채웁니다. 예를 들어, 29일 데이터가 없고 30일 데이터가 있다면, 29일은 30일 값으로 채워집니다. 데이터의 연속성을 유지할 때 유용합니다.
+                <div class="code-snippet">
+                    df["30_day_rolling_vol"] = df["30_day_rolling_vol"].bfill()
+                </div>
+            </p>
+        </div>
+
+        <!-- Fill Missing Values: ffill() -->
+        <div class="card">
+            <span class="card-icon">⬅️</span>
+            <h2 class="card-title">결측값 채우기: Ffill (Forward Fill)</h2>
+            <p class="card-text">
+                `ffill()`은 **이전 유효한 관측값**으로 결측값을 채웁니다. 예를 들어, 29일 데이터가 없고 28일 데이터가 있다면, 29일은 28일 값으로 채워집니다. 이는 `bfill()`과 반대 방향으로 작동합니다.
+                <div class="code-snippet">
+                    df["7_day_closing_avg"] = df["7_day_closing_avg"].ffill()
+                </div>
+            </p>
+        </div>
+
+        <!-- Interpolation -->
+        <div class="card">
+            <span class="card-icon">〰️</span>
+            <h2 class="card-title">결측값 보간 (Interpolation)</h2>
+            <p class="card-text">
+                `interpolate()`는 알려진 데이터 포인트들을 기반으로 결측값을 **추정**하여 채웁니다. `method="linear"`는 선형 보간을 의미하며, 데이터가 예측 가능한 방식으로 변할 때 유용합니다. `bfill`이나 `ffill`이 한쪽의 값만 쓰는 것과 달리, 보간은 양쪽의 값을 고려합니다.
+                <div class="code-snippet">
+                    df["7_day_closing_avg"] = df["7_day_closing_avg"].interpolate(method="linear")
+                </div>
+            </p>
+        </div>
+
+        <!-- Bfill/Ffill vs Interpolate -->
+        <div class="card" style="grid-column: 1 / -1; background-color: #d1e7dd;">
+            <span class="card-icon">⚖️</span>
+            <h2 class="card-title">Bfill/Ffill vs. Interpolate</h2>
+            <p class="card-text">
+                * **Bfill/Ffill**: 가장 가까운 **단일 유효값** (미래 또는 과거)으로 결측값을 대체합니다. 단순하고 직접적입니다.
+                * **Interpolate**: 알려진 데이터 포인트들 사이의 **추세**를 기반으로 결측값을 추정합니다. 데이터가 선형적이거나 예측 가능한 패턴을 따를 때 더 자연스러운 값을 생성할 수 있습니다. 어떤 방법을 사용할지는 데이터의 특성과 분석 목적에 따라 달라집니다.
+            </p>
+        </div>
+
+        <!-- Syntax Breakdown Section -->
+        <div class="syntax-section">
+            <h2 class="syntax-title">🌟 파이썬 데이터 분석 핵심 문법 🌟</h2>
+            <p class="card-text" style="text-align: center; margin-bottom: 30px;">
+                지금까지 시계열 데이터 분석에 사용된 Pandas와 Matplotlib의 주요 문법들을 다시 한번 정리해봅시다.
+            </p>
+
+            <div class="syntax-item">
+                <h3>`df.isnull().sum()`</h3>
+                <p>데이터프레임(<code>df</code>)의 각 컬럼에 있는 결측값(NaN)의 개수를 합산하여 보여줍니다. 데이터 정제 과정의 첫 단계에서 유용합니다.</p>
+            </div>
+            <div class="syntax-item">
+                <h3>`df['Column'].bfill()` / `df['Column'].ffill()`</h3>
+                <p>
+                    컬럼 내의 결측값을 채우는 함수입니다. <br>
+                    - `bfill()`: "Backward Fill"의 약자로, 다음 유효한 값으로 결측값을 채웁니다.<br>
+                    - `ffill()`: "Forward Fill"의 약자로, 이전 유효한 값으로 결측값을 채웁니다.<br>
+                    원본 데이터프레임에 적용하려면 `df['Column'] = df['Column'].bfill()` 처럼 다시 할당해야 합니다.
+                </p>
+            </div>
+            <div class="syntax-item">
+                <h3>`df['Column'].interpolate(method="linear")`</h3>
+                <p>컬럼 내의 결측값을 보간법으로 채웁니다. `method="linear"`는 선형 보간을 사용하여 인접한 유효값 사이의 중간 값을 추정합니다. 데이터의 패턴을 유지하며 결측값을 채울 때 유용합니다.</p>
+            </div>
+            <div class="syntax-item">
+                <h3>`df.loc['YYYY']` 또는 `df.loc['YYYY-MM-DD']`</h3>
+                <p>날짜를 인덱스로 사용하는 데이터프레임에서 특정 연도 또는 특정 날짜의 데이터를 선택할 때 사용합니다. `loc`는 레이블(인덱스 이름)을 기반으로 데이터를 선택하는 데 사용됩니다.</p>
+            </div>
+            <div class="syntax-item">
+                <h3>`df['Column'].rolling(window=N).mean()`</h3>
+                <p>컬럼에 대해 이동 평균(Rolling Average)을 계산합니다. `window=N`은 N개 기간 동안의 데이터를 사용하여 평균을 계산한다는 의미입니다. 데이터를 부드럽게 만들어 추세를 파악하는 데 사용됩니다.</p>
+            </div>
+            <div class="syntax-item">
+                <h3>`df['Column'].pct_change() * 100`</h3>
+                <p>컬럼의 이전 값 대비 현재 값의 백분율 변화율을 계산합니다. 금융 데이터의 일일 수익률 등을 분석할 때 유용합니다.</p>
+            </div>
+            <div class="syntax-item">
+                <h3>`df.resample('M').mean()`</h3>
+                <p>시계열 데이터를 다른 시간 단위(예: `'M'`은 월별)로 재샘플링(집계)합니다. `mean()` 대신 `max()`, `min()`, `sum()` 등 다양한 집계 함수를 사용할 수 있습니다. 데이터의 시간 단위를 변경하여 분석 관점을 바꿀 때 사용됩니다.</p>
+            </div>
+            <div class="syntax-item">
+                <h3>`abs(df['Column'])`</h3>
+                <p>컬럼의 각 값에 대한 절대값을 계산합니다. 양수와 음수 모두 동일한 기준으로 크기를 비교할 때 사용됩니다 (예: 변화율의 방향과 관계없이 큰 변화를 식별할 때).</p>
+            </div>
+            <div class="syntax-item">
+                <h3>`plt.show()`</h3>
+                <p>Matplotlib으로 생성한 플롯을 화면에 표시합니다. Jupyter Notebook이나 Colab 환경에서 플롯이 자동으로 표시되지 않을 때 명시적으로 플롯을 보여주기 위해 사용됩니다.</p>
+            </div>
+            <div class="syntax-item">
+                <h3>`ax = df['Column'].plot(secondary_y=True)`</h3>
+                <p>두 개의 y축을 사용하여 서로 다른 스케일을 가진 두 변수를 하나의 차트에 플로팅할 때 사용됩니다. `secondary_y=True`는 두 번째 y축을 생성합니다.</p>
+            </div>
+            <div class="syntax-item">
+                <h3>`df['Col1'].corr(df['Col2'])` 또는 `df[['Col1', 'Col2']].corr()`</h3>
+                <p>두 컬럼(`Col1`, `Col2`) 또는 여러 컬럼 간의 상관관계를 계산합니다. 결과는 두 변수 간의 선형 관계 강도와 방향을 나타내는 값입니다. 상관 행렬을 통해 여러 변수 간의 관계를 한눈에 볼 수 있습니다.</p>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
