@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>시계열 데이터 편자기 상관(PACF)</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f0f4f8; /* Light blue-gray background */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .container {
+            background-color: #ffffff;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            padding: 30px;
+            max-width: 900px;
+            width: 100%;
+            display: grid;
+            gap: 20px;
+            grid-template-columns: repeat(1, 1fr); /* Single column for mobile */
+        }
+        @media (min-width: 768px) {
+            .container {
+                grid-template-columns: repeat(2, 1fr); /* Two columns for tablet and desktop */
+            }
+        }
+        .card {
+            background-color: #e2f0f9; /* Lighter blue for cards */
+            border-radius: 15px;
+            padding: 25px;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+            transition: transform 0.3s ease-in-out;
+            min-height: 200px; /* Ensure cards have a minimum height */
+        }
+        .card:hover {
+            transform: translateY(-5px);
+        }
+        .card-icon {
+            font-size: 3rem; /* Large icon size */
+            margin-bottom: 15px;
+            color: #3b82f6; /* Blue icon color */
+        }
+        .card-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #1e3a8a; /* Darker blue for titles */
+            margin-bottom: 10px;
+        }
+        .card-text {
+            font-size: 1rem;
+            color: #4a5568; /* Grayish text color */
+            line-height: 1.6;
+        }
+        .header-section {
+            grid-column: 1 / -1; /* Span full width */
+            text-align: center;
+            padding-bottom: 20px;
+        }
+        .header-title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: #1e3a8a;
+            margin-bottom: 10px;
+        }
+        .header-subtitle {
+            font-size: 1.2rem;
+            color: #4a5568;
+        }
+        .code-snippet {
+            background-color: #1a202c; /* Dark background for code */
+            color: #a0aec0; /* Light gray text for code */
+            padding: 10px 15px;
+            border-radius: 8px;
+            font-family: monospace;
+            font-size: 0.9rem;
+            overflow-x: auto;
+            white-space: pre-wrap; /* Allows wrapping of long lines */
+            word-break: break-all; /* Breaks words if necessary */
+            text-align: left; /* Align code left */
+        }
+        .syntax-section {
+            grid-column: 1 / -1; /* Span full width */
+            padding-top: 30px;
+            border-top: 2px solid #cbd5e0; /* Separator line */
+            margin-top: 20px;
+        }
+        .syntax-title {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #1e3a8a;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        .syntax-item {
+            background-color: #e2f0f9;
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 15px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.03);
+            text-align: left;
+        }
+        .syntax-item h3 {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: #3b82f6;
+            margin-bottom: 5px;
+        }
+        .syntax-item p {
+            font-size: 0.95rem;
+            color: #4a5568;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header Section -->
+        <div class="header-section">
+            <h1 class="header-title">편자기 상관 (PACF): 시계열의 직접적인 영향력 파악</h1>
+            <p class="header-subtitle">중간 영향을 제거하고 순수한 관계를 들여다보기</p>
+        </div>
+
+        <!-- What is Partial Autocorrelation (PACF)? -->
+        <div class="card">
+            <span class="card-icon">🎯</span>
+            <h2 class="card-title">편자기 상관 (PACF)이란?</h2>
+            <p class="card-text">
+                <b>편자기 상관(Partial Autocorrelation Function, PACF)</b>은 시계열 데이터의 현재 값이 특정 과거의 값과 얼마나 <b>직접적으로</b> 관련이 있는지를 측정합니다. 여기서 중요한 것은 중간 지연(intermediate lags)의 영향을 **제거한 후**의 관계만을 본다는 점입니다.
+                <br><br>
+                **예시:** 오늘 커피 소비량과 3일 전 커피 소비량의 관계를 알고 싶을 때, 1일 전과 2일 전의 소비량 영향을 배제하고 순수한 3일 전의 영향만을 측정합니다.
+            </p>
+        </div>
+
+        <!-- PACF vs. ACF -->
+        <div class="card">
+            <span class="card-icon">🔍</span>
+            <h2 class="card-title">PACF vs. ACF</h2>
+            <p class="card-text">
+                <b>- 자기 상관 (ACF):</b> 시계열과 지연된 값들 간의 **전체 상관관계**를 보여줍니다. 간접적인 영향(예: 1일 전 값이 2일 전 값에 영향을 미치고, 2일 전 값이 오늘에 영향을 미치는 식)이 모두 포함됩니다.
+                <br><b>- 편자기 상관 (PACF):</b> 중간의 다른 지연 값들의 영향을 **제거한 후**의 **직접적인 상관관계**만을 보여줍니다. 마치 돋보기로 특정 시점의 순수한 영향력을 들여다보는 것과 같습니다.
+            </p>
+        </div>
+
+        <!-- Interpreting PACF Plot -->
+        <div class="card" style="grid-column: 1 / -1; background-color: #d1e7dd;">
+            <span class="card-icon">📉</span>
+            <h2 class="card-title">PACF 플롯 해석</h2>
+            <p class="card-text">
+                PACF 플롯은 각 지연에 대한 상관 계수 값을 막대로 보여주며, ACF와 마찬가지로 파란색 음영은 신뢰 구간을 나타냅니다.
+                <br><br>
+                - **막대가 유의미하게 솟아 있다면:** 해당 지연에서 현재 값에 직접적인 영향을 미치는 관계가 있음을 의미합니다.
+                - **막대가 빠르게 0으로 떨어지면:** 현재 값에 직접적인 영향을 미치는 것은 최근 값들뿐임을 시사합니다.
+                - **막대가 천천히 감소하거나 진동하면:** 더 오래된 값들도 현재 값에 직접적인 영향을 미칠 수 있음을 나타냅니다.
+            </p>
+        </div>
+
+        <!-- Why PACF Completes ACF -->
+        <div class="card" style="grid-column: 1 / -1;">
+            <span class="card-icon">🧩</span>
+            <h2 class="card-title">왜 PACF가 ACF를 보완할까요?</h2>
+            <p class="card-text">
+                ACF는 모든 상관관계를 보여주지만, 이는 종종 간접적인 영향으로 인한 '노이즈'를 포함할 수 있습니다. PACF는 이러한 간접적인 효과를 제거하여 각 시점이 다른 시점에 **어떻게 직접적으로 영향을 미치는지**에 대한 더 명확한 그림을 제공함으로써 스토리를 완성합니다. 시계열 모델(예: ARIMA)의 차수(order)를 결정하는 데 매우 중요합니다.
+            </p>
+        </div>
+
+        <!-- Python Syntax for PACF Plot -->
+        <div class="card" style="grid-column: 1 / -1;">
+            <span class="card-icon">🐍</span>
+            <h2 class="card-title">Python에서 편자기 상관 플롯 그리기</h2>
+            <p class="card-text">
+                `statsmodels` 라이브러리의 `plot_pacf` 함수를 사용하여 편자기 상관 플롯을 쉽게 생성할 수 있습니다.
+                <div class="code-snippet">
+                    from statsmodels.graphics.tsa.graphics import plot_pacf<br>import matplotlib.pyplot as plt<br><br># 예시: 비트코인 'Adj Close'의 편자기 상관 플롯<br>fig, ax = plt.subplots(figsize=(12, 6))<br>plot_pacf(df['Adj Close'], lags=20, ax=ax) # lags는 표시할 최대 지연 수<br>plt.title('Bitcoin Adj Close: Partial Autocorrelation Function (PACF)')<br>plt.xlabel('Number of Lags')<br>plt.ylabel('Partial Autocorrelation')<br>plt.grid(True)<br>plt.show()<br><br># 예시: 초콜릿 매출의 편자기 상관 플롯<br>fig, ax = plt.subplots(figsize=(12, 6))<br>plot_pacf(df_choco['revenue'], lags=12, ax=ax) # 월간 데이터이므로 12개의 lag로 연간 패턴 확인<br>plt.title('Choco Revenue: Partial Autocorrelation Function (PACF)')<br>plt.xlabel('Number of Lags')<br>plt.ylabel('Partial Autocorrelation')<br>plt.grid(True)<br>plt.show()
+                </div>
+            </p>
+        </div>
+
+        <!-- Syntax Breakdown Section -->
+        <div class="syntax-section">
+            <h2 class="syntax-title">🌟 파이썬 데이터 분석 핵심 문법 🌟</h2>
+            <p class="card-text" style="text-align: center; margin-bottom: 30px;">
+                이번 인포그래픽에서 다룬 편자기 상관 분석과 관련된 주요 문법들을 다시 한번 정리해봅시다.
+            </p>
+
+            <div class="syntax-item">
+                <h3>`from statsmodels.graphics.tsa.graphics import plot_pacf`</h3>
+                <p><code>statsmodels</code> 라이브러리의 <code>graphics.tsa.graphics</code> 모듈에서 편자기 상관 플롯을 그리는 <code>plot_pacf</code> 함수를 임포트합니다.</p>
+            </div>
+            <div class="syntax-item">
+                <h3>`fig, ax = plt.subplots(figsize=(width, height))`</h3>
+                <p>Matplotlib에서 새로운 Figure(그림)와 Axes(축) 객체를 생성합니다. <code>figsize</code>는 플롯의 가로/세로 크기(인치 단위)를 설정하여 플롯의 가독성을 높입니다.</p>
+            </div>
+            <div class="syntax-item">
+                <h3>`plot_pacf(x, lags=N, ax=ax, alpha=A)`</h3>
+                <p>
+                    주어진 시계열 데이터(<code>x</code>)에 대한 편자기 상관 함수(PACF) 플롯을 생성합니다.<br>
+                    - <code>x</code>: 편자기 상관을 계산할 Pandas Series 객체.<br>
+                    - <code>lags</code>: 플롯에 표시할 최대 지연(lag)의 개수.<br>
+                    - <code>ax</code>: 플롯을 그릴 Axes 객체.<br>
+                    - <code>alpha</code>: 신뢰 구간을 설정하는 유의 수준 (기본값 <code>0.05</code>). 파란색 음영으로 표시되는 영역이 신뢰 구간이며, 이 영역을 벗어나는 막대는 통계적으로 유의미한 편자기 상관을 나타냅니다.
+                </p>
+            </div>
+            <div class="syntax-item">
+                <h3>`plt.title('Title')`, `plt.xlabel('Label')`, `plt.ylabel('Label')`</h3>
+                <p>Matplotlib 플롯의 제목, X축 레이블, Y축 레이블을 설정합니다.</p>
+            </div>
+            <div class="syntax-item">
+                <h3>`plt.grid(True)`</h3>
+                <p>현재 Matplotlib 플롯에 그리드(격자)를 추가하여 데이터의 패턴을 더 쉽게 시각적으로 파악할 수 있도록 합니다.</p>
+            </div>
+            <div class="syntax-item">
+                <h3>`plt.show()`</h3>
+                <p>Matplotlib으로 생성된 플롯을 화면에 표시합니다.</p>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
