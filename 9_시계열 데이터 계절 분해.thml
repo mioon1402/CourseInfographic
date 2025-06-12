@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>시계열 데이터 계절 분해</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f0f4f8; /* Light blue-gray background */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .container {
+            background-color: #ffffff;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            padding: 30px;
+            max-width: 900px;
+            width: 100%;
+            display: grid;
+            gap: 20px;
+            grid-template-columns: repeat(1, 1fr); /* Single column for mobile */
+        }
+        @media (min-width: 768px) {
+            .container {
+                grid-template-columns: repeat(2, 1fr); /* Two columns for tablet and desktop */
+            }
+        }
+        .card {
+            background-color: #e2f0f9; /* Lighter blue for cards */
+            border-radius: 15px;
+            padding: 25px;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+            transition: transform 0.3s ease-in-out;
+            min-height: 200px; /* Ensure cards have a minimum height */
+        }
+        .card:hover {
+            transform: translateY(-5px);
+        }
+        .card-icon {
+            font-size: 3rem; /* Large icon size */
+            margin-bottom: 15px;
+            color: #3b82f6; /* Blue icon color */
+        }
+        .card-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #1e3a8a; /* Darker blue for titles */
+            margin-bottom: 10px;
+        }
+        .card-text {
+            font-size: 1rem;
+            color: #4a5568; /* Grayish text color */
+            line-height: 1.6;
+        }
+        .header-section {
+            grid-column: 1 / -1; /* Span full width */
+            text-align: center;
+            padding-bottom: 20px;
+        }
+        .header-title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: #1e3a8a;
+            margin-bottom: 10px;
+        }
+        .header-subtitle {
+            font-size: 1.2rem;
+            color: #4a5568;
+        }
+        .code-snippet {
+            background-color: #1a202c; /* Dark background for code */
+            color: #a0aec0; /* Light gray text for code */
+            padding: 10px 15px;
+            border-radius: 8px;
+            font-family: monospace;
+            font-size: 0.9rem;
+            overflow-x: auto;
+            white-space: pre-wrap; /* Allows wrapping of long lines */
+            word-break: break-all; /* Breaks words if necessary */
+            text-align: left; /* Align code left */
+        }
+        .syntax-section {
+            grid-column: 1 / -1; /* Span full width */
+            padding-top: 30px;
+            border-top: 2px solid #cbd5e0; /* Separator line */
+            margin-top: 20px;
+        }
+        .syntax-title {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #1e3a8a;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        .syntax-item {
+            background-color: #e2f0f9;
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 15px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.03);
+            text-align: left;
+        }
+        .syntax-item h3 {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: #3b82f6;
+            margin-bottom: 5px;
+        }
+        .syntax-item p {
+            font-size: 0.95rem;
+            color: #4a5568;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header Section -->
+        <div class="header-section">
+            <h1 class="header-title">시계열 데이터의 계절 분해 (Seasonal Decomposition)</h1>
+            <p class="header-subtitle">데이터의 추세, 계절성, 잔차를 이해하고 예측에 활용하기</p>
+        </div>
+
+        <!-- What is Seasonal Decomposition? -->
+        <div class="card">
+            <span class="card-icon">✂️</span>
+            <h2 class="card-title">계절 분해란?</h2>
+            <p class="card-text">
+                계절 분해는 시계열 데이터를 <b>세 가지 주요 구성 요소</b>로 분리하는 기법입니다: <b>추세(Trend)</b>, <b>계절성(Seasonality)</b>, 그리고 <b>잔차/오차(Error Term)</b>. 이를 통해 데이터의 숨겨진 패턴을 더 명확하게 파악할 수 있습니다.
+            </p>
+        </div>
+
+        <!-- Component 1: Trend -->
+        <div class="card">
+            <span class="card-icon">➡️↗️↘️</span>
+            <h2 class="card-title">구성 요소 1: 추세 (Trend)</h2>
+            <p class="card-text">
+                시계열 데이터의 장기적인 전반적인 방향을 나타냅니다. 시간의 흐름에 따라 증가, 감소 또는 일정하게 유지될 수 있지만, 매일 급격하게 변하지는 않습니다. (예: 비트코인 가격의 전반적인 상승 추세)
+            </p>
+        </div>
+
+        <!-- Component 2: Seasonality -->
+        <div class="card">
+            <span class="card-icon">🔄</span>
+            <h2 class="card-title">구성 요소 2: 계절성 (Seasonality)</h2>
+            <p class="card-text">
+                일정하고 반복적인 주기로 나타나는 패턴을 의미합니다. (예: 여름에는 판매량이 높고 겨울에는 낮은 경향). 이 패턴은 시간 경과에 따라 일정하며 주기적입니다.
+            </p>
+        </div>
+
+        <!-- Component 3: Error Term -->
+        <div class="card">
+            <span class="card-icon">🎲</span>
+            <h2 class="card-title">구성 요소 3: 잔차 / 오차 (Error Term)</h2>
+            <p class="card-text">
+                추세와 계절성으로 설명되지 않는 시계열 데이터의 나머지 부분입니다. 이는 임의적이고 예측 불가능한 변동성으로 간주되며, 일반적으로 패턴이 없는 무작위 보행(random walk)처럼 나타납니다.
+            </p>
+        </div>
+
+        <!-- Type 1: Additive Seasonality -->
+        <div class="card">
+            <span class="card-icon">➕</span>
+            <h2 class="card-title">계절성 유형 1: 가법적 계절성 (Additive)</h2>
+            <p class="card-text">
+                <b>계절적 변동의 크기가 추세의 크기와 관계없이 일정</b>하게 유지되는 형태입니다. 예를 들어, 매년 7월에 항상 10단위가 추가되거나 12월에 50단위가 감소하는 경우입니다. 추세가 낮거나 높을 때에도 계절적 변동의 폭은 동일합니다.
+            </p>
+        </div>
+
+        <!-- Type 2: Multiplicative Seasonality -->
+        <div class="card">
+            <span class="card-icon">✖️</span>
+            <h2 class="card-title">계절성 유형 2: 승법적 계절성 (Multiplicative)</h2>
+            <p class="card-text">
+                <b>계절적 변동의 크기가 추세의 크기에 비례</b>하는 형태입니다. 즉, 추세가 증가하면 계절적 변동의 폭도 함께 커지는 경향을 보입니다. 예를 들어, 7월에 10% 증가하거나 12월에 50% 감소하는 경우입니다.
+            </p>
+        </div>
+
+        <!-- Why Seasonality Type Matters -->
+        <div class="card" style="grid-column: 1 / -1; background-color: #d1e7dd;">
+            <span class="card-icon">🎯</span>
+            <h2 class="card-title">계절성 유형을 이해해야 하는 이유</h2>
+            <p class="card-text">
+                데이터가 가법적인지 승법적인지 이해하면 미래 움직임을 더 잘 예측하고, 더 정확한 정보에 기반한 의사결정을 내릴 수 있습니다. 이는 적절한 시계열 모델을 선택하는 데 중요한 영향을 미칩니다.
+            </p>
+        </div>
+
+        <!-- How to Identify Seasonality Type -->
+        <div class="card" style="grid-column: 1 / -1;">
+            <span class="card-icon">💡</span>
+            <h2 class="card-title">계절성 유형 식별 방법</h2>
+            <p class="card-text">
+                <b>1. 데이터 시각화:</b> 플롯을 통해 계절적 변동의 폭이 일정한지(가법적) 또는 추세에 비례하여 증가하는지(승법적) 시각적으로 확인합니다.
+                <br><br>
+                <b>2. 모델 성능 비교:</b> 두 가지 유형(가법적, 승법적)의 모델을 각각 만들고, 어느 모델이 시계열 데이터에 가장 잘 맞는지(예측 성능이 더 좋은지) 결과를 통해 확인하는 것이 더 선호되는 방법입니다.
+                <div class="code-snippet">
+                    # Python에서 계절 분해를 수행하는 일반적인 방법 (Statsmodels 라이브러리)<br># from statsmodels.tsa.seasonal import seasonal_decompose<br># result_additive = seasonal_decompose(df['Close'], model='additive', period=365)<br># result_multiplicative = seasonal_decompose(df['Close'], model='multiplicative', period=365)
+                </div>
+                <p class="card-text mt-3">
+                    <b>참고:</b> 위 코드는 `seasonal_decompose` 함수의 예시이며, 실제 모델 선택은 성능 비교를 통해 이루어집니다.
+                </p>
+            </p>
+        </div>
+
+        <!-- Syntax Breakdown Section -->
+        <div class="syntax-section">
+            <h2 class="syntax-title">🌟 파이썬 데이터 분석 핵심 문법 🌟</h2>
+            <p class="card-text" style="text-align: center; margin-bottom: 30px;">
+                이번 인포그래픽에서 다룬 시계열 분해와 관련된 개념들을 정리해봅시다.
+            </p>
+
+            <div class="syntax-item">
+                <h3>시계열 구성 요소: 추세 (Trend)</h3>
+                <p>시계열 데이터의 장기적인 움직임이나 방향을 나타냅니다. 데이터의 전반적인 성장 또는 감소 추세를 의미합니다.</p>
+            </div>
+            <div class="syntax-item">
+                <h3>시계열 구성 요소: 계절성 (Seasonality)</h3>
+                <p>고정된 시간 간격으로 반복적으로 나타나는 패턴을 의미합니다. (예: 일, 주, 월, 분기, 연도).</p>
+            </div>
+            <div class="syntax-item">
+                <h3>시계열 구성 요소: 잔차/오차 (Error Term / Residual)</h3>
+                <p>추세와 계절성으로 설명되지 않는 시계열의 나머지 부분입니다. 무작위 변동으로 간주됩니다.</p>
+            </div>
+            <div class="syntax-item">
+                <h3>가법적 계절성 (Additive Seasonality)</h3>
+                <p>계절적 변동의 크기가 추세의 크기와 관계없이 <b>일정</b>하게 유지되는 형태입니다. $Y_t = T_t + S_t + E_t$ ($Y_t$: 실제값, $T_t$: 추세, $S_t$: 계절성, $E_t$: 오차)</p>
+            </div>
+            <div class="syntax-item">
+                <h3>승법적 계절성 (Multiplicative Seasonality)</h3>
+                <p>계절적 변동의 크기가 추세의 크기에 <b>비례</b>하여 증가하거나 감소하는 형태입니다. $Y_t = T_t \times S_t \times E_t$</p>
+            </div>
+            <div class="syntax-item">
+                <h3>`statsmodels.tsa.seasonal.seasonal_decompose()`</h3>
+                <p>
+                    Python의 `statsmodels` 라이브러리에서 제공하는 함수로, 시계열 데이터를 추세, 계절성, 잔차로 분해하는 데 사용됩니다.<br>
+                    - `model='additive'` 또는 `model='multiplicative'`를 통해 분해 모델을 지정할 수 있습니다.<br>
+                    - `period` 인자는 계절 주기를 나타냅니다 (예: 일별 데이터에서 연간 계절성은 `period=365`).
+                </p>
+            </div>
+            <div class="syntax-item">
+                <h3>시각적 식별 (Data Visualization)</h3>
+                <p>시계열 플롯을 통해 계절적 패턴의 크기 변화를 직접 관찰하여 가법적 또는 승법적 계절성을 판단하는 방법입니다.</p>
+            </div>
+            <div class="syntax-item">
+                <h3>모델 성능 기반 식별 (Model Performance)</h3>
+                <p>가법적 모델과 승법적 모델을 각각 구축한 후, 실제 데이터에 대한 예측 성능(예: RMSE, MAE)을 비교하여 더 나은 모델을 선택하는 방법입니다. 일반적으로 더 객관적이고 선호됩니다.</p>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
