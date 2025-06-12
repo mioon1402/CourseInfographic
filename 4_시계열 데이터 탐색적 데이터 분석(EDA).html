@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>시계열 데이터 탐색적 데이터 분석(EDA)</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f0f4f8; /* Light blue-gray background */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .container {
+            background-color: #ffffff;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            padding: 30px;
+            max-width: 900px;
+            width: 100%;
+            display: grid;
+            gap: 20px;
+            grid-template-columns: repeat(1, 1fr); /* Single column for mobile */
+        }
+        @media (min-width: 768px) {
+            .container {
+                grid-template-columns: repeat(2, 1fr); /* Two columns for tablet and desktop */
+            }
+        }
+        .card {
+            background-color: #e2f0f9; /* Lighter blue for cards */
+            border-radius: 15px;
+            padding: 25px;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+            transition: transform 0.3s ease-in-out;
+            min-height: 200px; /* Ensure cards have a minimum height */
+        }
+        .card:hover {
+            transform: translateY(-5px);
+        }
+        .card-icon {
+            font-size: 3rem; /* Large icon size */
+            margin-bottom: 15px;
+            color: #3b82f6; /* Blue icon color */
+        }
+        .card-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #1e3a8a; /* Darker blue for titles */
+            margin-bottom: 10px;
+        }
+        .card-text {
+            font-size: 1rem;
+            color: #4a5568; /* Grayish text color */
+            line-height: 1.6;
+        }
+        .header-section {
+            grid-column: 1 / -1; /* Span full width */
+            text-align: center;
+            padding-bottom: 20px;
+        }
+        .header-title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: #1e3a8a;
+            margin-bottom: 10px;
+        }
+        .header-subtitle {
+            font-size: 1.2rem;
+            color: #4a5568;
+        }
+        .code-snippet {
+            background-color: #1a202c; /* Dark background for code */
+            color: #a0aec0; /* Light gray text for code */
+            padding: 10px 15px;
+            border-radius: 8px;
+            font-family: monospace;
+            font-size: 0.9rem;
+            overflow-x: auto;
+            white-space: pre-wrap; /* Allows wrapping of long lines */
+            word-break: break-all; /* Breaks words if necessary */
+            text-align: left; /* Align code left */
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header Section -->
+        <div class="header-section">
+            <h1 class="header-title">탐색적 데이터 분석 (EDA): 시계열 데이터 깊이 이해하기</h1>
+            <p class="header-subtitle">데이터의 성장, 주기, 패턴을 발견하는 핵심 기법</p>
+        </div>
+
+        <!-- Importance of EDA -->
+        <div class="card">
+            <span class="card-icon">🤔</span>
+            <h2 class="card-title">EDA의 중요성</h2>
+            <p class="card-text">
+                훌륭한 데이터 분석가나 과학자가 되기 위해서는 데이터의 목적, 주기, 성장 방식, 발전 과정 등을 이해하는 것이 중요합니다. EDA는 이러한 통찰력을 얻는 데 필수적입니다.
+            </p>
+        </div>
+
+        <!-- Rolling Average Calculation -->
+        <div class="card">
+            <span class="card-icon">📉</span>
+            <h2 class="card-title">이동 평균 (Rolling Average) 계산</h2>
+            <p class="card-text">
+                이동 평균은 시계열 데이터의 단기적인 변동성을 줄이고 장기적인 추세를 부드럽게 보여주는 데 사용됩니다. 7일 이동 평균은 7일간의 평균을 나타내며, 특징 공학에도 중요합니다.
+                <div class="code-snippet">
+                    df["7_day_closing_avg"] = df["Close"].rolling(window=7).mean()
+                </div>
+            </p>
+        </div>
+
+        <!-- Visualizing Rolling Average -->
+        <div class="card">
+            <span class="card-icon">📊</span>
+            <h2 class="card-title">이동 평균 시각화</h2>
+            <p class="card-text">
+                원본 종가(Close)와 7일 이동 평균을 함께 플로팅하면, 이동 평균선이 원본 데이터보다 약간 지연되어 부드러운 추세를 보여주는 것을 확인할 수 있습니다.
+                <div class="code-snippet">
+                    import matplotlib.pyplot as plt<br>df[["Close", "7_day_closing_avg"]].loc["2023"].plot(figsize=(15,7))<br>plt.title('Bitcoin Price: Close vs. 7-Day Rolling Average (2023)')<br>plt.xlabel('Date')<br>plt.ylabel('Price')<br>plt.legend()<br>plt.grid(True)<br>plt.show()
+                </div>
+            </p>
+        </div>
+
+        <!-- Aggregating Data (Resampling) -->
+        <div class="card">
+            <span class="card-icon"> aggregated_data </span>
+            <h2 class="card-title">데이터 집계 (Resampling)</h2>
+            <p class="card-text">
+                `resample()` 메서드를 사용하여 데이터를 월별(`"ME"`) 등으로 집계하고, 해당 기간의 평균이나 최대값을 계산하여 월별 최고 종가 등을 찾을 수 있습니다.
+                <div class="code-snippet">
+                    # 월말("ME")을 기준으로 월별 평균 종가를 계산하고, 이 중 가장 높은 값을 기록한 월을 찾습니다.<br>df.resample("ME").mean()["Close"].idxmax()
+                </div>
+            </p>
+        </div>
+
+        <!-- Previewing Data (Tail) -->
+        <div class="card" style="grid-column: 1 / -1; background-color: #d1e7dd;"> <!-- Span full width, lighter green -->
+            <span class="card-icon">🔚</span>
+            <h2 class="card-title">데이터 미리보기 (꼬리 부분)</h2>
+            <p class="card-text">
+                `df.tail()` 메서드를 사용하여 데이터프레임의 마지막 5행을 빠르게 확인할 수 있습니다. 이는 최신 데이터의 구조와 값을 파악하는 데 유용합니다. `df.head()`와 반대됩니다.
+                <div class="code-snippet">
+                    df.tail()
+                </div>
+            </p>
+        </div>
+    </div>
+</body>
+</html>
