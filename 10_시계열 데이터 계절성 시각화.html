@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>시계열 데이터 계절성 시각화</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f0f4f8; /* Light blue-gray background */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .container {
+            background-color: #ffffff;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            padding: 30px;
+            max-width: 900px;
+            width: 100%;
+            display: grid;
+            gap: 20px;
+            grid-template-columns: repeat(1, 1fr); /* Single column for mobile */
+        }
+        @media (min-width: 768px) {
+            .container {
+                grid-template-columns: repeat(2, 1fr); /* Two columns for tablet and desktop */
+            }
+        }
+        .card {
+            background-color: #e2f0f9; /* Lighter blue for cards */
+            border-radius: 15px;
+            padding: 25px;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+            transition: transform 0.3s ease-in-out;
+            min-height: 200px; /* Ensure cards have a minimum height */
+        }
+        .card:hover {
+            transform: translateY(-5px);
+        }
+        .card-icon {
+            font-size: 3rem; /* Large icon size */
+            margin-bottom: 15px;
+            color: #3b82f6; /* Blue icon color */
+        }
+        .card-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #1e3a8a; /* Darker blue for titles */
+            margin-bottom: 10px;
+        }
+        .card-text {
+            font-size: 1rem;
+            color: #4a5568; /* Grayish text color */
+            line-height: 1.6;
+        }
+        .header-section {
+            grid-column: 1 / -1; /* Span full width */
+            text-align: center;
+            padding-bottom: 20px;
+        }
+        .header-title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: #1e3a8a;
+            margin-bottom: 10px;
+        }
+        .header-subtitle {
+            font-size: 1.2rem;
+            color: #4a5568;
+        }
+        .code-snippet {
+            background-color: #1a202c; /* Dark background for code */
+            color: #a0aec0; /* Light gray text for code */
+            padding: 10px 15px;
+            border-radius: 8px;
+            font-family: monospace;
+            font-size: 0.9rem;
+            overflow-x: auto;
+            white-space: pre-wrap; /* Allows wrapping of long lines */
+            word-break: break-all; /* Breaks words if necessary */
+            text-align: left; /* Align code left */
+        }
+        .syntax-section {
+            grid-column: 1 / -1; /* Span full width */
+            padding-top: 30px;
+            border-top: 2px solid #cbd5e0; /* Separator line */
+            margin-top: 20px;
+        }
+        .syntax-title {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #1e3a8a;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        .syntax-item {
+            background-color: #e2f0f9;
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 15px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.03);
+            text-align: left;
+        }
+        .syntax-item h3 {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: #3b82f6;
+            margin-bottom: 5px;
+        }
+        .syntax-item p {
+            font-size: 0.95rem;
+            color: #4a5568;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header Section -->
+        <div class="header-section">
+            <h1 class="header-title">시계열 데이터 계절성 시각화</h1>
+            <p class="header-subtitle">반복되는 패턴을 찾아내고 이해하기</p>
+        </div>
+
+        <!-- What is Seasonality? -->
+        <div class="card">
+            <span class="card-icon">⏰</span>
+            <h2 class="card-title">계절성(Seasonality)이란?</h2>
+            <p class="card-text">
+                <b>계절성</b>은 시계열 데이터에서 **일정하고 반복적인 주기로 나타나는 패턴**을 의미합니다. 이는 일별, 주별, 월별, 분기별, 또는 연도별 주기 등 다양하게 나타날 수 있습니다. 계절성을 이해하는 것은 정확한 예측에 필수적입니다.
+            </p>
+        </div>
+
+        <!-- Visualizing Monthly Seasonality with month_plot -->
+        <div class="card">
+            <span class="card-icon">📅</span>
+            <h2 class="card-title">월별 계절성 시각화 (`month_plot`)</h2>
+            <p class="card-text">
+                `statsmodels` 라이브러리의 `month_plot`은 매월 데이터가 연도별로 어떻게 움직이는지 보여줍니다.
+                <br><b>- 검은색 선:</b> 각 월의 실제 값을 나타냅니다.
+                <br><b>- 빨간색 선:</b> 해당 월의 평균값을 나타냅니다.
+                <br>빨간색 선의 높낮이를 통해 월별 평균적인 패턴(계절성)을 파악할 수 있습니다.
+                <div class="code-snippet">
+                    from statsmodels.graphics.tsa.plots import month_plot<br>import matplotlib.pyplot as plt<br># 월별 평균 종가를 계산하여 플로팅<br>month_plot(df['Close'].resample('ME').mean(), ylabel="Closing Price")<br>plt.show()
+                </div>
+            </p>
+        </div>
+
+        <!-- Visualizing Quarterly Seasonality with quarter_plot -->
+        <div class="card">
+            <span class="card-icon">📊</span>
+            <h2 class="card-title">분기별 계절성 시각화 (`quarter_plot`)</h2>
+            <p class="card-text">
+                `quarter_plot`은 `month_plot`과 유사하게 분기별(`QE`) 패턴을 시각화합니다. 분기별로 데이터의 평균적인 움직임이 어떻게 나타나는지 확인하여 더 큰 주기의 계절성을 탐색할 수 있습니다.
+                <div class="code-snippet">
+                    from statsmodels.graphics.tsa.plots import quarter_plot<br># 분기별 평균 종가를 계산하여 플로팅<br>quarter_plot(df['Close'].resample('QE').mean(), ylabel="Closing Price")<br>plt.show()
+                </div>
+            </p>
+        </div>
+
+        <!-- Real-world Example: Choco Monthly Revenue -->
+        <div class="card" style="grid-column: 1 / -1; background-color: #d1e7dd;">
+            <span class="card-icon">🍫</span>
+            <h2 class="card-title">실제 데이터 예시: 초콜릿 회사 월별 매출</h2>
+            <p class="card-text">
+                초콜릿 회사 월별 매출 데이터(`choco_monthly_revenue.csv`)를 로드하여 계절적 패턴을 시각화합니다. 이 데이터는 월별로 이미 집계되어 있으므로 `resample()`이 필요 없습니다.
+                <div class="code-snippet">
+                    import pandas as pd<br># 데이터셋 로드 및 날짜 인덱스 설정<br>df_choco = pd.read_csv(<br>&nbsp;&nbsp;&nbsp;&nbsp;"choco_monthly_revenue.csv",<br>&nbsp;&nbsp;&nbsp;&nbsp;index_col="Month with Year",<br>&nbsp;&nbsp;&nbsp;&nbsp;parse_dates=True<br>)<br><br># 매출 데이터의 월별 계절성 플로팅<br>month_plot(df_choco['revenue'], ylabel="Monthly Revenue")<br>plt.show()
+                </div>
+                이 예시에서는 11월(블랙프라이데이 등)에 매출이 급증하는 명확한 계절적 특성을 확인할 수 있습니다.
+            </p>
+        </div>
+
+        <!-- Syntax Breakdown Section -->
+        <div class="syntax-section">
+            <h2 class="syntax-title">🌟 파이썬 데이터 분석 핵심 문법 🌟</h2>
+            <p class="card-text" style="text-align: center; margin-bottom: 30px;">
+                이번 인포그래픽에서 사용된 Pandas 및 Statsmodels의 주요 문법들을 다시 한번 정리해봅시다.
+            </p>
+
+            <div class="syntax-item">
+                <h3>`from statsmodels.graphics.tsa.plots import month_plot, quarter_plot`</h3>
+                <p><code>statsmodels</code> 라이브러리의 <code>graphics.tsa.plots</code> 모듈에서 계절성 시각화에 특화된 <code>month_plot</code>과 <code>quarter_plot</code> 함수를 임포트합니다.</p>
+            </div>
+            <div class="syntax-item">
+                <h3>`df['Column'].resample('ME').mean()`</h3>
+                <p>시계열 데이터를 월말(<code>'ME'</code>) 기준으로 재샘플링(집계)하고 각 월의 평균값(<code>mean()</code>)을 계산합니다. 월별 계절성 플롯을 만들기 전에 데이터를 준비하는 데 사용됩니다. 분기말은 <code>'QE'</code>를 사용합니다.</p>
+            </div>
+            <div class="syntax-item">
+                <h3>`month_plot(series, ylabel="Label")`</h3>
+                <p>주어진 시계열 데이터(<code>series</code>)의 월별 계절적 패턴을 시각화합니다. <code>ylabel</code>은 Y축의 레이블을 설정합니다. 각 월의 실제 데이터(검은색)와 월별 평균값(빨간색)을 보여줍니다.</p>
+            </div>
+            <div class="syntax-item">
+                <h3>`quarter_plot(series, ylabel="Label")`</h3>
+                <p>주어진 시계열 데이터(<code>series</code>)의 분기별 계절적 패턴을 시각화합니다. <code>month_plot</code>과 유사하게 작동하며, 분기별 데이터의 경향을 파악하는 데 사용됩니다.</p>
+            </div>
+            <div class="syntax-item">
+                <h3>`pd.read_csv("file.csv", index_col="Column Name", parse_dates=True)`</h3>
+                <p>CSV 파일을 읽어와 Pandas 데이터프레임으로 만듭니다. <code>index_col</code>은 특정 컬럼을 데이터프레임의 인덱스로 설정하고, <code>parse_dates=True</code>는 해당 컬럼을 날짜/시간 형식으로 자동 변환하도록 지시합니다. 시계열 데이터를 로드할 때 중요합니다.</p>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
