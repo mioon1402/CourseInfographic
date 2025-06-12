@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>시계열 데이터 분석 인포그래픽 모음</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f0f4f8; /* Light blue-gray background */
+            display: flex;
+            justify-content: center;
+            align-items: flex-start; /* Align to top for longer content */
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .container {
+            background-color: #ffffff;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            padding: 30px;
+            max-width: 600px; /* Max width for single column to look good */
+            width: 100%;
+            text-align: center;
+        }
+        .header-title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: #1e3a8a;
+            margin-bottom: 10px;
+        }
+        .header-subtitle {
+            font-size: 1.2rem;
+            color: #4a5568;
+            margin-bottom: 30px;
+        }
+        .grid-container { /* Renamed to list-container conceptually, but kept for ID */
+            display: block; /* Change to block for list layout */
+            gap: 20px; /* Keep gap for spacing between items */
+        }
+        .infographic-card {
+            background-color: #e2f0f9; /* Lighter blue for cards */
+            border-radius: 15px;
+            padding: 20px;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+            transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+            min-height: 120px; /* Adjusted height for list items */
+            margin-bottom: 20px; /* Add margin to separate list items */
+            max-width: 100%; /* Ensure it fits within its container */
+        }
+        .infographic-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+        }
+        .card-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: #1e3a8a;
+            margin-bottom: 15px;
+            flex-grow: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .card-button {
+            display: inline-block;
+            background-color: #3b82f6; /* Blue button */
+            color: #ffffff;
+            padding: 10px 20px;
+            border-radius: 10px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: background-color 0.3s ease-in-out;
+        }
+        .card-button:hover {
+            background-color: #2563eb; /* Darker blue on hover */
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header Section -->
+        <div class="header-section">
+            <h1 class="header-title">📊 시계열 데이터 분석 인포그래픽 모음 📊</h1>
+            <p class="header-subtitle">시계열 데이터에 대한 핵심 개념과 파이썬 코드를 시각적으로 정리한 인포그래픽들을 한곳에서 만나보세요!</p>
+        </div>
+
+        <!-- Infographic Links List (Dynamically populated by JavaScript) -->
+        <div id="infographic-grid" class="grid-container">
+            <!-- Infographic cards will be inserted here by JavaScript -->
+        </div>
+    </div>
+
+    <script>
+        // GitHub 사용자 이름과 저장소 이름을 여기에 입력하세요!
+        const repoOwner = 'mioon1402'; // 업데이트됨
+        const repoName = 'CourseInfographic'; // 업데이트됨
+
+        const apiBaseUrl = `https://api.github.com/repos/${repoOwner}/${repoName}/contents/`;
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const gridContainer = document.getElementById('infographic-grid');
+
+            // GitHub API를 통해 저장소의 파일 목록을 가져옵니다.
+            fetch(apiBaseUrl)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(`GitHub API HTTP 오류! 상태: ${response.status}. 사용자 이름과 저장소 이름이 올바른지 확인하고, 저장소가 공개(Public) 상태인지 확인해주세요.`);
+                    }
+                    return response.json();
+                })
+                .then(files => {
+                    // .html 파일만 필터링하고 index.html은 제외합니다.
+                    const infographicFiles = files
+                        .filter(file => file.name.endsWith('.html') && file.name !== 'index.html')
+                        .map(file => {
+                            // 파일 이름에서 확장자를 제거하고, 하이픈(-)이나 언더스코어(_)를 공백으로 바꾼 후
+                            // 각 단어의 첫 글자를 대문자로 만들어 제목을 만듭니다.
+                            let title = file.name.replace('.html', '').replace(/[-_]/g, ' ');
+                            title = title.split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
+
+                            // 특정 파일 이름에 대한 더 정확한 한글 제목 매핑 (필요시 추가/수정)
+                            const customTitles = {
+                                "Time Series Infographic": "시계열 데이터 인포그래픽",
+                                "Python Setup Infographic": "Python 튜토리얼 환경 설정 인포그래픽",
+                                "Time Series Index Infographic": "시계열 데이터 인덱스 설정 및 활용 인포그래픽",
+                                "Eda Infographic": "시계열 데이터 탐색적 데이터 분석(EDA) 인포그래픽",
+                                "Eda Part2 Infographic": "시계열 데이터 EDA Part 2: 기간별 변화율 분석 인포그래픽",
+                                "Data Viz Correlation Infographic": "시계열 데이터 시각화 및 상관관계 분석 인포그래픽",
+                                "Data Manipulation Infographic": "시계열 데이터 조작: 결측값 처리 & 핵심 문법",
+                                "Seasonal Decomposition Infographic Updated": "시계열 데이터 계절 분해 인포그래픽", 
+                                "Autocorrelation Infographic": "시계열 데이터 자기 상관(Autocorrelation) 인포그래픽",
+                                "Pacf Applied Infographic": "시계열 데이터 편자기 상관(PACF) 분석 및 적용 인포그래픽"
+                            };
+                            title = customTitles[title] || title; // 커스텀 제목이 있으면 사용, 없으면 가공된 제목 사용
+
+                            return {
+                                title: title,
+                                href: file.name
+                            };
+                        });
+
+                    // 인포그래픽 목록을 페이지에 추가합니다.
+                    infographicFiles.forEach(info => {
+                        const cardDiv = document.createElement('div');
+                        cardDiv.className = 'infographic-card';
+
+                        const titleH3 = document.createElement('h3');
+                        titleH3.className = 'card-title';
+                        titleH3.textContent = info.title;
+
+                        const linkA = document.createElement('a');
+                        linkA.href = info.href;
+                        linkA.className = 'card-button';
+                        linkA.textContent = '자세히 보기';
+
+                        cardDiv.appendChild(titleH3);
+                        cardDiv.appendChild(linkA);
+                        gridContainer.appendChild(cardDiv);
+                    });
+                })
+                .catch(error => {
+                    console.error('인포그래픽 목록을 불러오는 중 오류 발생:', error);
+                    gridContainer.innerHTML = `<p class="text-red-500">인포그래픽 목록을 불러오는 데 실패했습니다: ${error.message}<br>GitHub 사용자 이름과 저장소 이름이 올바른지 확인하거나, 저장소가 공개(Public) 상태인지 확인해 주세요. (GitHub API 사용)</p>`;
+                });
+        });
+    </script>
+</body>
+</html>
