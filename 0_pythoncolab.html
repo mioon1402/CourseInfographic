@@ -1,0 +1,277 @@
+<p data-ke-size="size16">&nbsp;</p>
+<p data-ke-size="size16"></p>
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<p data-ke-size="size16">  </p>
+<!-- 
+    Narrative Plan: This infographic tells the story of a Python time series analysis project. 
+    It starts with setting up the environment (The Toolkit), moves to data preparation (The Foundation), 
+    initial visualization, seasonality and correlation analysis (The Analysis), 
+    and finally, model assessment and forecasting (The Outcome).
+
+    Visualization Choices:
+    - Toolkit Section: Goal: Inform. Chosen Visualization: HTML/CSS Iconography (Unicode). Justification: Simple, clear way to introduce the libraries without complex graphics. Confirms NO SVG.
+    - Data Prep Section: Goal: Organize. Chosen Visualization: HTML/CSS Flowchart. Justification: Best for showing a step-by-step process. Confirms NO SVG/Mermaid.
+    - Trend Chart: Goal: Change. Chosen Visualization: Chart.js Line Chart. Justification: Standard for showing data over time. Confirms NO SVG.
+    - Decomposition Chart: Goal: Compare (Composition). Chosen Visualization: Chart.js Donut Chart. Justification: Aesthetically pleasing way to show parts of a whole. Confirms NO SVG.
+    - Monthly Pattern Chart: Goal: Compare. Chosen Visualization: Chart.js Bar Chart. Justification: Clearly compares average values across categories (months). Confirms NO SVG.
+    - ACF/PACF Charts: Goal: Relationships. Chosen Visualization: Chart.js Bar Charts. Justification: Effectively visualizes correlation at different time lags. Confirms NO SVG.
+    - Metrics Section: Goal: Inform. Chosen Visualization: HTML/CSS with Unicode. Justification: Simple, high-impact way to present key metrics. Confirms NO SVG.
+    - Forecast Chart: Goal: Change. Chosen Visualization: Chart.js Line Chart with forecast. Justification: Clearly shows historical data and future predictions. Confirms NO SVG.
+
+    SVG/Mermaid Confirmation: No SVG graphics or Mermaid JS were used in this document. All charts are rendered to Canvas by Chart.js, and diagrams are built with HTML/CSS.
+    -->
+<p data-ke-size="size16"></p>
+<div class="container mx-auto p-4 md:p-8"><header class="text-center mb-12">
+<h1 class="text-4xl md:text-5xl font-bold text-[#0582CA]">시계열 예측의 모든 것</h1>
+<p class="text-lg text-slate-600 mt-4" data-ke-size="size16">Python 코드로 배우는 데이터 분석 워크플로우</p>
+</header><main class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+<section class="lg:col-span-2 bg-white rounded-lg shadow-md p-6">
+<h2 class="text-2xl font-bold text-[#006494] mb-4" data-ke-size="size26">1. 분석가의 툴킷: 필수 라이브러리</h2>
+<p class="text-slate-600 mb-6" data-ke-size="size16">성공적인 시계열 분석은 올바른 도구를 선택하는 것에서 시작됩니다. 파이썬에서는 강력한 라이브러리들이 이 과정을 지원합니다.</p>
+<div class="grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
+<div class="flex flex-col items-center"><span class="text-5xl mb-2">📊</span>
+<h3 class="font-bold text-slate-800" data-ke-size="size23">Pandas</h3>
+<p class="text-sm text-slate-500" data-ke-size="size16">데이터 조작 및 분석</p>
+</div>
+<div class="flex flex-col items-center"><span class="text-5xl mb-2">📈</span>
+<h3 class="font-bold text-slate-800" data-ke-size="size23">Matplotlib</h3>
+<p class="text-sm text-slate-500" data-ke-size="size16">데이터 시각화</p>
+</div>
+<div class="flex flex-col items-center"><span class="text-5xl mb-2">📉</span>
+<h3 class="font-bold text-slate-800" data-ke-size="size23">Statsmodels</h3>
+<p class="text-sm text-slate-500" data-ke-size="size16">통계 모델링 및 분석</p>
+</div>
+<div class="flex flex-col items-center"><span class="text-5xl mb-2">⚙️</span>
+<h3 class="font-bold text-slate-800" data-ke-size="size23">Scikit-learn</h3>
+<p class="text-sm text-slate-500" data-ke-size="size16">모델 성능 평가</p>
+</div>
+</div>
+</section>
+<section class="bg-white rounded-lg shadow-md p-6">
+<h2 class="text-2xl font-bold text-[#006494] mb-4" data-ke-size="size26">2. 기초 다지기: 데이터 준비</h2>
+<p class="text-slate-600 mb-6" data-ke-size="size16">정확한 분석을 위해 원본 데이터를 시계열 분석에 적합한 형태로 가공하고 정리하는 과정은 필수적입니다.</p>
+<div class="flex flex-col items-center space-y-4">
+<div class="w-full text-center bg-sky-100 text-sky-800 p-3 rounded-lg shadow">CSV 파일 읽기 (`pd.read_csv`)</div>
+<div class="text-2xl text-slate-400">⬇️</div>
+<div class="w-full text-center bg-sky-100 text-sky-800 p-3 rounded-lg shadow">날짜 열을 인덱스로 설정 (`index_col`, `parse_dates`)</div>
+<div class="text-2xl text-slate-400">⬇️</div>
+<div class="w-full text-center bg-sky-100 text-sky-800 p-3 rounded-lg shadow">분석할 열 이름 변경 (`df.rename`)</div>
+<div class="text-2xl text-slate-400">⬇️</div>
+<div class="w-full text-center bg-sky-100 text-sky-800 p-3 rounded-lg shadow">시간 주기 설정 (`df.asfreq`)</div>
+</div>
+</section>
+<section class="bg-white rounded-lg shadow-md p-6">
+<h2 class="text-2xl font-bold text-[#006494] mb-4" data-ke-size="size26">3. 첫인상 파악: 데이터 시각화</h2>
+<p class="text-slate-600 mb-6" data-ke-size="size16">데이터를 직접 눈으로 확인하는 것은 분석의 첫걸음입니다. 선 그래프를 통해 데이터의 전반적인 추세와 패턴을 파악할 수 있습니다.</p>
+<div class="chart-container">&nbsp;</div>
+</section>
+<section class="lg:col-span-2 bg-white rounded-lg shadow-md p-6">
+<h2 class="text-2xl font-bold text-[#006494] mb-4" data-ke-size="size26">4. 숨겨진 리듬 찾기: 계절성 분석</h2>
+<p class="text-slate-600 mb-6" data-ke-size="size16">많은 시계열 데이터는 특정 주기를 가지고 반복되는 '계절성' 패턴을 보입니다. 이를 분해하고 이해하는 것은 예측 정확도를 높이는 핵심입니다.</p>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
+<div>
+<h3 class="text-xl font-semibold text-slate-700 mb-2 text-center" data-ke-size="size23">시계열의 구성 요소</h3>
+<p class="text-slate-600 mb-4 text-center" data-ke-size="size16">시계열 데이터는 주로 추세, 계절성, 그리고 불규칙한 나머지(잔차)로 구성됩니다.</p>
+<div class="chart-container h-64 md:h-80">&nbsp;</div>
+</div>
+<div>
+<h3 class="text-xl font-semibold text-slate-700 mb-2 text-center" data-ke-size="size23">월별 데이터 패턴</h3>
+<p class="text-slate-600 mb-4 text-center" data-ke-size="size16">`month_plot`은 각 월별 데이터의 평균적인 경향을 보여주어 계절적 패턴을 쉽게 파악하도록 돕습니다.</p>
+<div class="chart-container h-64 md:h-80">&nbsp;</div>
+</div>
+</div>
+</section>
+<section class="bg-white rounded-lg shadow-md p-6">
+<h2 class="text-2xl font-bold text-[#006494] mb-4" data-ke-size="size26">5. 과거의 메아리: 자기상관 분석 (ACF)</h2>
+<p class="text-slate-600 mb-6" data-ke-size="size16">자기상관 함수(ACF)는 현재의 데이터가 과거의 데이터와 얼마나 연관되어 있는지를 보여줍니다. 파란색 영역을 벗어나는 막대는 통계적으로 유의미한 상관관계를 의미합니다.</p>
+<div class="chart-container">&nbsp;</div>
+</section>
+<section class="bg-white rounded-lg shadow-md p-6">
+<h2 class="text-2xl font-bold text-[#006494] mb-4" data-ke-size="size26">6. 직접적 영향 분석: 부분 자기상관 (PACF)</h2>
+<p class="text-slate-600 mb-6" data-ke-size="size16">부분 자기상관 함수(PACF)는 다른 시점의 영향을 제외하고, 오직 두 시점 간의 순수한 상관관계를 보여줍니다. 예측 모델의 파라미터를 결정하는 데 중요한 역할을 합니다.</p>
+<div class="chart-container">&nbsp;</div>
+</section>
+<section class="lg:col-span-2 bg-white rounded-lg shadow-md p-6">
+<h2 class="text-2xl font-bold text-[#006494] mb-4" data-ke-size="size26">7. 예측 심판하기: 모델 성능 평가</h2>
+<p class="text-slate-600 mb-6" data-ke-size="size16">좋은 예측 모델을 만들기 위해서는 모델의 성능을 객관적인 지표로 평가해야 합니다. RMSE, MAE, MAPE는 예측이 실제 값과 얼마나 차이 나는지를 나타내는 대표적인 지표입니다.</p>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-6 text-center">
+<div class="bg-amber-100 p-4 rounded-lg">
+<h3 class="text-xl font-bold text-amber-800" data-ke-size="size23">RMSE</h3>
+<p class="text-slate-600 mt-1" data-ke-size="size16">오차의 크기에 민감</p>
+</div>
+<div class="bg-amber-100 p-4 rounded-lg">
+<h3 class="text-xl font-bold text-amber-800" data-ke-size="size23">MAE</h3>
+<p class="text-slate-600 mt-1" data-ke-size="size16">오차의 절대적인 평균</p>
+</div>
+<div class="bg-amber-100 p-4 rounded-lg">
+<h3 class="text-xl font-bold text-amber-800" data-ke-size="size23">MAPE</h3>
+<p class="text-slate-600 mt-1" data-ke-size="size16">오차를 백분율로 표시</p>
+</div>
+</div>
+</section>
+<section class="lg:col-span-2 bg-white rounded-lg shadow-md p-6">
+<h2 class="text-2xl font-bold text-[#006494] mb-4" data-ke-size="size26">8. 미래 내다보기: 최종 예측 시각화</h2>
+<p class="text-slate-600 mb-6" data-ke-size="size16">분석의 최종 목표는 미래를 예측하는 것입니다. 과거 데이터(Train)를 기반으로 학습한 모델이 생성한 미래 예측(Forecast)을 시각적으로 확인하며 분석을 마무리합니다.</p>
+<div class="chart-container !max-w-4xl">&nbsp;</div>
+</section>
+</main></div>
+<script>
+        const colorPalette = {
+            blue: '#00A6FB',
+            darkBlue: '#0582CA',
+            darkestBlue: '#006494',
+            yellow: '#F7B801',
+            lightYellow: '#F4D58D',
+            slate: '#64748b'
+        };
+
+        function wrapLabels(labels, maxLength) {
+            return labels.map(label => {
+                if (typeof label !== 'string' || label.length <= maxLength) {
+                    return label;
+                }
+                const words = label.split(' ');
+                const lines = [];
+                let currentLine = '';
+                words.forEach(word => {
+                    if ((currentLine + ' ' + word).trim().length > maxLength) {
+                        lines.push(currentLine.trim());
+                        currentLine = word;
+                    } else {
+                        currentLine = (currentLine + ' ' + word).trim();
+                    }
+                });
+                if (currentLine) {
+                    lines.push(currentLine.trim());
+                }
+                return lines;
+            });
+        }
+        
+        function getTooltipConfig() {
+            return {
+                plugins: {
+                    tooltip: {
+                        callbacks: {
+                            title: function(tooltipItems) {
+                                const item = tooltipItems[0];
+                                let label = item.chart.data.labels[item.dataIndex];
+                                if (Array.isArray(label)) {
+                                    return label.join(' ');
+                                } else {
+                                    return label;
+                                }
+                            }
+                        }
+                    }
+                }
+            };
+        }
+
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const commonChartOptions = {
+                responsive: true,
+                maintainAspectRatio: false,
+                ...getTooltipConfig()
+            };
+
+            new Chart(document.getElementById('timeSeriesPlot'), {
+                type: 'line',
+                data: {
+                    labels: Array.from({ length: 50 }, (_, i) => `Day ${i + 1}`),
+                    datasets: [{
+                        label: '일별 데이터',
+                        data: Array.from({ length: 50 }, () => Math.random() * 50 + 20),
+                        borderColor: colorPalette.blue,
+                        backgroundColor: 'rgba(0, 166, 251, 0.1)',
+                        fill: true,
+                        tension: 0.3
+                    }]
+                },
+                options: { ...commonChartOptions }
+            });
+
+            new Chart(document.getElementById('decompositionDonutChart'), {
+                type: 'doughnut',
+                data: {
+                    labels: ['추세 (Trend)', '계절성 (Seasonality)', '잔차 (Residual)'],
+                    datasets: [{
+                        label: 'Composition',
+                        data: [65, 25, 10],
+                        backgroundColor: [colorPalette.blue, colorPalette.yellow, colorPalette.slate],
+                        hoverOffset: 4
+                    }]
+                },
+                options: { ...commonChartOptions }
+            });
+            
+            const monthlyLabels = ['1월', '2월', '3월', '4월', '5월', '6월', '7월', '8월', '9월', '10월', '11월', '12월'];
+            new Chart(document.getElementById('monthlyPatternChart'), {
+                type: 'bar',
+                data: {
+                    labels: monthlyLabels,
+                    datasets: [{
+                        label: '월별 평균',
+                        data: [15, 18, 25, 35, 45, 50, 48, 46, 38, 28, 22, 16],
+                        backgroundColor: colorPalette.darkBlue,
+                    }]
+                },
+                options: { ...commonChartOptions, scales: { y: { beginAtZero: true } } }
+            });
+            
+            const lagLabels = Array.from({ length: 20 }, (_, i) => `Lag ${i + 1}`);
+            const acfData = Array.from({ length: 20 }, (_, i) => 0.8 * Math.exp(-i / 4) + (Math.random() - 0.5) * 0.1);
+            new Chart(document.getElementById('acfPlot'), {
+                type: 'bar',
+                data: {
+                    labels: lagLabels,
+                    datasets: [{
+                        label: 'ACF',
+                        data: acfData,
+                        backgroundColor: colorPalette.darkBlue,
+                    }]
+                },
+                options: { ...commonChartOptions, scales: { y: { beginAtZero: false } } }
+            });
+
+            const pacfData = Array.from({ length: 20 }, (_, i) => i < 2 ? 0.7 - i * 0.3 : (Math.random() - 0.5) * 0.15);
+            new Chart(document.getElementById('pacfPlot'), {
+                type: 'bar',
+                data: {
+                    labels: lagLabels,
+                    datasets: [{
+                        label: 'PACF',
+                        data: pacfData,
+                        backgroundColor: colorPalette.darkBlue,
+                    }]
+                },
+                 options: { ...commonChartOptions, scales: { y: { beginAtZero: false } } }
+            });
+
+            const forecastLabels = Array.from({ length: 60 }, (_, i) => `Day ${i + 1}`);
+            const trainData = Array.from({ length: 50 }, () => Math.random() * 50 + 20);
+            const forecastData = Array(49).fill(null).concat([trainData[49]]).concat(Array.from({ length: 10 }, (_, i) => trainData[49] + (i * 0.5) + (Math.random() - 0.5) * 5));
+            new Chart(document.getElementById('forecastPlot'), {
+                type: 'line',
+                data: {
+                    labels: forecastLabels,
+                    datasets: [{
+                        label: '과거 데이터 (Train)',
+                        data: trainData,
+                        borderColor: colorPalette.darkestBlue,
+                        tension: 0.1
+                    }, {
+                        label: '미래 예측 (Forecast)',
+                        data: forecastData,
+                        borderColor: colorPalette.yellow,
+                        borderDash: [5, 5],
+                        tension: 0.1,
+                        borderWidth: 3
+                    }]
+                },
+                options: { ...commonChartOptions }
+            });
+        });
+    </script>
