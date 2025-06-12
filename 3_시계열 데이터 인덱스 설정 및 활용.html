@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>시계열 데이터 인덱스 설정 및 활용</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f0f4f8; /* Light blue-gray background */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .container {
+            background-color: #ffffff;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            padding: 30px;
+            max-width: 900px;
+            width: 100%;
+            display: grid;
+            gap: 20px;
+            grid-template-columns: repeat(1, 1fr); /* Single column for mobile */
+        }
+        @media (min-width: 768px) {
+            .container {
+                grid-template-columns: repeat(2, 1fr); /* Two columns for tablet and desktop */
+            }
+        }
+        .card {
+            background-color: #e2f0f9; /* Lighter blue for cards */
+            border-radius: 15px;
+            padding: 25px;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+            transition: transform 0.3s ease-in-out;
+            min-height: 200px; /* Ensure cards have a minimum height */
+        }
+        .card:hover {
+            transform: translateY(-5px);
+        }
+        .card-icon {
+            font-size: 3rem; /* Large icon size */
+            margin-bottom: 15px;
+            color: #3b82f6; /* Blue icon color */
+        }
+        .card-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #1e3a8a; /* Darker blue for titles */
+            margin-bottom: 10px;
+        }
+        .card-text {
+            font-size: 1rem;
+            color: #4a5568; /* Grayish text color */
+            line-height: 1.6;
+        }
+        .header-section {
+            grid-column: 1 / -1; /* Span full width */
+            text-align: center;
+            padding-bottom: 20px;
+        }
+        .header-title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: #1e3a8a;
+            margin-bottom: 10px;
+        }
+        .header-subtitle {
+            font-size: 1.2rem;
+            color: #4a5568;
+        }
+        .code-snippet {
+            background-color: #1a202c; /* Dark background for code */
+            color: #a0aec0; /* Light gray text for code */
+            padding: 10px 15px;
+            border-radius: 8px;
+            font-family: monospace;
+            font-size: 0.9rem;
+            overflow-x: auto;
+            white-space: pre-wrap; /* Allows wrapping of long lines */
+            word-break: break-all; /* Breaks words if necessary */
+            text-align: left; /* Align code left */
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header Section -->
+        <div class="header-section">
+            <h1 class="header-title">시계열 인덱스: 시간 데이터를 마스터하는 법</h1>
+            <p class="header-subtitle">파이썬으로 날짜를 효율적으로 다루기</p>
+        </div>
+
+        <!-- Importance of Time Series Index -->
+        <div class="card">
+            <span class="card-icon">⏰</span>
+            <h2 class="card-title">시계열 인덱스의 중요성</h2>
+            <p class="card-text">
+                시계열 데이터에서 날짜를 인덱스로 설정하는 것은 데이터 분석, 시각화, 예측을 훨씬 쉽게 만듭니다. Pandas, Matplotlib, Statsmodels와 같은 주요 라이브러리는 날짜를 인덱스로 활용합니다.
+            </p>
+        </div>
+
+        <!-- Convert Date to Datetime Object -->
+        <div class="card">
+            <span class="card-icon">📆</span>
+            <h2 class="card-title">날짜 형식 통일 (Datetime 변환)</h2>
+            <p class="card-text">
+                데이터를 인덱스로 사용하기 전에, 날짜 컬럼을 파이썬의 `datetime` 객체로 변환해야 합니다. 표준 형식(`YYYY-MM-DD`)으로 지정하는 것이 중요합니다.
+                <div class="code-snippet">
+                    df['Date'] = pd.to_datetime(df['Date'], format='%Y-%m-%d')
+                </div>
+            </p>
+        </div>
+
+        <!-- Set Date as Index -->
+        <div class="card">
+            <span class="card-icon">🗓️</span>
+            <h2 class="card-title">'Date' 컬럼 인덱스로 설정</h2>
+            <p class="card-text">
+                날짜 컬럼을 데이터프레임의 인덱스로 설정하면 날짜 기반으로 데이터를 쉽게 조작하고 분석할 수 있습니다. `inplace=True`는 원본 데이터프레임에 변경사항을 즉시 적용합니다.
+                <div class="code-snippet">
+                    df.set_index('Date', inplace=True)
+                </div>
+            </p>
+        </div>
+
+        <!-- Select Data by Date -->
+        <div class="card">
+            <span class="card-icon">🔍</span>
+            <h2 class="card-title">날짜 인덱스로 데이터 선택</h2>
+            <p class="card-text">
+                날짜를 인덱스로 설정하면 `.loc[]`을 사용하여 특정 날짜 또는 기간의 데이터를 직관적으로 선택하고 접근할 수 있습니다.
+                <div class="code-snippet">
+                    df.loc['2021-11-09']
+                </div>
+            </p>
+        </div>
+
+        <!-- Set Index during Data Import -->
+        <div class="card">
+            <span class="card-icon">📥</span>
+            <h2 class="card-title">데이터 로드 시 인덱스 설정 (대안)</h2>
+            <p class="card-text">
+                데이터를 로드할 때 `pd.read_csv` 함수에서 `index_col`과 `parse_dates` 인자를 사용하여 바로 날짜를 인덱스로 설정하고 파싱할 수 있습니다.
+                <div class="code-snippet">
+                    df1 = pd.read_csv(<br>&nbsp;&nbsp;&nbsp;&nbsp;'bitcoin_price.csv',<br>&nbsp;&nbsp;&nbsp;&nbsp;index_col='Date',<br>&nbsp;&nbsp;&nbsp;&nbsp;parse_dates=True<br>)
+                </div>
+            </p>
+        </div>
+
+        <!-- Resampling Data -->
+        <div class="card" style="grid-column: 1 / -1; background-color: #d1e7dd;"> <!-- Span full width, lighter green -->
+            <span class="card-icon">🔄</span>
+            <h2 class="card-title">데이터 리샘플링 (시간 단위 변경)</h2>
+            <p class="card-text">
+                `resample()` 메서드를 사용하여 데이터를 다른 시간 단위(주간, 월간, 분기별, 연간 등)로 집계할 수 있습니다. 이는 비즈니스 문제에 따라 데이터의 노이즈를 줄이거나 다른 관점으로 데이터를 볼 때 유용합니다.
+                <div class="code-snippet">
+                    # 주간 평균<br>df_weekly_mean = df.resample('W').mean()<br><br># 주간 중앙값<br>df_weekly_median = df.resample('W').median()<br><br># 주간 최대값<br>df_weekly_max = df.resample('W').max()
+                </div>
+            </p>
+        </div>
+    </div>
+</body>
+</html>
