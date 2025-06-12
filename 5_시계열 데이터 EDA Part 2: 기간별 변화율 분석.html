@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>시계열 데이터 EDA Part 2: 기간별 변화율 분석</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f0f4f8; /* Light blue-gray background */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .container {
+            background-color: #ffffff;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            padding: 30px;
+            max-width: 900px;
+            width: 100%;
+            display: grid;
+            gap: 20px;
+            grid-template-columns: repeat(1, 1fr); /* Single column for mobile */
+        }
+        @media (min-width: 768px) {
+            .container {
+                grid-template-columns: repeat(2, 1fr); /* Two columns for tablet and desktop */
+            }
+        }
+        .card {
+            background-color: #e2f0f9; /* Lighter blue for cards */
+            border-radius: 15px;
+            padding: 25px;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+            transition: transform 0.3s ease-in-out;
+            min-height: 200px; /* Ensure cards have a minimum height */
+        }
+        .card:hover {
+            transform: translateY(-5px);
+        }
+        .card-icon {
+            font-size: 3rem; /* Large icon size */
+            margin-bottom: 15px;
+            color: #3b82f6; /* Blue icon color */
+        }
+        .card-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #1e3a8a; /* Darker blue for titles */
+            margin-bottom: 10px;
+        }
+        .card-text {
+            font-size: 1rem;
+            color: #4a5568; /* Grayish text color */
+            line-height: 1.6;
+        }
+        .header-section {
+            grid-column: 1 / -1; /* Span full width */
+            text-align: center;
+            padding-bottom: 20px;
+        }
+        .header-title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: #1e3a8a;
+            margin-bottom: 10px;
+        }
+        .header-subtitle {
+            font-size: 1.2rem;
+            color: #4a5568;
+        }
+        .code-snippet {
+            background-color: #1a202c; /* Dark background for code */
+            color: #a0aec0; /* Light gray text for code */
+            padding: 10px 15px;
+            border-radius: 8px;
+            font-family: monospace;
+            font-size: 0.9rem;
+            overflow-x: auto;
+            white-space: pre-wrap; /* Allows wrapping of long lines */
+            word-break: break-all; /* Breaks words if necessary */
+            text-align: left; /* Align code left */
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header Section -->
+        <div class="header-section">
+            <h1 class="header-title">시계열 데이터 EDA Part 2: 기간별 변화율 분석</h1>
+            <p class="header-subtitle">데이터의 변동성과 중요한 변화 감지하기</p>
+        </div>
+
+        <!-- Period-over-Period Comparison -->
+        <div class="card">
+            <span class="card-icon">📈📉</span>
+            <h2 class="card-title">기간별 비교 (Percentage Change)</h2>
+            <p class="card-text">
+                특정 기간(예: 일별) 동안의 백분율 변화를 계산하는 것은 시계열 데이터에서 변동성을 이해하는 데 매우 중요합니다. 이는 금융 데이터 분석에서 특히 유용합니다.
+            </p>
+        </div>
+
+        <!-- Compute Daily Percentage Change -->
+        <div class="card">
+            <span class="card-icon">🧮</span>
+            <h2 class="card-title">일별 백분율 변화 계산</h2>
+            <p class="card-text">
+                Pandas의 `.pct_change()` 함수를 사용하여 'Close' 가격의 일별 변화율을 쉽게 계산할 수 있습니다. 결과에 100을 곱하여 백분율 형태로 표시할 수 있습니다. 첫 번째 날의 값은 NaN입니다.
+                <div class="code-snippet">
+                    df["daily_returns_100%"] = df['Close'].pct_change() * 100
+                </div>
+            </p>
+        </div>
+
+        <!-- Identify Significant Volatility -->
+        <div class="card">
+            <span class="card-icon">⚠️</span>
+            <h2 class="card-title">주요 변동성 식별 (10% 이상 변화)</h2>
+            <p class="card-text">
+                일일 변화율의 절대값(양수 또는 음수 모두)이 특정 임계값(예: 10%)을 초과하는 날짜를 식별하여 가격의 상당한 변동이 발생한 시점을 파악할 수 있습니다.
+                <div class="code-snippet">
+                    df[abs(df["daily_returns_100%"]) > 10]
+                </div>
+                비트코인 데이터에서는 양방향으로 10% 이상 변화한 날이 97일이나 있을 정도로 변동성이 매우 큽니다.
+            </p>
+        </div>
+
+        <!-- Absolute Value for Comprehensive Analysis -->
+        <div class="card" style="grid-column: 1 / -1; background-color: #d1e7dd;"> <!-- Span full width, lighter green -->
+            <span class="card-icon">➕➖</span>
+            <h2 class="card-title">절대값 사용의 중요성</h2>
+            <p class="card-text">
+                `abs()` 함수를 사용하여 양수 및 음수 변화율을 모두 고려하면, 가격이 크게 상승했든 하락했든 상관없이 모든 '강력한' 변화의 날짜를 포괄적으로 분석할 수 있습니다.
+            </p>
+        </div>
+    </div>
+</body>
+</html>
