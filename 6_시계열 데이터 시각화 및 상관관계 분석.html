@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>시계열 데이터 시각화 및 상관관계 분석</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f0f4f8; /* Light blue-gray background */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .container {
+            background-color: #ffffff;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            padding: 30px;
+            max-width: 900px;
+            width: 100%;
+            display: grid;
+            gap: 20px;
+            grid-template-columns: repeat(1, 1fr); /* Single column for mobile */
+        }
+        @media (min-width: 768px) {
+            .container {
+                grid-template-columns: repeat(2, 1fr); /* Two columns for tablet and desktop */
+            }
+        }
+        .card {
+            background-color: #e2f0f9; /* Lighter blue for cards */
+            border-radius: 15px;
+            padding: 25px;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+            transition: transform 0.3s ease-in-out;
+            min-height: 200px; /* Ensure cards have a minimum height */
+        }
+        .card:hover {
+            transform: translateY(-5px);
+        }
+        .card-icon {
+            font-size: 3rem; /* Large icon size */
+            margin-bottom: 15px;
+            color: #3b82f6; /* Blue icon color */
+        }
+        .card-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #1e3a8a; /* Darker blue for titles */
+            margin-bottom: 10px;
+        }
+        .card-text {
+            font-size: 1rem;
+            color: #4a5568; /* Grayish text color */
+            line-height: 1.6;
+        }
+        .header-section {
+            grid-column: 1 / -1; /* Span full width */
+            text-align: center;
+            padding-bottom: 20px;
+        }
+        .header-title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: #1e3a8a;
+            margin-bottom: 10px;
+        }
+        .header-subtitle {
+            font-size: 1.2rem;
+            color: #4a5568;
+        }
+        .code-snippet {
+            background-color: #1a202c; /* Dark background for code */
+            color: #a0aec0; /* Light gray text for code */
+            padding: 10px 15px;
+            border-radius: 8px;
+            font-family: monospace;
+            font-size: 0.9rem;
+            overflow-x: auto;
+            white-space: pre-wrap; /* Allows wrapping of long lines */
+            word-break: break-all; /* Breaks words if necessary */
+            text-align: left; /* Align code left */
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header Section -->
+        <div class="header-section">
+            <h1 class="header-title">시계열 데이터 시각화 & 상관관계 분석</h1>
+            <p class="header-subtitle">데이터의 패턴과 변수 간의 관계를 시각적으로 탐색하기</p>
+        </div>
+
+        <!-- Basic Data Plotting -->
+        <div class="card">
+            <span class="card-icon">📈</span>
+            <h2 class="card-title">기본 데이터 플로팅</h2>
+            <p class="card-text">
+                시계열 데이터 분석의 첫 단계는 데이터의 전반적인 추세를 파악하기 위해 기본적인 일별 종가(Close price)를 시각화하는 것입니다. `title` 인자를 사용하여 플롯에 제목을 추가할 수 있습니다.
+                <div class="code-snippet">
+                    df["Close"].plot(title="Daily Closing Price")<br>plt.show()
+                </div>
+            </p>
+        </div>
+
+        <!-- Rolling Average Volume -->
+        <div class="card">
+            <span class="card-icon">📦</span>
+            <h2 class="card-title">거래량 이동 평균 계산</h2>
+            <p class="card-text">
+                30일 이동 평균은 거래량과 같은 시계열 데이터의 장기적인 변화를 추적하고, 단기적인 노이즈를 줄이는 데 유용합니다.
+                <div class="code-snippet">
+                    df["30_day_rolling_vol"] = df["Volume"].rolling(window=30).mean()
+                </div>
+            </p>
+        </div>
+
+        <!-- Dual-Axis Plotting -->
+        <div class="card">
+            <span class="card-icon">↕️</span>
+            <h2 class="card-title">두 개의 Y축으로 플로팅</h2>
+            <p class="card-text">
+                종가(Close)와 거래량(Volume)처럼 스케일이 매우 다른 두 변수를 함께 시각화하려면 `secondary_y=True`를 사용하여 두 번째 Y축을 사용하는 것이 좋습니다. 이를 통해 두 변수의 움직임을 효과적으로 비교할 수 있습니다.
+                <div class="code-snippet">
+                    import matplotlib.pyplot as plt<br>df[["30_day_rolling_vol"]].plot(legend=True)<br>ax = df["Close"].plot(secondary_y=True, legend=True)<br>ax.set_ylabel("Closing Price")<br>plt.title('30-Day Rolling Volume vs. Close Price')<br>plt.xlabel('Date')<br>plt.grid(True)<br>plt.show()
+                </div>
+            </p>
+        </div>
+
+        <!-- Correlation in Time Series -->
+        <div class="card" style="grid-column: 1 / -1; background-color: #d1e7dd;"> <!-- Span full width, lighter green -->
+            <span class="card-icon">🔗</span>
+            <h2 class="card-title">시계열 데이터의 상관관계</h2>
+            <p class="card-text">
+                변수 간의 선형 관계를 측정하는 데 **피어슨 상관관계(Pearson Correlation)**가 사용될 수 있지만, 시계열 데이터는 추세와 자기상관성 때문에 피어슨 상관관계가 오해의 소지가 있을 수 있습니다. 데이터 포인트의 순위에 기반한 **스피어만 상관관계(Spearman Correlation)**가 더 적합할 수도 있습니다.
+                <br><br>
+                **30일 이동 거래량과 종가 간의 상관관계 계산:**
+                <div class="code-snippet">
+                    # 단일 상관 계수 출력<br>print(df["30_day_rolling_vol"].corr(df["Close"]))<br><br># 여러 변수 간의 상관 행렬 출력<br>df[["Close", "30_day_rolling_vol"]].corr()
+                </div>
+            </p>
+        </div>
+    </div>
+</body>
+</html>
