@@ -4,211 +4,164 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>올인원 데이터 분석 포털</title>
-<meta name="description" content="코딩 없이 클릭 몇 번으로 파이썬 데이터 분석을 실행하는 포털. 분석 모듈을 고르고 Colab에서 바로 결과를 확인하세요.">
+<meta name="description" content="코딩 없이 클릭 몇 번으로 파이썬 데이터 분석을 실행하는 포털. 분석 모듈을 고르고 Colab에서 바로 전문가 수준의 결과를 확인하세요.">
 <style>
 /* ─────────────────────────────────────────────────────────────
-   디자인 토큰 (Light / Dark)
-   색상은 색약(CVD) 검증을 통과한 팔레트를 사용합니다.
+   디자인 토큰 (Light / Dark) — 색약(CVD) 검증을 통과한 팔레트
    ───────────────────────────────────────────────────────────── */
 :root{
   color-scheme: light;
-  --bg:#f9f9f7;
-  --surface:#fcfcfb;
-  --surface-2:#f2f2ee;
-  --surface-3:#e9e9e3;
-  --border:rgba(11,11,11,.12);
-  --border-strong:rgba(11,11,11,.22);
-  --text:#0b0b0b;
-  --text-2:#52514e;
-  --muted:#898781;
-  --accent:#2a78d6;
-  --accent-ink:#184f95;
-  --accent-wash:rgba(42,120,214,.10);
-  --good:#0ca30c;
-  --warn:#fab219;
-  --crit:#d03b3b;
+  --bg:#f9f9f7; --surface:#fcfcfb; --surface-2:#f2f2ee; --surface-3:#e9e9e3;
+  --border:rgba(11,11,11,.12); --border-strong:rgba(11,11,11,.22);
+  --text:#0b0b0b; --text-2:#52514e; --muted:#898781;
+  --accent:#2a78d6; --accent-ink:#184f95; --accent-wash:rgba(42,120,214,.10);
+  --good:#0ca30c; --good-ink:#046b04; --warn:#e08800; --crit:#d03b3b;
   --shadow:0 1px 2px rgba(11,11,11,.05), 0 8px 24px rgba(11,11,11,.06);
   --shadow-lg:0 2px 4px rgba(11,11,11,.06), 0 16px 40px rgba(11,11,11,.10);
-  /* 카테고리 색 (팔레트 슬롯 1·3·8·2·7·5) */
-  --cat-eda:#2a78d6;
-  --cat-ts:#1baf7a;
-  --cat-anomaly:#e34948;
-  --cat-regress:#eb6834;
-  --cat-classify:#4a3aa7;
-  --cat-cluster:#e87ba4;
-  --radius:14px;
-  --radius-sm:10px;
+  --cat-eda:#2a78d6; --cat-compare:#4a3aa7; --cat-ts:#1baf7a; --cat-anomaly:#e34948;
+  --cat-quality:#eda100; --cat-regress:#eb6834; --cat-classify:#008300; --cat-cluster:#e87ba4;
+  --radius:14px; --radius-sm:10px;
 }
 @media (prefers-color-scheme: dark){
   :root:not([data-theme="light"]){
     color-scheme: dark;
-    --bg:#0d0d0d;
-    --surface:#1a1a19;
-    --surface-2:#222220;
-    --surface-3:#2c2c2a;
-    --border:rgba(255,255,255,.12);
-    --border-strong:rgba(255,255,255,.24);
-    --text:#ffffff;
-    --text-2:#c3c2b7;
-    --muted:#898781;
-    --accent:#3987e5;
-    --accent-ink:#9ec5f4;
-    --accent-wash:rgba(57,135,229,.16);
-    --good:#0ca30c;
-    --warn:#fab219;
-    --crit:#d03b3b;
+    --bg:#0d0d0d; --surface:#1a1a19; --surface-2:#222220; --surface-3:#2c2c2a;
+    --border:rgba(255,255,255,.12); --border-strong:rgba(255,255,255,.24);
+    --text:#ffffff; --text-2:#c3c2b7; --muted:#898781;
+    --accent:#3987e5; --accent-ink:#9ec5f4; --accent-wash:rgba(57,135,229,.16);
+    --good:#0ca30c; --good-ink:#5fd35f; --warn:#fab219; --crit:#e66767;
     --shadow:0 1px 2px rgba(0,0,0,.4), 0 8px 24px rgba(0,0,0,.35);
     --shadow-lg:0 2px 4px rgba(0,0,0,.5), 0 16px 40px rgba(0,0,0,.45);
-    --cat-eda:#3987e5;
-    --cat-ts:#199e70;
-    --cat-anomaly:#e66767;
-    --cat-regress:#d95926;
-    --cat-classify:#9085e9;
-    --cat-cluster:#d55181;
+    --cat-eda:#3987e5; --cat-compare:#9085e9; --cat-ts:#199e70; --cat-anomaly:#e66767;
+    --cat-quality:#c98500; --cat-regress:#d95926; --cat-classify:#008300; --cat-cluster:#d55181;
   }
 }
 :root[data-theme="dark"]{
   color-scheme: dark;
-  --bg:#0d0d0d;
-  --surface:#1a1a19;
-  --surface-2:#222220;
-  --surface-3:#2c2c2a;
-  --border:rgba(255,255,255,.12);
-  --border-strong:rgba(255,255,255,.24);
-  --text:#ffffff;
-  --text-2:#c3c2b7;
-  --muted:#898781;
-  --accent:#3987e5;
-  --accent-ink:#9ec5f4;
-  --accent-wash:rgba(57,135,229,.16);
+  --bg:#0d0d0d; --surface:#1a1a19; --surface-2:#222220; --surface-3:#2c2c2a;
+  --border:rgba(255,255,255,.12); --border-strong:rgba(255,255,255,.24);
+  --text:#ffffff; --text-2:#c3c2b7; --muted:#898781;
+  --accent:#3987e5; --accent-ink:#9ec5f4; --accent-wash:rgba(57,135,229,.16);
+  --good:#0ca30c; --good-ink:#5fd35f; --warn:#fab219; --crit:#e66767;
   --shadow:0 1px 2px rgba(0,0,0,.4), 0 8px 24px rgba(0,0,0,.35);
   --shadow-lg:0 2px 4px rgba(0,0,0,.5), 0 16px 40px rgba(0,0,0,.45);
-  --cat-eda:#3987e5;
-  --cat-ts:#199e70;
-  --cat-anomaly:#e66767;
-  --cat-regress:#d95926;
-  --cat-classify:#9085e9;
-  --cat-cluster:#d55181;
+  --cat-eda:#3987e5; --cat-compare:#9085e9; --cat-ts:#199e70; --cat-anomaly:#e66767;
+  --cat-quality:#c98500; --cat-regress:#d95926; --cat-classify:#008300; --cat-cluster:#d55181;
 }
 
 *,*::before,*::after{box-sizing:border-box}
-html{-webkit-text-size-adjust:100%}
+html{-webkit-text-size-adjust:100%;scroll-behavior:smooth}
 body{
-  margin:0;
-  background:var(--bg);
-  color:var(--text);
-  font-family:system-ui,-apple-system,"Segoe UI","Apple SD Gothic Neo","Malgun Gothic",sans-serif;
-  font-size:15px;
-  line-height:1.6;
-  word-break:keep-all;
+  margin:0;background:var(--bg);color:var(--text);
+  font-family:system-ui,-apple-system,'Segoe UI','Apple SD Gothic Neo','Malgun Gothic',sans-serif;
+  font-size:15px;line-height:1.6;word-break:keep-all;
 }
 h1,h2,h3,h4{margin:0;line-height:1.3;letter-spacing:-.01em}
 p{margin:0}
 a{color:var(--accent);text-underline-offset:3px}
 button{font:inherit;color:inherit}
+code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:.92em;
+  background:var(--surface-2);border:1px solid var(--border);border-radius:5px;padding:1px 5px}
 :focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:6px}
 
 /* ── 상단 바 ───────────────────────────────────────────────── */
-.topbar{
-  position:sticky;top:0;z-index:50;
+.topbar{position:sticky;top:0;z-index:50;
   background:color-mix(in srgb, var(--bg) 88%, transparent);
-  backdrop-filter:saturate(180%) blur(12px);
-  border-bottom:1px solid var(--border);
-}
-.topbar-inner{
-  max-width:1180px;margin:0 auto;padding:12px 20px;
-  display:flex;align-items:center;gap:14px;
-}
+  backdrop-filter:saturate(180%) blur(12px);border-bottom:1px solid var(--border)}
+.topbar-inner{max-width:1180px;margin:0 auto;padding:12px 20px;display:flex;align-items:center;gap:10px}
 .brand{display:flex;align-items:center;gap:10px;font-weight:700;font-size:16px}
-.brand-mark{
-  width:30px;height:30px;border-radius:9px;flex:none;
+.brand-mark{width:30px;height:30px;border-radius:9px;flex:none;
   background:linear-gradient(135deg,var(--accent),var(--cat-cluster));
-  display:grid;place-items:center;color:#fff;font-size:15px;
-}
+  display:grid;place-items:center;color:#fff;font-size:15px}
 .brand small{display:block;font-weight:500;font-size:11.5px;color:var(--muted);letter-spacing:0}
 .topbar-spacer{flex:1}
-.icon-btn{
-  background:var(--surface);border:1px solid var(--border);border-radius:9px;
-  width:36px;height:36px;display:grid;place-items:center;cursor:pointer;font-size:15px;
-  transition:background .15s, border-color .15s;
-}
+.icon-btn{background:var(--surface);border:1px solid var(--border);border-radius:9px;
+  height:36px;min-width:36px;padding:0 11px;display:inline-flex;align-items:center;gap:6px;
+  justify-content:center;cursor:pointer;font-size:13px;white-space:nowrap;
+  transition:background .15s,border-color .15s}
 .icon-btn:hover{background:var(--surface-2);border-color:var(--border-strong)}
-.ghost-link{
-  font-size:13px;color:var(--text-2);text-decoration:none;padding:7px 11px;
-  border-radius:9px;border:1px solid transparent;white-space:nowrap;
-}
+.ghost-link{font-size:13px;color:var(--text-2);text-decoration:none;padding:7px 11px;
+  border-radius:9px;border:1px solid transparent;white-space:nowrap}
 .ghost-link:hover{background:var(--surface-2);border-color:var(--border)}
+@media (max-width:720px){ .hide-sm{display:none} }
 
 /* ── 레이아웃 ─────────────────────────────────────────────── */
 .wrap{max-width:1180px;margin:0 auto;padding:26px 20px 140px}
 .layout{display:grid;grid-template-columns:minmax(0,1fr) 344px;gap:24px;align-items:start}
-@media (max-width:960px){ .layout{grid-template-columns:minmax(0,1fr)} }
+@media (max-width:980px){ .layout{grid-template-columns:minmax(0,1fr)} }
 
 /* ── 히어로 ───────────────────────────────────────────────── */
-.hero{margin-bottom:26px}
+.hero{margin-bottom:22px}
 .hero h1{font-size:clamp(25px,4.2vw,36px);font-weight:700;margin-bottom:10px}
-.hero .lede{color:var(--text-2);font-size:16px;max-width:62ch}
+.hero .lede{color:var(--text-2);font-size:16px;max-width:64ch}
 .steps{display:flex;gap:10px;flex-wrap:wrap;margin-top:18px}
-.step-chip{
-  display:flex;align-items:center;gap:9px;background:var(--surface);
+.step-chip{display:flex;align-items:center;gap:9px;background:var(--surface);
   border:1px solid var(--border);border-radius:999px;padding:7px 15px 7px 8px;
-  font-size:13px;color:var(--text-2);box-shadow:var(--shadow);
-}
-.step-num{
-  width:22px;height:22px;border-radius:50%;background:var(--accent-wash);
-  color:var(--accent-ink);display:grid;place-items:center;font-size:12px;font-weight:700;flex:none;
-}
+  font-size:13px;color:var(--text-2);box-shadow:var(--shadow)}
+.step-num{width:22px;height:22px;border-radius:50%;background:var(--accent-wash);
+  color:var(--accent-ink);display:grid;place-items:center;font-size:12px;font-weight:700;flex:none}
+
+/* ── 첫 사용 가이드 ───────────────────────────────────────── */
+.guide{background:linear-gradient(135deg,var(--accent-wash),transparent 70%),var(--surface);
+  border:1px solid var(--accent);border-radius:var(--radius);padding:20px 22px;margin-bottom:20px;
+  box-shadow:var(--shadow);position:relative}
+.guide h2{font-size:17px;margin-bottom:6px}
+.guide .g-close{position:absolute;top:12px;right:12px;background:none;border:0;cursor:pointer;
+  color:var(--muted);font-size:19px;line-height:1;padding:4px 8px;border-radius:7px}
+.guide .g-close:hover{background:var(--surface-2);color:var(--text)}
+.guide-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(215px,1fr));gap:14px;margin-top:14px}
+.guide-item{display:flex;gap:10px;align-items:flex-start;font-size:13.5px;color:var(--text-2);line-height:1.6}
+.guide-item .gi-num{width:22px;height:22px;border-radius:7px;background:var(--accent);color:#fff;
+  display:grid;place-items:center;font-size:12px;font-weight:700;flex:none;margin-top:1px}
+.guide-item b{color:var(--text)}
 
 /* ── 카드 / 섹션 ──────────────────────────────────────────── */
-.card{
-  background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);
-  box-shadow:var(--shadow);padding:22px;margin-bottom:20px;
-}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);
+  box-shadow:var(--shadow);padding:22px;margin-bottom:20px}
 .card-head{display:flex;align-items:baseline;gap:11px;margin-bottom:4px;flex-wrap:wrap}
 .card-head h2{font-size:18px;font-weight:700}
-.sec-badge{
-  font-size:11px;font-weight:700;letter-spacing:.04em;color:var(--accent-ink);
-  background:var(--accent-wash);border-radius:999px;padding:3px 9px;flex:none;
-}
+.sec-badge{font-size:11px;font-weight:700;letter-spacing:.04em;color:var(--accent-ink);
+  background:var(--accent-wash);border-radius:999px;padding:3px 9px;flex:none}
 .card-sub{color:var(--text-2);font-size:13.5px;margin-bottom:18px}
 
 /* ── 모듈 그리드 ──────────────────────────────────────────── */
 .cat-block{margin-bottom:20px}
 .cat-block:last-child{margin-bottom:0}
-.cat-title{
-  display:flex;align-items:center;gap:8px;font-size:13px;font-weight:700;
-  color:var(--text-2);margin-bottom:10px;
-}
+.cat-title{display:flex;align-items:center;gap:8px;font-size:13px;font-weight:700;
+  color:var(--text-2);margin-bottom:10px;flex-wrap:wrap}
 .cat-dot{width:9px;height:9px;border-radius:3px;flex:none;background:var(--cat)}
-.mod-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(232px,1fr));gap:11px}
-.mod{
-  position:relative;text-align:left;cursor:pointer;
-  background:var(--surface-2);border:1px solid var(--border);border-radius:var(--radius-sm);
-  padding:14px 14px 13px;display:flex;flex-direction:column;gap:5px;
-  transition:border-color .15s, background .15s, transform .12s, box-shadow .15s;
-}
+.mod-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(238px,1fr));gap:11px}
+.mod{position:relative;text-align:left;cursor:pointer;background:var(--surface-2);
+  border:1px solid var(--border);border-radius:var(--radius-sm);padding:14px 14px 13px;
+  display:flex;flex-direction:column;gap:5px;min-width:0;
+  transition:border-color .15s,background .15s,transform .12s,box-shadow .15s}
 .mod:hover{border-color:var(--border-strong);transform:translateY(-2px);box-shadow:var(--shadow)}
-.mod-top{display:flex;align-items:center;gap:9px}
-.mod-icon{
-  width:30px;height:30px;border-radius:9px;flex:none;display:grid;place-items:center;
-  font-size:15px;background:color-mix(in srgb, var(--cat) 16%, transparent);
-}
-.mod-name{font-weight:650;font-size:14.5px;letter-spacing:-.01em}
+.mod-top{display:flex;align-items:center;gap:9px;min-width:0}
+.mod-icon{width:30px;height:30px;border-radius:9px;flex:none;display:grid;place-items:center;
+  font-size:15px;background:color-mix(in srgb, var(--cat) 16%, transparent)}
+.mod-name{font-weight:650;font-size:14.5px;letter-spacing:-.01em;min-width:0}
 .mod-desc{font-size:12.5px;color:var(--text-2);line-height:1.5}
 .mod-q{font-size:12px;color:var(--muted);font-style:italic}
-.mod[aria-pressed="true"]{
-  background:color-mix(in srgb, var(--cat) 9%, var(--surface));
-  border-color:var(--cat);box-shadow:0 0 0 1px var(--cat) inset;
-}
-.mod[aria-pressed="true"]::after{
-  content:"✓";position:absolute;top:9px;right:11px;
-  color:var(--cat);font-weight:800;font-size:14px;
-}
-.mod-tag{
-  align-self:flex-start;margin-top:3px;font-size:10.5px;font-weight:700;letter-spacing:.03em;
-  color:var(--cat);background:color-mix(in srgb, var(--cat) 14%, transparent);
-  border-radius:5px;padding:2px 6px;
-}
+.mod-tags{display:flex;gap:5px;flex-wrap:wrap;margin-top:4px}
+.mod-tag{font-size:10.5px;font-weight:700;letter-spacing:.02em;border-radius:5px;padding:2px 6px;
+  color:var(--cat);background:color-mix(in srgb, var(--cat) 14%, transparent)}
+.mod-tag.lvl{color:var(--text-2);background:var(--surface-3)}
+.mod-tag.rec{color:#fff;background:var(--good)}
+.mod[aria-pressed="true"]{background:color-mix(in srgb, var(--cat) 9%, var(--surface));
+  border-color:var(--cat);box-shadow:0 0 0 1px var(--cat) inset}
+.mod[aria-pressed="true"]::after{content:"✓";position:absolute;top:9px;right:11px;
+  color:var(--cat);font-weight:800;font-size:14px}
+
+/* ── 선택 상세 패널 ───────────────────────────────────────── */
+.detail{margin-top:18px;border:1px solid var(--cat,var(--border));border-radius:var(--radius-sm);
+  background:var(--surface-2);padding:16px 18px;display:none}
+.detail.on{display:block}
+.detail h3{font-size:15px;margin-bottom:8px;display:flex;align-items:center;gap:8px}
+.detail-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(215px,1fr));gap:14px;margin-top:12px}
+.detail-box{background:var(--surface);border:1px solid var(--border);border-radius:9px;padding:11px 13px}
+.detail-box .db-t{font-size:11.5px;font-weight:700;color:var(--muted);letter-spacing:.03em;margin-bottom:5px}
+.detail-box ul{margin:0;padding-left:16px;font-size:12.5px;color:var(--text-2);line-height:1.65}
+.detail-box p{font-size:12.5px;color:var(--text-2);line-height:1.6}
 
 /* ── 폼 ──────────────────────────────────────────────────── */
 .field-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:15px}
@@ -217,147 +170,162 @@ button{font:inherit;color:inherit}
 .field label{font-size:13px;font-weight:650;display:flex;align-items:center;gap:6px;flex-wrap:wrap}
 .req{color:var(--crit);font-size:11px;font-weight:700}
 .opt{color:var(--muted);font-size:11px;font-weight:500}
-.help{font-size:12px;color:var(--muted);line-height:1.5}
-input[type=text],input[type=number],select,textarea{
-  width:100%;background:var(--surface-2);color:var(--text);
-  border:1px solid var(--border);border-radius:9px;padding:9px 11px;font:inherit;font-size:14px;
-  transition:border-color .15s, background .15s;
-}
+.help{font-size:12px;color:var(--muted);line-height:1.55}
+input[type=text],input[type=number],select,textarea{width:100%;background:var(--surface-2);
+  color:var(--text);border:1px solid var(--border);border-radius:9px;padding:9px 11px;
+  font:inherit;font-size:14px;transition:border-color .15s,background .15s}
 input:focus,select:focus,textarea:focus{border-color:var(--accent);background:var(--surface)}
 input[disabled],select[disabled]{opacity:.5;cursor:not-allowed}
 select{appearance:none;background-image:linear-gradient(45deg,transparent 50%,var(--muted) 50%),linear-gradient(135deg,var(--muted) 50%,transparent 50%);
   background-position:calc(100% - 17px) calc(1em + 1px), calc(100% - 12px) calc(1em + 1px);
-  background-size:5px 5px, 5px 5px;background-repeat:no-repeat;padding-right:34px}
-.field.invalid input,.field.invalid select{border-color:var(--crit);box-shadow:0 0 0 3px color-mix(in srgb,var(--crit) 15%,transparent)}
+  background-size:5px 5px,5px 5px;background-repeat:no-repeat;padding-right:34px}
+.field.invalid input,.field.invalid select{border-color:var(--crit);
+  box-shadow:0 0 0 3px color-mix(in srgb,var(--crit) 15%,transparent)}
 .switch{display:flex;align-items:center;gap:10px;cursor:pointer;padding:7px 0}
 .switch input{position:absolute;opacity:0;pointer-events:none}
-.switch-track{
-  width:40px;height:23px;border-radius:999px;background:var(--surface-3);
-  border:1px solid var(--border);position:relative;flex:none;transition:background .18s;
-}
-.switch-track::after{
-  content:"";position:absolute;top:2px;left:2px;width:17px;height:17px;border-radius:50%;
-  background:var(--surface);box-shadow:0 1px 3px rgba(0,0,0,.3);transition:transform .18s;
-}
+.switch-track{width:40px;height:23px;border-radius:999px;background:var(--surface-3);
+  border:1px solid var(--border);position:relative;flex:none;transition:background .18s}
+.switch-track::after{content:"";position:absolute;top:2px;left:2px;width:17px;height:17px;
+  border-radius:50%;background:var(--surface);box-shadow:0 1px 3px rgba(0,0,0,.3);transition:transform .18s}
 .switch input:checked + .switch-track{background:var(--accent);border-color:var(--accent)}
 .switch input:checked + .switch-track::after{transform:translateX(17px);background:#fff}
 .switch-text{font-size:13px;font-weight:600}
-
-/* 컬럼 칩 */
 .chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:2px}
-.chip{
-  font-size:12px;padding:4px 10px;border-radius:999px;cursor:pointer;
-  background:var(--surface-2);border:1px solid var(--border);color:var(--text-2);
-  transition:background .13s,border-color .13s,color .13s;white-space:nowrap;max-width:100%;
-  overflow:hidden;text-overflow:ellipsis;
-}
+.chip{font-size:12px;padding:4px 10px;border-radius:999px;cursor:pointer;background:var(--surface-2);
+  border:1px solid var(--border);color:var(--text-2);white-space:nowrap;max-width:100%;
+  overflow:hidden;text-overflow:ellipsis;transition:background .13s,border-color .13s,color .13s}
 .chip:hover{border-color:var(--border-strong)}
-.chip[aria-pressed="true"]{background:var(--accent-wash);border-color:var(--accent);color:var(--accent-ink);font-weight:600}
+.chip[aria-pressed="true"]{background:var(--accent-wash);border-color:var(--accent);
+  color:var(--accent-ink);font-weight:600}
 .chip .t{opacity:.6;font-size:10.5px;margin-left:4px}
 
-/* ── 드롭존 ───────────────────────────────────────────────── */
-.dropzone{
-  border:1.5px dashed var(--border-strong);border-radius:var(--radius-sm);
+/* ── 용어 툴팁 ────────────────────────────────────────────── */
+.term{border-bottom:1.5px dotted var(--accent);cursor:help;position:relative;color:var(--text-2)}
+.term::after{content:attr(data-def);position:absolute;left:50%;bottom:calc(100% + 8px);
+  transform:translateX(-50%);background:var(--text);color:var(--bg);padding:9px 12px;
+  border-radius:9px;font-size:12px;font-weight:500;line-height:1.55;width:max-content;
+  max-width:270px;white-space:normal;opacity:0;pointer-events:none;transition:opacity .15s;
+  z-index:40;box-shadow:var(--shadow-lg);text-align:left}
+.term:hover::after,.term:focus::after{opacity:1}
+
+/* ── 드롭존 / 미리보기 ────────────────────────────────────── */
+.dz-row{display:flex;gap:12px;align-items:stretch;flex-wrap:wrap}
+.dropzone{flex:1 1 320px;border:1.5px dashed var(--border-strong);border-radius:var(--radius-sm);
   padding:22px 18px;text-align:center;cursor:pointer;background:var(--surface-2);
-  transition:border-color .15s, background .15s;
-}
+  transition:border-color .15s,background .15s}
 .dropzone:hover,.dropzone.over{border-color:var(--accent);background:var(--accent-wash)}
 .dropzone .dz-icon{font-size:26px;line-height:1}
 .dropzone .dz-main{font-weight:650;font-size:14px;margin-top:7px}
 .dropzone .dz-sub{font-size:12.5px;color:var(--muted);margin-top:4px}
-.privacy{
-  display:flex;gap:9px;align-items:flex-start;margin-top:12px;font-size:12px;color:var(--text-2);
-  background:color-mix(in srgb,var(--good) 9%,transparent);border:1px solid color-mix(in srgb,var(--good) 28%,transparent);
-  border-radius:9px;padding:10px 12px;
-}
-.file-ok{
-  display:none;margin-top:12px;font-size:13px;background:var(--surface-2);
-  border:1px solid var(--border);border-radius:9px;padding:12px 14px;
-}
+.sample-box{flex:0 1 235px;border:1px solid var(--border);border-radius:var(--radius-sm);
+  background:var(--surface-2);padding:16px;display:flex;flex-direction:column;justify-content:center;gap:9px}
+.sample-box .sb-t{font-weight:650;font-size:13.5px}
+.sample-box .sb-d{font-size:12px;color:var(--muted);line-height:1.5}
+.privacy{display:flex;gap:9px;align-items:flex-start;margin-top:12px;font-size:12px;color:var(--text-2);
+  background:color-mix(in srgb,var(--good) 9%,transparent);
+  border:1px solid color-mix(in srgb,var(--good) 28%,transparent);border-radius:9px;padding:10px 12px}
+.file-ok{display:none;margin-top:12px;font-size:13px;background:var(--surface-2);
+  border:1px solid var(--border);border-radius:9px;padding:12px 14px}
 .file-ok.on{display:block}
 .file-ok .fo-name{font-weight:650;display:flex;align-items:center;gap:7px;flex-wrap:wrap}
 .file-ok .fo-meta{color:var(--muted);font-size:12px;margin-top:3px}
+.preview-wrap{margin-top:12px;overflow-x:auto;border:1px solid var(--border);border-radius:9px;
+  background:var(--surface);display:none}
+.preview-wrap.on{display:block}
+.preview-wrap table{border-collapse:collapse;width:100%;font-size:12px}
+.preview-wrap th{text-align:left;padding:8px 11px;color:var(--text-2);font-size:11.5px;
+  border-bottom:1.5px solid var(--border);white-space:nowrap;background:var(--surface-2)}
+.preview-wrap th span{display:block;font-weight:500;color:var(--muted);font-size:10.5px}
+.preview-wrap td{padding:6px 11px;border-bottom:1px solid var(--border);white-space:nowrap;color:var(--text-2)}
+.rec-strip{display:none;margin-top:14px;background:color-mix(in srgb,var(--good) 8%,transparent);
+  border:1px solid color-mix(in srgb,var(--good) 32%,transparent);border-radius:10px;padding:12px 14px}
+.rec-strip.on{display:block}
+.rec-strip .rs-t{font-size:13px;font-weight:700;color:var(--good-ink);margin-bottom:8px}
+.rec-list{display:flex;flex-wrap:wrap;gap:7px}
+.rec-btn{font-size:12.5px;padding:6px 12px;border-radius:999px;cursor:pointer;
+  background:var(--surface);border:1px solid var(--border);color:var(--text);font-weight:600}
+.rec-btn:hover{border-color:var(--good);background:color-mix(in srgb,var(--good) 10%,transparent)}
 
 /* ── 요약 패널 ────────────────────────────────────────────── */
 .side{position:sticky;top:74px;display:flex;flex-direction:column;gap:16px}
-@media (max-width:960px){ .side{position:static} }
-.panel{
-  background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);
-  box-shadow:var(--shadow-lg);overflow:hidden;
-}
-.panel-head{
-  padding:14px 18px;border-bottom:1px solid var(--border);
-  display:flex;align-items:center;gap:9px;font-weight:700;font-size:14px;
-  background:var(--surface-2);
-}
+@media (max-width:980px){ .side{position:static} }
+.panel{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);
+  box-shadow:var(--shadow-lg);overflow:hidden}
+.panel-head{padding:14px 18px;border-bottom:1px solid var(--border);display:flex;align-items:center;
+  gap:9px;font-weight:700;font-size:14px;background:var(--surface-2)}
 .panel-body{padding:16px 18px}
-.summary-line{
-  font-size:14px;line-height:1.65;color:var(--text);
-  background:var(--accent-wash);border-radius:10px;padding:12px 14px;margin-bottom:14px;
-}
+.summary-line{font-size:14px;line-height:1.65;color:var(--text);background:var(--accent-wash);
+  border-radius:10px;padding:12px 14px;margin-bottom:14px}
 .summary-line .hl{font-weight:700;color:var(--accent-ink)}
-.kv{display:flex;justify-content:space-between;gap:12px;padding:7px 0;border-bottom:1px solid var(--border);font-size:13px}
+.kv{display:flex;justify-content:space-between;gap:12px;padding:7px 0;
+  border-bottom:1px solid var(--border);font-size:13px}
 .kv:last-child{border-bottom:0}
 .kv .k{color:var(--muted);flex:none}
 .kv .v{text-align:right;font-weight:600;overflow-wrap:anywhere}
-.warnbox{
-  display:none;font-size:12.5px;line-height:1.55;border-radius:9px;padding:10px 12px;margin-bottom:12px;
-  background:color-mix(in srgb,var(--warn) 14%,transparent);
-  border:1px solid color-mix(in srgb,var(--warn) 45%,transparent);color:var(--text);
-}
+.warnbox{display:none;font-size:12.5px;line-height:1.55;border-radius:9px;padding:10px 12px;
+  margin-bottom:12px;background:color-mix(in srgb,var(--warn) 14%,transparent);
+  border:1px solid color-mix(in srgb,var(--warn) 45%,transparent);color:var(--text)}
 .warnbox.on{display:block}
 .warnbox ul{margin:5px 0 0;padding-left:18px}
+.checklist{font-size:12.5px;color:var(--text-2);line-height:1.75}
+.checklist li{margin-bottom:5px}
 
 /* ── 버튼 ─────────────────────────────────────────────────── */
-.btn{
-  display:inline-flex;align-items:center;justify-content:center;gap:8px;
-  border-radius:11px;padding:12px 18px;font-size:15px;font-weight:700;
-  border:1px solid transparent;cursor:pointer;text-decoration:none;width:100%;
-  transition:filter .15s, background .15s, transform .1s;
-}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;border-radius:11px;
+  padding:12px 18px;font-size:15px;font-weight:700;border:1px solid transparent;cursor:pointer;
+  text-decoration:none;width:100%;transition:filter .15s,background .15s,transform .1s}
 .btn:active{transform:translateY(1px)}
-.btn-primary{background:var(--accent);color:#fff;box-shadow:0 4px 14px color-mix(in srgb,var(--accent) 35%,transparent)}
+.btn-primary{background:var(--accent);color:#fff;
+  box-shadow:0 4px 14px color-mix(in srgb,var(--accent) 35%,transparent)}
 .btn-primary:hover{filter:brightness(1.08)}
-.btn-secondary{background:var(--surface-2);border-color:var(--border);color:var(--text);font-size:13.5px;font-weight:600;padding:10px 14px}
+.btn-secondary{background:var(--surface-2);border-color:var(--border);color:var(--text);
+  font-size:13.5px;font-weight:600;padding:10px 14px}
 .btn-secondary:hover{background:var(--surface-3);border-color:var(--border-strong)}
 .btn-row{display:flex;gap:9px;margin-top:10px}
 .btn-row .btn{width:auto;flex:1}
-
-/* 실행 바 (모바일) */
-.launchbar{
-  position:fixed;left:0;right:0;bottom:0;z-index:60;display:none;
+.launchbar{position:fixed;left:0;right:0;bottom:0;z-index:60;display:none;
   padding:11px 16px calc(11px + env(safe-area-inset-bottom));
-  background:color-mix(in srgb,var(--bg) 92%, transparent);
-  backdrop-filter:blur(12px);border-top:1px solid var(--border);
-}
-@media (max-width:960px){ .launchbar{display:block} }
+  background:color-mix(in srgb,var(--bg) 92%, transparent);backdrop-filter:blur(12px);
+  border-top:1px solid var(--border)}
+@media (max-width:980px){ .launchbar{display:block} }
+
+/* ── 모달 ─────────────────────────────────────────────────── */
+.modal{position:fixed;inset:0;z-index:90;display:none;align-items:center;justify-content:center;
+  padding:20px;background:rgba(11,11,11,.55);backdrop-filter:blur(3px)}
+.modal.on{display:flex}
+.modal-box{background:var(--surface);border:1px solid var(--border);border-radius:16px;
+  box-shadow:var(--shadow-lg);max-width:720px;width:100%;max-height:84vh;display:flex;flex-direction:column}
+.modal-head{padding:16px 20px;border-bottom:1px solid var(--border);display:flex;
+  align-items:center;gap:10px;font-weight:700;font-size:16px}
+.modal-head .m-close{margin-left:auto;background:none;border:0;cursor:pointer;color:var(--muted);
+  font-size:21px;line-height:1;padding:3px 8px;border-radius:7px}
+.modal-head .m-close:hover{background:var(--surface-2);color:var(--text)}
+.modal-body{padding:18px 20px;overflow-y:auto}
+.gloss-item{padding:11px 0;border-bottom:1px solid var(--border)}
+.gloss-item:last-child{border-bottom:0}
+.gloss-item dt{font-weight:700;font-size:13.5px;margin-bottom:3px}
+.gloss-item dd{margin:0;font-size:13px;color:var(--text-2);line-height:1.65}
+.gloss-search{width:100%;margin-bottom:6px}
 
 /* ── 토스트 ───────────────────────────────────────────────── */
-.toast{
-  position:fixed;left:50%;bottom:26px;transform:translate(-50%,26px);
-  background:var(--text);color:var(--bg);padding:12px 20px;border-radius:11px;
-  font-size:13.5px;font-weight:600;box-shadow:var(--shadow-lg);z-index:100;
-  opacity:0;pointer-events:none;transition:opacity .22s, transform .22s;max-width:min(90vw,460px);
-  text-align:center;line-height:1.5;
-}
+.toast{position:fixed;left:50%;bottom:26px;transform:translate(-50%,26px);background:var(--text);
+  color:var(--bg);padding:12px 20px;border-radius:11px;font-size:13.5px;font-weight:600;
+  box-shadow:var(--shadow-lg);z-index:100;opacity:0;pointer-events:none;
+  transition:opacity .22s,transform .22s;max-width:min(90vw,470px);text-align:center;
+  line-height:1.55;white-space:pre-line}
 .toast.on{opacity:1;transform:translate(-50%,0)}
 
-/* ── 접기 ─────────────────────────────────────────────────── */
 details.adv{margin-top:16px;border-top:1px solid var(--border);padding-top:14px}
-details.adv summary{
-  cursor:pointer;font-size:13px;font-weight:650;color:var(--text-2);
-  list-style:none;display:flex;align-items:center;gap:7px;
-}
+details.adv summary{cursor:pointer;font-size:13px;font-weight:650;color:var(--text-2);
+  list-style:none;display:flex;align-items:center;gap:7px}
 details.adv summary::-webkit-details-marker{display:none}
 details.adv summary::before{content:"▸";transition:transform .15s;display:inline-block;color:var(--muted)}
 details.adv[open] summary::before{transform:rotate(90deg)}
 details.adv .field-grid{margin-top:14px}
-
-.url-preview{
-  font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:11px;color:var(--muted);
-  background:var(--surface-2);border:1px solid var(--border);border-radius:8px;
-  padding:9px 11px;margin-top:11px;overflow-wrap:anywhere;line-height:1.5;max-height:82px;overflow:auto;
-}
+.url-preview{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:11px;color:var(--muted);
+  background:var(--surface-2);border:1px solid var(--border);border-radius:8px;padding:9px 11px;
+  margin-top:11px;overflow-wrap:anywhere;line-height:1.5;max-height:96px;overflow:auto}
+.url-preview code{background:none;border:0;padding:0;color:var(--text-2)}
 .footer{margin-top:34px;text-align:center;color:var(--muted);font-size:12.5px;line-height:1.8}
 .visually-hidden{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
 </style>
@@ -371,7 +339,9 @@ details.adv .field-grid{margin-top:14px}
       <span>올인원 데이터 분석 포털<small>코딩 없이 클릭 몇 번으로 · Colab 연동</small></span>
     </div>
     <div class="topbar-spacer"></div>
-    <a class="ghost-link" href="index.html">📚 학습 자료</a>
+    <button class="icon-btn hide-sm" id="glossBtn" type="button">📖 <span>용어 사전</span></button>
+    <button class="icon-btn hide-sm" id="helpBtn" type="button">❓ <span>사용법</span></button>
+    <a class="ghost-link hide-sm" href="index.html">📚 학습 자료</a>
     <button class="icon-btn" id="themeBtn" type="button" title="화면 밝기 전환" aria-label="화면 밝기 전환">🌗</button>
   </div>
 </header>
@@ -381,34 +351,63 @@ details.adv .field-grid{margin-top:14px}
     <h1>분석하고 싶은 것을 고르세요.<br>파이썬은 저희가 돌립니다.</h1>
     <p class="lede">
       엑셀 파일(CSV)만 있으면 됩니다. 아래에서 <strong>목적에 맞는 분석</strong>을 고르고 버튼을 누르면,
-      구글 Colab에서 전문가 수준의 분석 코드가 자동으로 실행되고 <strong>해석까지 한국어로</strong> 나옵니다.
+      구글 Colab에서 전문가 수준의 분석이 자동으로 실행되고 <strong>해석까지 한국어로</strong> 나옵니다.
     </p>
     <div class="steps">
       <span class="step-chip"><span class="step-num">1</span> 분석 종류 고르기</span>
-      <span class="step-chip"><span class="step-num">2</span> 컬럼·옵션 지정</span>
-      <span class="step-chip"><span class="step-num">3</span> Colab에서 실행 &amp; 결과 확인</span>
+      <span class="step-chip"><span class="step-num">2</span> 데이터 연결하기</span>
+      <span class="step-chip"><span class="step-num">3</span> 컬럼·옵션 지정</span>
+      <span class="step-chip"><span class="step-num">4</span> Colab에서 실행 &amp; 결과 확인</span>
+    </div>
+  </section>
+
+  <!-- 처음 사용 가이드 -->
+  <section class="guide" id="guideCard">
+    <button class="g-close" id="guideClose" type="button" aria-label="가이드 닫기">×</button>
+    <h2>👋 처음이신가요? 3분이면 충분합니다</h2>
+    <p style="color:var(--text-2);font-size:13.5px">
+      데이터 분석을 한 번도 해보지 않으셔도 괜찮습니다. 아래 순서대로만 따라오세요.
+      <strong>설치할 프로그램은 없고, 구글 계정만</strong> 있으면 됩니다.
+    </p>
+    <div class="guide-grid">
+      <div class="guide-item"><span class="gi-num">1</span><div>
+        <b>파일이 없어도 시작할 수 있어요.</b><br>아래 <b>[연습용 예제 파일 받기]</b>를 눌러 샘플 CSV로 먼저 연습해 보세요.</div></div>
+      <div class="guide-item"><span class="gi-num">2</span><div>
+        <b>뭘 골라야 할지 모르겠다면?</b><br>CSV를 올리면 데이터를 살펴보고 <b>어울리는 분석을 추천</b>해 드립니다.</div></div>
+      <div class="guide-item"><span class="gi-num">3</span><div>
+        <b>용어가 어렵다면?</b><br>점선이 그어진 단어에 마우스를 올려 보세요. 위쪽 <b>[📖 용어 사전]</b>도 있습니다.</div></div>
+      <div class="guide-item"><span class="gi-num">4</span><div>
+        <b>결과를 못 읽겠다면?</b><br>모든 결과 아래에 <b>“이 결과를 이렇게 읽으세요”</b> 해석이 한국어로 붙습니다.</div></div>
     </div>
   </section>
 
   <div class="layout">
     <!-- ─── 왼쪽: 입력 ─────────────────────────────────────── -->
     <div>
-      <!-- STEP 1 : 모듈 -->
+      <!-- STEP 1 -->
       <section class="card">
         <div class="card-head"><span class="sec-badge">STEP 1</span><h2>무엇을 알고 싶으신가요?</h2></div>
-        <p class="card-sub">목적에 가장 가까운 카드를 하나 고르세요. 용어를 몰라도 괜찮습니다 — 아래 질문 문장으로 고르시면 됩니다.</p>
+        <p class="card-sub">목적에 가장 가까운 카드를 하나 고르세요. 용어를 몰라도 괜찮습니다 — 카드에 적힌 <strong>질문 문장</strong>으로 고르시면 됩니다.</p>
         <div id="moduleList"></div>
+        <div class="detail" id="modDetail"></div>
       </section>
 
-      <!-- STEP 2 : 데이터 -->
+      <!-- STEP 2 -->
       <section class="card">
         <div class="card-head"><span class="sec-badge">STEP 2</span><h2>데이터 연결하기 <span class="opt">(선택이지만 강력 추천)</span></h2></div>
-        <p class="card-sub">CSV 파일을 여기에 올리면 <strong>컬럼 이름을 목록에서 골라</strong> 쓸 수 있어 오타 걱정이 사라집니다.</p>
+        <p class="card-sub">CSV를 올리면 <strong>컬럼을 목록에서 골라</strong> 쓸 수 있어 오타 걱정이 사라지고, <strong>어울리는 분석도 추천</strong>해 드립니다.</p>
 
-        <div class="dropzone" id="dropzone" tabindex="0" role="button" aria-label="CSV 파일 선택 또는 끌어다 놓기">
-          <div class="dz-icon">📄</div>
-          <div class="dz-main">CSV 파일을 끌어다 놓거나 클릭해서 선택</div>
-          <div class="dz-sub">엑셀에서 저장한 한글 CSV(cp949/euc-kr)도 자동 인식합니다</div>
+        <div class="dz-row">
+          <div class="dropzone" id="dropzone" tabindex="0" role="button" aria-label="CSV 파일 선택 또는 끌어다 놓기">
+            <div class="dz-icon">📄</div>
+            <div class="dz-main">CSV 파일을 끌어다 놓거나 클릭해서 선택</div>
+            <div class="dz-sub">엑셀에서 저장한 한글 CSV(cp949/euc-kr)도 자동 인식합니다</div>
+          </div>
+          <div class="sample-box">
+            <div class="sb-t">🧪 연습용 예제 파일</div>
+            <div class="sb-d">공장 설비 1년치 기록(180일). 모든 분석을 바로 시험해 볼 수 있습니다.</div>
+            <button class="btn btn-secondary" id="sampleBtn" type="button" style="width:100%">⬇️ 예제 파일 받기</button>
+          </div>
         </div>
         <input type="file" id="fileInput" accept=".csv,.txt,.tsv" class="visually-hidden">
 
@@ -422,19 +421,23 @@ details.adv .field-grid{margin-top:14px}
           <div class="fo-name"><span aria-hidden="true">✅</span> <span id="fileName"></span></div>
           <div class="fo-meta" id="fileMeta"></div>
         </div>
+        <div class="preview-wrap" id="previewWrap"></div>
+        <div class="rec-strip" id="recStrip">
+          <div class="rs-t">💡 이 데이터에 어울리는 분석을 골라 봤습니다 — 눌러서 바로 선택</div>
+          <div class="rec-list" id="recList"></div>
+        </div>
       </section>
 
-      <!-- STEP 3 : 파라미터 -->
+      <!-- STEP 3 -->
       <section class="card">
         <div class="card-head"><span class="sec-badge">STEP 3</span><h2>분석 기준 정하기</h2></div>
         <p class="card-sub" id="paramSub">선택한 분석에 필요한 항목만 표시됩니다.</p>
-
         <div class="field-grid" id="commonFields"></div>
         <div id="moduleParams"></div>
       </section>
     </div>
 
-    <!-- ─── 오른쪽: 요약 & 실행 ────────────────────────────── -->
+    <!-- ─── 오른쪽 ─────────────────────────────────────────── -->
     <aside class="side">
       <div class="panel">
         <div class="panel-head"><span aria-hidden="true">🧭</span> 실행 요약</div>
@@ -458,16 +461,29 @@ details.adv .field-grid{margin-top:14px}
         <div class="panel-body" style="font-size:13px;color:var(--text-2);line-height:1.7">
           <div style="margin-bottom:8px"><strong style="color:var(--text)">1.</strong> 새 탭이 열리면 상단 메뉴 <strong>[런타임] → [모두 실행]</strong> 을 누르세요. (단축키 <code>Ctrl</code>+<code>F9</code>)</div>
           <div style="margin-bottom:8px"><strong style="color:var(--text)">2.</strong> 설정은 <strong>자동으로 전달</strong>됩니다. 혹시 인식이 안 되면 <strong>🔑 설정 코드</strong>를 붙여넣는 칸이 나오니 <code>Ctrl</code>+<code>V</code> 하세요.</div>
-          <div style="margin-bottom:8px"><strong style="color:var(--text)">3.</strong> <strong>파일 선택</strong> 버튼이 뜨면 CSV를 올리세요.</div>
-          <div><strong style="color:var(--text)">4.</strong> 그래프와 <strong>한국어 해석 리포트</strong>가 자동으로 만들어집니다.</div>
+          <div style="margin-bottom:8px"><strong style="color:var(--text)">3.</strong> <strong>파일 선택</strong> 버튼이 뜨면 CSV를 올리세요. (없으면 <strong>취소</strong> → 예제 데이터로 진행)</div>
+          <div><strong style="color:var(--text)">4.</strong> 그래프와 <strong>한국어 해석 리포트</strong>가 자동으로 만들어지고 ZIP으로 저장됩니다.</div>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-head"><span aria-hidden="true">✅</span> 데이터 준비 체크리스트</div>
+        <div class="panel-body">
+          <ul class="checklist" style="margin:0;padding-left:18px">
+            <li><strong>첫 줄이 컬럼 이름</strong>인가요? (제목·병합 셀이 위에 있으면 안 됩니다)</li>
+            <li>숫자 컬럼에 <code>측정불가</code>, <code>-</code> 같은 <strong>글자가 섞여</strong> 있지 않나요? 빈칸으로 두세요.</li>
+            <li>날짜는 <code>2024-01-31</code> 처럼 <strong>일정한 형식</strong>인가요?</li>
+            <li>한 시트에 <strong>표 하나만</strong> 있나요?</li>
+            <li>잘 모르겠다면 <strong>[데이터 품질 진단]</strong> 분석을 먼저 돌려 보세요.</li>
+          </ul>
         </div>
       </div>
     </aside>
   </div>
 
   <div class="footer">
-    실행 환경: Google Colab (무료) · 분석 엔진: Python · pandas · scikit-learn · Prophet · XGBoost · Plotly<br>
-    분석 결과 해석이 어려우시면 각 리포트 하단의 <strong>“이 결과를 이렇게 읽으세요”</strong> 안내를 참고하세요.
+    실행 환경: Google Colab (무료) · 분석 엔진: Python · pandas · scikit-learn · Prophet · XGBoost · SciPy · Plotly<br>
+    분석 결과 해석이 어려우시면 각 리포트의 <strong>“🧭 이 결과를 이렇게 읽으세요”</strong> 안내를 참고하세요.
   </div>
 </div>
 
@@ -475,34 +491,47 @@ details.adv .field-grid{margin-top:14px}
   <button class="btn btn-primary" id="runBtnMobile" type="button"><span aria-hidden="true">🚀</span> Colab에서 분석 시작</button>
 </div>
 
+<!-- 용어 사전 -->
+<div class="modal" id="glossModal">
+  <div class="modal-box">
+    <div class="modal-head"><span aria-hidden="true">📖</span> 용어 사전
+      <button class="m-close" data-close="glossModal" type="button" aria-label="닫기">×</button></div>
+    <div class="modal-body">
+      <input type="text" class="gloss-search" id="glossSearch" placeholder="궁금한 용어를 검색하세요 (예: 상관계수)">
+      <dl id="glossList" style="margin:8px 0 0"></dl>
+    </div>
+  </div>
+</div>
+
+<!-- 사용법 -->
+<div class="modal" id="helpModal">
+  <div class="modal-box">
+    <div class="modal-head"><span aria-hidden="true">❓</span> 사용법 자세히 보기
+      <button class="m-close" data-close="helpModal" type="button" aria-label="닫기">×</button></div>
+    <div class="modal-body" id="helpBody"></div>
+  </div>
+</div>
+
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
 <script>
 "use strict";
 /* ═══════════════════════════════════════════════════════════════
-   0. 노트북 위치 설정
-   ─ candidates 에 적힌 브랜치를 앞에서부터 확인해, 노트북이 실제로
-     있는 브랜치를 자동으로 찾아 씁니다. 브랜치를 손으로 고칠 필요가
-     없고, 작업 브랜치를 main 에 머지하면 알아서 main 으로 넘어갑니다.
-   ─ 특정 브랜치를 강제하려면 이 페이지 주소 뒤에 ?nb_branch=브랜치명
+   0. 노트북 위치 — 실제로 노트북이 있는 브랜치를 자동으로 찾습니다
    ═══════════════════════════════════════════════════════════════ */
 const NB = {
   owner: 'mioon1402',
   repo:  'CourseInfographic',
   path:  'analysis_portal.ipynb',
   candidates: ['main', 'claude/all-in-one-data-analysis-portal-t73xwf'],
-  branch: null,        // 확인이 끝나면 여기에 채워집니다
-  verified: false
+  branch: null, verified: false
 };
-
-const NB_CACHE_KEY = 'dap_nb_branch';
-const NB_CACHE_TTL = 6 * 60 * 60 * 1000;   // 6시간
+const NB_CACHE_KEY = 'dap_nb_branch', NB_CACHE_TTL = 6 * 60 * 60 * 1000;
 
 function nbUrlFor(branch){
   return `https://raw.githubusercontent.com/${NB.owner}/${NB.repo}/`
        + `${branch.split('/').map(encodeURIComponent).join('/')}/${NB.path}`;
 }
-
 function nbCacheRead(){
   try{
     const o = JSON.parse(localStorage.getItem(NB_CACHE_KEY) || 'null');
@@ -510,12 +539,9 @@ function nbCacheRead(){
   }catch(_){}
   return null;
 }
-
-/** 노트북이 실제로 존재하는 브랜치를 찾습니다. (앞 후보 우선) */
 async function resolveBranch(){
   const forced = new URLSearchParams(location.search).get('nb_branch');
   if (forced){ NB.branch = forced; NB.verified = true; return forced; }
-
   for (const b of NB.candidates){
     try{
       const r = await fetch(nbUrlFor(b), { method:'HEAD', cache:'no-store' });
@@ -524,43 +550,91 @@ async function resolveBranch(){
         try{ localStorage.setItem(NB_CACHE_KEY, JSON.stringify({ b, t: Date.now() })); }catch(_){}
         return b;
       }
-    }catch(_){ break; }   // 네트워크 차단 등 — 캐시/기본값으로 진행
+    }catch(_){ break; }
   }
   NB.branch = NB.branch || nbCacheRead() || NB.candidates[0];
   return NB.branch;
 }
-
 let nbResolving = null;
 function ensureBranch(){
   if (NB.verified) return Promise.resolve(NB.branch);
   if (!nbResolving) nbResolving = resolveBranch().finally(() => { nbResolving = null; update(); });
   return nbResolving;
 }
-
-// 화면이 뜨자마자 백그라운드로 확인 시작 (보통 0.5초 이내)
 NB.branch = nbCacheRead() || NB.candidates[0];
 ensureBranch();
 
 /* ═══════════════════════════════════════════════════════════════
-   1. 카테고리 & 분석 모듈 정의  (이 객체가 UI 전체를 만듭니다)
+   1. 용어 사전 — 어려운 말은 전부 여기서 풀어 씁니다
+   ═══════════════════════════════════════════════════════════════ */
+const GLOSSARY = {
+  '상관계수':'두 값이 얼마나 함께 움직이는지를 -1 ~ +1 사이 숫자로 나타낸 것. +1은 완전히 같이 움직임, -1은 정반대, 0은 무관.',
+  '히트맵':'숫자의 크기를 색의 진하기로 표현한 표. 한눈에 어디가 강한지 알 수 있습니다.',
+  '결측치':'값이 비어 있는 칸. 측정을 못 했거나 입력이 빠진 경우입니다.',
+  '이상치':'다른 값들과 동떨어져 유난히 크거나 작은 값. 오류일 수도, 중요한 신호일 수도 있습니다.',
+  '중앙값':'값을 크기순으로 줄 세웠을 때 정확히 가운데 있는 값. 평균과 달리 극단값에 흔들리지 않습니다.',
+  '표준편차':'값들이 평균에서 평균적으로 얼마나 떨어져 있는지. 클수록 들쭉날쭉합니다.',
+  '정규분포':'가운데가 볼록하고 좌우가 대칭인 종 모양 분포. 많은 통계 방법이 이 모양을 가정합니다.',
+  '계절성':'요일·월·분기처럼 일정한 주기로 반복되는 패턴.',
+  '추세':'짧은 등락을 걷어낸, 길게 보았을 때의 방향(오름/내림).',
+  '평활화':'들쭉날쭉한 값을 부드럽게 다듬어 큰 흐름이 보이게 만드는 것.',
+  '이동평균':'최근 N개 값의 평균을 계속 이어 그린 선. 가장 이해하기 쉬운 평활 방법입니다.',
+  'MAPE':'예측이 실제와 평균 몇 % 어긋났는지. 10% 미만이면 매우 우수, 20% 미만이면 쓸 만합니다.',
+  '신뢰구간':'“진짜 값이 이 범위 안에 있을 것”이라고 보는 구간. 넓을수록 확신이 덜하다는 뜻입니다.',
+  'p값':'“차이가 우연히 생겼을 확률”. 보통 0.05(5%)보다 작으면 진짜 차이로 인정합니다.',
+  '유의수준':'우연으로 볼 수 있는 한계선. 보통 0.05를 씁니다.',
+  '효과 크기':'차이가 통계적으로 있느냐가 아니라, 실제로 얼마나 큰 차이인지를 나타내는 값.',
+  'R²':'모델이 결과의 변동을 몇 % 설명하는지. 100%에 가까울수록 잘 맞힙니다.',
+  '과적합':'모델이 연습 문제 답만 외운 상태. 새로운 데이터에서는 성능이 뚝 떨어집니다.',
+  '교차검증':'데이터를 여러 번 다르게 나눠 반복 채점해, 성적이 운이 아닌지 확인하는 방법.',
+  '검출률':'실제 불량 중에서 모델이 실제로 잡아낸 비율. 재현율이라고도 합니다.',
+  '정밀도':'모델이 “불량”이라고 한 것 중 진짜 불량이었던 비율.',
+  'AUC':'모델의 종합 판별력. 1에 가까울수록 좋고, 0.5면 찍는 것과 같습니다.',
+  '불균형 데이터':'정상 99%, 불량 1%처럼 한쪽이 압도적으로 많은 데이터. 정확도만 보면 속기 쉽습니다.',
+  '군집화':'정답을 알려주지 않고, 비슷한 것끼리 저절로 묶이게 하는 분석.',
+  '실루엣':'군집이 얼마나 잘 나뉘었는지 점수(-1~1). 0.5 이상이면 뚜렷하게 나뉜 것입니다.',
+  '표준화':'단위가 다른 값들(원, 개, ℃)을 같은 잣대로 맞추는 것. 비교·군집 전에 꼭 필요합니다.',
+  '주성분(PCA)':'여러 항목을 정보 손실을 최소화하며 2~3개로 압축하는 기법. 그림으로 보기 위해 씁니다.',
+  '관리도':'공정이 평소 범위 안에서 움직이는지 감시하는 그래프. 벗어나면 원인을 찾아야 합니다.',
+  '관리한계':'공정이 정상일 때 값이 머무는 범위(±3σ). 고객 규격과는 다른 개념입니다.',
+  'Cpk':'공정이 규격을 얼마나 여유 있게 만족하는지. 1.33 이상이면 우수합니다.',
+  '파레토':'“문제의 80%는 원인의 20%에서 나온다”는 법칙. 어디부터 고칠지 정할 때 씁니다.',
+  '중복 행':'완전히 똑같은 내용이 두 번 이상 들어간 행. 집계를 부풀립니다.',
+  'Isolation Forest':'정상 패턴에서 얼마나 쉽게 떨어져 나오는지로 이상치를 찾는 방법.',
+  'Random Forest':'여러 개의 판단 나무를 만들어 다수결로 결정하는 모델. 안정적이고 해석도 쉽습니다.',
+  'XGBoost':'앞선 모델의 실수를 다음 모델이 보완해 가며 정확도를 높이는 강력한 분류 모델.',
+  'Prophet':'추세와 계절 패턴을 자동으로 찾아 미래를 예측하는 도구.',
+  'STL':'데이터를 추세·계절·나머지(잔차) 세 조각으로 분리하는 방법.',
+};
+const TERM_RE = new RegExp('(' + Object.keys(GLOSSARY)
+  .sort((a,b) => b.length - a.length)
+  .map(t => t.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).join('|') + ')', 'g');
+
+/* ═══════════════════════════════════════════════════════════════
+   2. 카테고리 & 분석 모듈
    ═══════════════════════════════════════════════════════════════ */
 const CATEGORIES = [
   { id:'eda',      name:'탐색적 분석', icon:'🔍', color:'var(--cat-eda)',      note:'데이터의 성격부터 파악하고 싶을 때' },
+  { id:'compare',  name:'비교·검정',   icon:'⚖️', color:'var(--cat-compare)',  note:'A와 B의 차이가 진짜인지 확인할 때' },
   { id:'ts',       name:'시계열 분석', icon:'📈', color:'var(--cat-ts)',       note:'날짜/시간에 따라 변하는 데이터' },
   { id:'anomaly',  name:'이상 탐지',   icon:'🚨', color:'var(--cat-anomaly)',  note:'평소와 다른 값을 찾아낼 때' },
+  { id:'quality',  name:'품질관리',    icon:'🏭', color:'var(--cat-quality)',  note:'공정 관리와 개선 우선순위' },
   { id:'regress',  name:'수치 예측',   icon:'🎯', color:'var(--cat-regress)',  note:'숫자 결과값을 맞혀야 할 때' },
   { id:'classify', name:'상태 분류',   icon:'🏷️', color:'var(--cat-classify)', note:'정상/불량 같은 범주를 맞힐 때' },
   { id:'cluster',  name:'군집화',      icon:'🧩', color:'var(--cat-cluster)',  note:'비슷한 것끼리 묶고 싶을 때' }
 ];
 
-/* 필드 요구사항: 'required' | 'optional' | 'none' */
+/* need: 'required' | 'optional' | 'none'  (date · target · group · features) */
 const MODULES = [
   {
-    id:'eda_summary', cat:'eda', icon:'📋', tag:'가장 먼저 해보세요',
+    id:'eda_summary', cat:'eda', icon:'📋', tag:'가장 먼저', level:'입문', time:'약 1분',
     name:'데이터 자동 요약 리포트',
     desc:'행·열 개수, 결측치, 이상값, 분포를 한 장으로 정리해 드립니다.',
     q:'“이 데이터, 일단 어떻게 생겼지?”',
-    need:{ date:'optional', target:'optional', features:'optional' },
+    about:'분석을 시작하기 전에 데이터의 전체 모습을 파악하는 단계입니다. 어떤 컬럼이 있고, 빈 값은 얼마나 되고, 값이 어떻게 퍼져 있는지를 한 번에 보여 줍니다.',
+    dataNeed:'아무 CSV나 가능합니다. 특별히 지정할 컬럼이 없습니다.',
+    outputs:['컬럼별 성격·결측치·이상값 정리표','숫자 컬럼 분포 그래프','범주별 구성비','기간 커버리지','발견된 문제 요약'],
+    need:{ date:'optional', target:'optional', group:'none', features:'optional' },
     params:[
       { key:'max_plot_cols', label:'그래프로 볼 컬럼 수', type:'number', def:12, min:3, max:40, step:1,
         help:'분포 그래프를 그릴 최대 컬럼 개수입니다. 컬럼이 아주 많으면 줄이세요.' },
@@ -568,15 +642,42 @@ const MODULES = [
         help:'숫자 컬럼끼리 얼마나 함께 움직이는지도 같이 보여줍니다.' },
       { key:'missing_strategy', label:'결측치 처리 방식', type:'select', def:'report',
         options:[['report','리포트만 (원본 유지)'],['drop','결측 행 제거'],['fill_median','중앙값으로 채우기']],
-        help:'요약 리포트 단계에서는 보통 “리포트만”을 권장합니다.' }
+        help:'요약 단계에서는 보통 “리포트만”을 권장합니다.' }
     ]
   },
   {
-    id:'eda_corr', cat:'eda', icon:'🔗', tag:'핵심 기능',
+    id:'data_quality', cat:'eda', icon:'🧹', tag:'정리가 먼저', level:'입문', time:'약 1분',
+    name:'데이터 품질 진단 및 자동 정제',
+    desc:'빠진 값·중복·공백·이상치를 찾아 점수를 매기고, 자동으로 고쳐 줍니다.',
+    q:'“이 데이터 그냥 써도 될까?”',
+    about:'분석 결과가 이상하게 나오는 원인의 대부분은 데이터 자체의 문제입니다. 품질을 100점 만점으로 진단하고, 고칠 수 있는 것은 자동으로 정리한 깨끗한 CSV를 만들어 드립니다.',
+    dataNeed:'아무 CSV나 가능합니다.',
+    outputs:['종합 품질 점수(완전성·유일성·유효성·일관성)','문제 목록과 심각도','정제 전후 비교','바로 쓸 수 있는 정제된 CSV'],
+    need:{ date:'none', target:'none', group:'none', features:'none' },
+    params:[
+      { key:'fix_missing', label:'빈 값(결측치) 처리', type:'select', def:'keep',
+        options:[['keep','그대로 두기 (진단만)'],['median','중앙값으로 채우기'],['ffill','직전 값으로 채우기'],['drop','빈 값 있는 행 제거']],
+        help:'처음에는 “그대로 두기”로 진단만 해보시고, 문제를 확인한 뒤 처리 방식을 고르세요.' },
+      { key:'fix_outliers', label:'이상치 처리', type:'select', def:'flag',
+        options:[['flag','표시만 하기 (권장)'],['clip','정상 범위 경계값으로 조정'],['remove','해당 행 제거']],
+        help:'튀는 값이 진짜 이상 신호일 수 있으니, 지우기 전에 꼭 확인하세요.' },
+      { key:'fix_duplicates', label:'중복 행 제거', type:'bool', def:true,
+        help:'완전히 똑같은 행을 하나만 남깁니다. 집계가 부풀려지는 것을 막아 줍니다.' },
+      { key:'drop_useless', label:'쓸모없는 컬럼 제거', type:'bool', def:true,
+        help:'값이 항상 같아 분석에 도움이 안 되는 컬럼을 뺍니다.' },
+      { key:'trim_text', label:'앞뒤 공백 정리', type:'bool', def:true,
+        help:'“ A라인 ”과 “A라인”이 다른 값으로 취급되는 문제를 막아 줍니다.' }
+    ]
+  },
+  {
+    id:'eda_corr', cat:'eda', icon:'🔗', tag:'핵심 기능', level:'입문', time:'약 1분',
     name:'다중 변수 상관관계 분석 (Heatmap)',
     desc:'어떤 항목끼리 같이 오르내리는지 히트맵과 순위표로 보여줍니다.',
     q:'“온도가 오르면 불량률도 오를까?”',
-    need:{ date:'none', target:'optional', features:'optional' },
+    about:'여러 항목이 서로 어떤 관계인지를 한 장의 색 지도로 보여 줍니다. 관계가 강한 조합의 순위를 매기고, 가장 강한 관계는 산점도로 자세히 확인시켜 드립니다.',
+    dataNeed:'숫자 컬럼이 최소 2개 필요합니다.',
+    outputs:['상관관계 히트맵','관계가 강한 조합 순위표','타겟 기준 상관 막대그래프','가장 강한 관계의 산점도'],
+    need:{ date:'none', target:'optional', group:'none', features:'optional' },
     params:[
       { key:'corr_method', label:'상관 계산 방식', type:'select', def:'pearson',
         options:[['pearson','피어슨 — 직선 관계 (기본)'],['spearman','스피어만 — 순위 관계, 이상치에 강함'],['kendall','켄달 — 표본이 적을 때']],
@@ -592,11 +693,35 @@ const MODULES = [
     ]
   },
   {
-    id:'ts_forecast', cat:'ts', icon:'🔮', tag:'핵심 기능',
+    id:'compare_groups', cat:'compare', icon:'⚖️', tag:'현업 필수', level:'중급', time:'약 1분',
+    name:'그룹 간 차이 비교 (통계 검정)',
+    desc:'A라인과 B라인의 차이가 진짜인지, 우연인지 통계로 판정합니다.',
+    q:'“A라인이 B라인보다 정말 좋은 걸까?”',
+    about:'평균만 비교하면 우연한 차이에 속을 수 있습니다. 데이터 특성에 맞는 통계 검정을 자동으로 골라 “이 차이가 진짜인지”와 “얼마나 큰 차이인지”를 함께 알려 드립니다.',
+    dataNeed:'그룹을 나타내는 컬럼(예: 생산라인)과 비교할 숫자 컬럼(예: 수율)이 필요합니다.',
+    outputs:['그룹별 분포 상자그림','평균과 95% 신뢰구간','통계 검정 결과와 한국어 판정','그룹 쌍별 비교표'],
+    need:{ date:'none', target:'required', group:'required', features:'none' },
+    params:[
+      { key:'test_method', label:'검정 방법', type:'select', def:'auto',
+        options:[['auto','자동 선택 (권장)'],['parametric','평균 비교 (t검정 / ANOVA)'],['nonparametric','순위 비교 (이상치에 강함)']],
+        help:'자동 선택은 데이터가 정규분포인지 먼저 확인한 뒤 알맞은 방법을 고릅니다.' },
+      { key:'alpha', label:'유의수준 (기준선)', type:'number', def:0.05, min:0.001, max:0.2, step:0.005,
+        help:'“우연일 확률”이 이 값보다 작으면 진짜 차이로 판정합니다. 보통 0.05(5%)를 씁니다.' },
+      { key:'pairwise', label:'그룹 쌍별 비교', type:'bool', def:true,
+        help:'그룹이 3개 이상일 때 어느 조합끼리 차이가 나는지 하나하나 비교합니다.' },
+      { key:'min_group_n', label:'그룹 최소 데이터 수', type:'number', def:3, min:2, max:100, step:1,
+        help:'데이터가 이보다 적은 그룹은 신뢰할 수 없어 제외합니다.' }
+    ]
+  },
+  {
+    id:'ts_forecast', cat:'ts', icon:'🔮', tag:'핵심 기능', level:'중급', time:'약 2~3분',
     name:'미래 추세 및 계절성 예측 (Prophet)',
     desc:'과거 흐름에서 추세·요일·계절 패턴을 배워 앞으로의 값을 예측합니다.',
     q:'“다음 달 판매량은 얼마나 될까?”',
-    need:{ date:'required', target:'required', features:'none' },
+    about:'과거 데이터에서 장기 추세, 요일 패턴, 연간 계절성, 공휴일 효과를 각각 분리해 학습한 뒤 미래를 예측합니다. 과거 시점으로 돌아가 채점하는 방식으로 예측 정확도까지 알려 드립니다.',
+    dataNeed:'날짜 컬럼과 예측할 숫자 컬럼이 필요합니다. 최소 12개, 계절 패턴까지 보려면 2년치를 권장합니다.',
+    outputs:['예측 그래프와 예측 범위(신뢰구간)','추세·요일·계절·공휴일 패턴 분해','예측 정확도(MAPE) 검증','날짜별 예측값 CSV'],
+    need:{ date:'required', target:'required', group:'none', features:'none' },
     params:[
       { key:'periods', label:'예측할 기간 수', type:'number', def:30, min:1, max:3650, step:1,
         help:'아래 “기간 단위”를 기준으로 몇 칸 앞까지 예측할지 정합니다. (예: 일 단위 + 30 = 30일 뒤까지)' },
@@ -614,15 +739,18 @@ const MODULES = [
       { key:'floor_zero', label:'음수가 나오지 않게 하기', type:'bool', def:true,
         help:'판매량·불량 개수처럼 0보다 작아질 수 없는 값이라면 켜 두세요.' },
       { key:'cv_eval', label:'예측 정확도 검증 실행', type:'bool', def:true,
-        help:'과거 데이터로 “만약 그때 예측했다면 얼마나 맞았을지”를 계산해 오차율(MAPE)을 알려줍니다. 시간이 조금 더 걸립니다.' }
+        help:'과거 데이터로 “그때 예측했다면 얼마나 맞았을지”를 계산해 오차율(MAPE)을 알려줍니다. 시간이 조금 더 걸립니다.' }
     ]
   },
   {
-    id:'ts_smooth', cat:'ts', icon:'〰️',
+    id:'ts_smooth', cat:'ts', icon:'〰️', level:'입문', time:'약 1분',
     name:'데이터 평활화 및 트렌드 추출',
     desc:'들쭉날쭉한 값에서 잡음을 걷어내고 진짜 추세와 계절 패턴을 분리합니다.',
     q:'“매일 오르내리는데, 큰 흐름은 오르는 중일까?”',
-    need:{ date:'required', target:'required', features:'none' },
+    about:'하루하루의 등락에 가려 안 보이던 큰 흐름을 드러냅니다. 이동평균·지수가중·STL 세 가지 방법을 한 번에 비교해 보여 주고, 계절 패턴의 강도까지 수치로 알려 드립니다.',
+    dataNeed:'날짜 컬럼과 숫자 컬럼이 필요합니다.',
+    outputs:['원본 vs 평활선 비교 그래프','추세·계절·잔차 분리(STL)','계절성/추세 강도 점수','설명되지 않는 특이 시점 표시'],
+    need:{ date:'required', target:'required', group:'none', features:'none' },
     params:[
       { key:'method', label:'평활 방법', type:'select', def:'all',
         options:[['all','전부 비교해서 보기 (권장)'],['ma','이동평균 — 가장 직관적'],['ewm','지수가중 — 최근값에 가중치'],['stl','STL 분해 — 추세·계절·잔차 분리']],
@@ -632,7 +760,7 @@ const MODULES = [
       { key:'stl_period', label:'계절 주기 (0 = 자동)', type:'number', def:0, min:0, max:1000, step:1,
         help:'반복되는 주기의 길이입니다. 일별 주간 패턴이면 7, 월별 연간 패턴이면 12. 모르면 0(자동).' },
       { key:'resample', label:'집계 단위 변경', type:'select', def:'none',
-        options:[['none','원본 그대로'],['D','일별 합계로'],['W','주별 합계로'],['MS','월별 합계로']],
+        options:[['none','원본 그대로'],['D','일별로'],['W','주별로'],['MS','월별로']],
         help:'기록이 너무 촘촘할 때 묶어서 보면 흐름이 잘 보입니다.' },
       { key:'agg', label:'집계 방식', type:'select', def:'mean',
         options:[['mean','평균'],['sum','합계'],['max','최댓값'],['min','최솟값']],
@@ -640,11 +768,14 @@ const MODULES = [
     ]
   },
   {
-    id:'anomaly_iforest', cat:'anomaly', icon:'🚨', tag:'핵심 기능',
+    id:'anomaly_iforest', cat:'anomaly', icon:'🚨', tag:'핵심 기능', level:'중급', time:'약 1분',
     name:'장비 불량 · 스파이크 이상치 감지 (Isolation Forest)',
     desc:'정상 패턴에서 벗어난 데이터를 자동으로 찾아 순위와 원인 후보까지 제시합니다.',
     q:'“어제 설비에서 이상한 신호가 있었을까?”',
-    need:{ date:'optional', target:'optional', features:'optional' },
+    about:'여러 항목을 동시에 보고 “평소와 다른” 데이터를 찾아냅니다. 단순히 값이 크고 작은 것이 아니라 항목들의 조합이 이상한 경우까지 잡아내며, 왜 이상한지 원인 항목까지 짚어 드립니다.',
+    dataNeed:'숫자 컬럼이 필요합니다. 날짜가 있으면 언제 발생했는지도 보여 드립니다.',
+    outputs:['시간 흐름 위의 이상 지점 표시','이상점수 분포와 판정 기준선','벗어난 항목 분석(원인 후보)','이상 데이터만 모은 CSV'],
+    need:{ date:'optional', target:'optional', group:'none', features:'optional' },
     params:[
       { key:'contamination', label:'예상 이상치 비율 (%)', type:'number', def:2, min:0.1, max:25, step:0.1,
         help:'전체 중 몇 %가 이상치일 것 같은지입니다. 모르면 1~3% 정도로 시작해 보세요.' },
@@ -659,32 +790,77 @@ const MODULES = [
     ]
   },
   {
-    id:'regress_rf', cat:'regress', icon:'🎯',
+    id:'spc_control', cat:'quality', icon:'📐', tag:'제조 필수', level:'중급', time:'약 1분',
+    name:'공정 관리도 (SPC)',
+    desc:'공정이 안정적인지 판정하고, 규격을 만족하는 능력(Cpk)까지 계산합니다.',
+    q:'“우리 공정, 지금 정상인가?”',
+    about:'제조 현장의 표준 도구입니다. 공정이 평소 내는 변동 범위(관리한계)를 데이터에서 직접 계산하고, 그 범위를 벗어나거나 한쪽으로 치우치는 신호를 4가지 규칙으로 자동 점검합니다.',
+    dataNeed:'관리할 측정값(숫자) 컬럼이 필요합니다. 수율·치수·불량률처럼 일정 수준을 유지해야 하는 값이 적합합니다.',
+    outputs:['관리도(중심선·관리상한·관리하한)','이상 신호 4가지 규칙 점검표','공정능력 Cp / Cpk','규격 대비 분포 그래프'],
+    need:{ date:'optional', target:'required', group:'none', features:'none' },
+    params:[
+      { key:'subgroup', label:'부분군 크기', type:'number', def:1, min:1, max:10, step:1,
+        help:'한 번에 여러 개를 측정한다면 그 개수를 넣으세요. 하나씩 측정하면 1(개별값 관리도)입니다.' },
+      { key:'lsl', label:'규격 하한 (LSL)', type:'text', def:'',
+        help:'고객/설계 규격의 최솟값입니다. 모르면 비워 두세요. (비우면 공정능력 계산을 건너뜁니다)' },
+      { key:'usl', label:'규격 상한 (USL)', type:'text', def:'',
+        help:'고객/설계 규격의 최댓값입니다. 모르면 비워 두세요.' },
+      { key:'we_rules', label:'이상 신호 규칙 점검', type:'bool', def:true,
+        help:'관리한계 이탈 외에도 “평균이 이동하는 중” 같은 미묘한 신호까지 잡아 줍니다.' }
+    ]
+  },
+  {
+    id:'pareto', cat:'quality', icon:'📊', tag:'개선 우선순위', level:'입문', time:'약 30초',
+    name:'파레토 분석 (80 / 20)',
+    desc:'어떤 항목이 문제의 대부분을 차지하는지 찾아 개선 순서를 정해 줍니다.',
+    q:'“어디부터 손대야 효과가 클까?”',
+    about:'“문제의 80%는 원인의 20%에서 나온다”는 파레토 법칙을 그림으로 확인합니다. 항목별 크기와 누적 비율을 함께 보여 주어, 몇 개만 해결하면 되는지 명확히 알려 드립니다.',
+    dataNeed:'분류 컬럼(예: 불량유형, 라인, 제품)이 필요합니다. 값 컬럼을 비워 두면 건수로 셉니다.',
+    outputs:['파레토 차트(항목별 크기 + 누적 비율)','핵심 소수 항목 자동 판별','항목별 비중·누적 표'],
+    need:{ date:'none', target:'optional', group:'required', features:'none' },
+    params:[
+      { key:'top_n', label:'표시할 항목 수', type:'number', def:15, min:3, max:50, step:1,
+        help:'나머지는 “기타”로 묶어서 보여 줍니다.' },
+      { key:'cum_target', label:'핵심 기준 (누적 %)', type:'number', def:80, min:50, max:99, step:5,
+        help:'누적 비율이 이 값을 넘을 때까지를 “핵심 소수”로 봅니다. 보통 80%를 씁니다.' },
+      { key:'agg', label:'집계 방식', type:'select', def:'sum',
+        options:[['sum','합계'],['mean','평균']],
+        help:'값 컬럼을 지정했을 때 적용됩니다. 건수를 셀 때는 무시됩니다.' }
+    ]
+  },
+  {
+    id:'regress_rf', cat:'regress', icon:'🎯', level:'중급', time:'약 1~2분',
     name:'다중 변수 기반 결과 수치 예측 (Random Forest 회귀)',
     desc:'여러 조건값으로 결과 숫자를 예측하고, 어떤 조건이 결정적인지 보여줍니다.',
     q:'“온도·습도·속도를 알면 수율이 몇 %일까?”',
-    need:{ date:'none', target:'required', features:'optional' },
+    about:'여러 조건이 결과 숫자에 어떻게 영향을 주는지 학습합니다. 예측 정확도를 검증하고, 어떤 항목이 결과를 좌우하는지 순위를 매겨 개선 우선순위를 알려 드립니다.',
+    dataNeed:'예측할 숫자 컬럼(타겟)과 조건이 될 컬럼들이 필요합니다. 최소 30건 이상 권장.',
+    outputs:['실제값 vs 예측값 비교','설명력(R²)·평균 오차','항목 중요도 순위(순열 중요도 포함)','교차검증 결과'],
+    need:{ date:'none', target:'required', group:'none', features:'optional' },
     params:[
       { key:'test_size', label:'검증용 데이터 비율 (%)', type:'number', def:20, min:5, max:50, step:5,
         help:'모델이 못 본 데이터로 성적을 매기기 위해 떼어 둘 비율입니다. 보통 20%.' },
       { key:'n_estimators', label:'나무 개수', type:'number', def:300, min:50, max:1500, step:50,
         help:'많을수록 안정적입니다. 300이면 대체로 충분합니다.' },
       { key:'max_depth', label:'나무 최대 깊이 (0 = 제한 없음)', type:'number', def:0, min:0, max:60, step:1,
-        help:'데이터가 적은데 성능이 이상하게 완벽하다면 5~10으로 줄여 보세요.' },
+        help:'데이터가 적은데 성능이 이상하게 완벽하다면 5~10으로 줄여 보세요. 과적합을 막아 줍니다.' },
       { key:'cv_folds', label:'교차검증 횟수', type:'number', def:5, min:0, max:10, step:1,
         help:'데이터를 여러 번 나눠 반복 검증합니다. 0이면 생략합니다.' },
       { key:'importance', label:'변수 중요도 정밀 분석', type:'bool', def:true,
-        help:'값을 뒤섞어 성능이 얼마나 떨어지는지 보는 방식(순열 중요도)으로 더 믿을 만한 중요도를 계산합니다.' },
+        help:'값을 뒤섞어 성능이 얼마나 떨어지는지 보는 방식으로 더 믿을 만한 중요도를 계산합니다.' },
       { key:'log_target', label:'타겟 로그 변환', type:'bool', def:false,
         help:'금액처럼 값이 한쪽으로 심하게 치우쳐 있을 때 켜면 정확도가 올라갈 수 있습니다.' }
     ]
   },
   {
-    id:'classify_xgb', cat:'classify', icon:'🏷️',
+    id:'classify_xgb', cat:'classify', icon:'🏷️', level:'중급', time:'약 1~2분',
     name:'정상 / 불량 상태 패턴 분류 (XGBoost)',
-    desc:'조건값으로 상태(정상·불량 등)를 판정하고, 판정 근거와 정확도를 함께 제시합니다.',
+    desc:'조건값으로 상태를 판정하고, 판정 근거와 정확도를 함께 제시합니다.',
     q:'“이 조건이면 불량이 날까, 안 날까?”',
-    need:{ date:'none', target:'required', features:'optional' },
+    about:'여러 조건을 보고 상태(정상/불량 등)를 맞히는 모델을 만듭니다. “100건 중 몇 건을 잡아내고 몇 건을 놓치는지”를 현업 언어로 풀어서 설명해 드립니다.',
+    dataNeed:'상태를 나타내는 컬럼(정상/불량, OK/NG, 0/1)과 조건 컬럼들이 필요합니다.',
+    outputs:['혼동행렬(무엇을 맞히고 틀렸는지)','검출률·정밀도·AUC','ROC / 정밀도-검출률 곡선','판정에 중요한 항목 순위'],
+    need:{ date:'none', target:'required', group:'none', features:'optional' },
     params:[
       { key:'test_size', label:'검증용 데이터 비율 (%)', type:'number', def:20, min:5, max:50, step:5,
         help:'모델이 못 본 데이터로 성적을 매기기 위해 떼어 둘 비율입니다.' },
@@ -695,49 +871,56 @@ const MODULES = [
       { key:'max_depth', label:'트리 깊이', type:'number', def:5, min:2, max:15, step:1,
         help:'깊을수록 복잡한 패턴을 잡지만 과적합 위험이 커집니다.' },
       { key:'balance', label:'불균형 데이터 보정', type:'bool', def:true,
-        help:'불량이 1%처럼 아주 드문 경우 반드시 켜세요. 소수 클래스를 놓치지 않게 가중치를 줍니다.' },
+        help:'불량이 1%처럼 아주 드문 경우 반드시 켜세요. 소수 쪽을 놓치지 않게 가중치를 줍니다.' },
       { key:'threshold_opt', label:'판정 기준값 자동 최적화', type:'bool', def:true,
-        help:'“몇 % 이상이면 불량으로 볼지” 기준을 F1 기준으로 자동으로 찾아 줍니다.' }
+        help:'“몇 % 이상이면 불량으로 볼지” 기준을 자동으로 찾아 줍니다.' }
     ]
   },
   {
-    id:'cluster_kmeans', cat:'cluster', icon:'🧩',
+    id:'cluster_kmeans', cat:'cluster', icon:'🧩', level:'중급', time:'약 1분',
     name:'유사 특성 데이터 자동 그룹핑 (K-Means)',
     desc:'비슷한 성격의 행끼리 묶고, 각 그룹의 특징을 한국어로 요약해 줍니다.',
     q:'“우리 고객(설비)은 몇 가지 유형으로 나뉠까?”',
-    need:{ date:'none', target:'optional', features:'optional' },
+    about:'정답 없이 데이터 스스로 비슷한 것끼리 묶게 합니다. 몇 개로 나누는 게 좋은지도 자동으로 찾아 주고, 각 그룹이 어떤 성격인지 문장으로 설명해 드립니다.',
+    dataNeed:'숫자 컬럼이 최소 2개 필요합니다.',
+    outputs:['최적 그룹 수 탐색(실루엣·엘보우)','2차원 그룹 지도','그룹별 특징 히트맵과 설명','그룹 번호가 붙은 CSV'],
+    need:{ date:'none', target:'optional', group:'none', features:'optional' },
     params:[
       { key:'k', label:'나눌 그룹 수 (0 = 자동 탐색)', type:'number', def:0, min:0, max:8, step:1,
-        help:'0으로 두면 실루엣 점수로 최적 개수를 자동으로 찾아 줍니다. (권장) 사람이 해석할 수 있는 한도인 8개까지 지원합니다.' },
+        help:'0으로 두면 실루엣 점수로 최적 개수를 자동으로 찾아 줍니다. (권장) 해석 가능한 한도인 8개까지 지원합니다.' },
       { key:'k_max', label:'자동 탐색 최대 개수', type:'number', def:8, min:3, max:8, step:1,
         help:'자동 탐색 시 2개부터 이 값까지 시험해 봅니다.' },
       { key:'scale', label:'단위 자동 맞춤(표준화)', type:'bool', def:true,
         help:'단위가 다른 컬럼을 함께 묶을 때는 켜 두세요. 거의 항상 켜는 것이 맞습니다.' },
       { key:'pca_view', label:'2차원 지도로 시각화', type:'bool', def:true,
-        help:'여러 컬럼을 2차원으로 압축(PCA)해 그룹이 어떻게 나뉘었는지 눈으로 확인합니다.' },
+        help:'여러 컬럼을 2차원으로 압축해 그룹이 어떻게 나뉘었는지 눈으로 확인합니다.' },
       { key:'profile', label:'그룹별 특징 요약표', type:'bool', def:true,
-        help:'각 그룹이 평균보다 높은/낮은 항목을 정리해 “이 그룹은 어떤 유형인지” 설명해 줍니다.' }
+        help:'각 그룹이 평균보다 높은/낮은 항목을 정리해 “어떤 유형인지” 설명해 줍니다.' }
     ]
   }
 ];
-
 const MODULE_BY_ID = Object.fromEntries(MODULES.map(m => [m.id, m]));
+const CAT_BY_ID = Object.fromEntries(CATEGORIES.map(c => [c.id, c]));
 
 /* ═══════════════════════════════════════════════════════════════
-   2. 상태
+   3. 상태 & 유틸
    ═══════════════════════════════════════════════════════════════ */
-const state = {
-  moduleId: null,
-  columns: [],          // [{name, kind}]  kind: 'date' | 'number' | 'text'
-  values: {}            // date_col, target_col, feature_cols, p_<key>
-};
-
+const state = { moduleId:null, columns:[], preview:[], values:{}, recommended:[] };
 const $  = (s, r=document) => r.querySelector(s);
 const $$ = (s, r=document) => Array.from(r.querySelectorAll(s));
 const esc = s => String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 
+/** 도움말 문장 속의 어려운 용어에 설명 툴팁을 붙입니다. (태그 안쪽은 건드리지 않음) */
+function linkTerms(html){
+  return String(html).split(/(<[^>]+>)/).map(part => {
+    if (part.startsWith('<')) return part;
+    return part.replace(TERM_RE, m =>
+      `<span class="term" tabindex="0" data-def="${esc(GLOSSARY[m])}">${m}</span>`);
+  }).join('');
+}
+
 /* ═══════════════════════════════════════════════════════════════
-   3. STEP 1 — 모듈 카드 렌더링
+   4. STEP 1 — 모듈 카드
    ═══════════════════════════════════════════════════════════════ */
 function renderModules(){
   const host = $('#moduleList');
@@ -760,34 +943,61 @@ function renderModules(){
               </span>
               <span class="mod-desc">${esc(m.desc)}</span>
               <span class="mod-q">${esc(m.q)}</span>
-              ${m.tag ? `<span class="mod-tag">${esc(m.tag)}</span>` : ''}
+              <span class="mod-tags">
+                ${state.recommended.includes(m.id) ? '<span class="mod-tag rec">✨ 추천</span>' : ''}
+                ${m.tag ? `<span class="mod-tag">${esc(m.tag)}</span>` : ''}
+                <span class="mod-tag lvl">${esc(m.level)} · ${esc(m.time)}</span>
+              </span>
             </button>`).join('')}
         </div>
       </div>`;
   }).join('');
+  $$('.mod', host).forEach(btn => btn.addEventListener('click', () => selectModule(btn.dataset.mod)));
+}
 
-  $$('.mod', host).forEach(btn => {
-    btn.addEventListener('click', () => selectModule(btn.dataset.mod));
-  });
+function renderDetail(){
+  const m = MODULE_BY_ID[state.moduleId];
+  const box = $('#modDetail');
+  if (!m){ box.classList.remove('on'); box.innerHTML = ''; return; }
+  const cat = CAT_BY_ID[m.cat];
+  box.style.setProperty('--cat', cat.color);
+  box.innerHTML = `
+    <h3><span>${m.icon}</span> ${esc(m.name)}</h3>
+    <p style="font-size:13.5px;color:var(--text-2);line-height:1.7">${linkTerms(esc(m.about))}</p>
+    <div class="detail-grid">
+      <div class="detail-box">
+        <div class="db-t">📥 필요한 데이터</div>
+        <p>${linkTerms(esc(m.dataNeed))}</p>
+      </div>
+      <div class="detail-box">
+        <div class="db-t">📤 나오는 결과물</div>
+        <ul>${m.outputs.map(o => `<li>${linkTerms(esc(o))}</li>`).join('')}</ul>
+      </div>
+      <div class="detail-box">
+        <div class="db-t">⏱️ 예상 소요 시간</div>
+        <p><strong style="color:var(--text);font-size:14px">${esc(m.time)}</strong><br>
+        난이도: ${esc(m.level)}<br>
+        <span style="color:var(--muted)">Colab 실행 후 자동으로 진행됩니다.</span></p>
+      </div>
+    </div>`;
+  box.classList.add('on');
 }
 
 function selectModule(id){
   state.moduleId = id;
   $$('.mod').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.mod === id)));
-  renderFields();
-  save();
-  update();
-  const el = $('#commonFields');
-  if (el && window.matchMedia('(max-width:960px)').matches){
-    el.scrollIntoView({behavior:'smooth', block:'start'});
+  renderDetail(); renderFields(); save(); update();
+  if (window.matchMedia('(max-width:980px)').matches){
+    $('#modDetail').scrollIntoView({ behavior:'smooth', block:'start' });
   }
 }
 
 /* ═══════════════════════════════════════════════════════════════
-   4. STEP 3 — 공통 필드 + 모듈별 파라미터
+   5. STEP 3 — 필드
    ═══════════════════════════════════════════════════════════════ */
+function kindLabel(k){ return k === 'date' ? '날짜' : k === 'number' ? '숫자' : '텍스트'; }
+
 function columnSelectHTML(id, value, kindFilter, placeholder){
-  // CSV를 읽었으면 드롭다운, 아니면 직접 입력
   if (state.columns.length){
     const prefer = state.columns.filter(c => !kindFilter || kindFilter.includes(c.kind));
     const others = state.columns.filter(c => prefer.indexOf(c) === -1);
@@ -800,8 +1010,6 @@ function columnSelectHTML(id, value, kindFilter, placeholder){
   }
   return `<input type="text" id="${id}" data-key="${id}" value="${esc(value||'')}" placeholder="${esc(placeholder)}" autocomplete="off">`;
 }
-
-function kindLabel(k){ return k === 'date' ? '날짜' : k === 'number' ? '숫자' : '텍스트'; }
 
 function featureFieldHTML(value){
   const chips = state.columns.length ? `
@@ -819,9 +1027,7 @@ function featureFieldHTML(value){
 
 function renderFields(){
   const m = MODULE_BY_ID[state.moduleId];
-  const host = $('#commonFields');
-  const phost = $('#moduleParams');
-
+  const host = $('#commonFields'), phost = $('#moduleParams');
   if (!m){
     host.innerHTML = `<p class="help" style="grid-column:1/-1">STEP 1에서 분석을 먼저 선택해 주세요.</p>`;
     phost.innerHTML = '';
@@ -829,37 +1035,57 @@ function renderFields(){
     return;
   }
   $('#paramSub').innerHTML = `<strong>${esc(m.name)}</strong> 에 필요한 항목만 표시하고 있습니다.`;
-
   const v = state.values;
   let html = '';
 
   if (m.need.date !== 'none'){
     const req = m.need.date === 'required';
-    html += `
-      <div class="field" id="f_date_col">
+    html += `<div class="field" id="f_date_col">
         <label for="date_col">날짜 / 시간 컬럼 ${req ? '<span class="req">필수</span>' : '<span class="opt">선택</span>'}</label>
         ${columnSelectHTML('date_col', v.date_col, ['date'], req ? '날짜 컬럼을 고르세요' : '(선택) 시간 흐름을 함께 보려면 지정')}
-        <span class="help">예: <code>날짜</code>, <code>date</code>, <code>측정시각</code> — 2024-01-31 같은 형식이면 무엇이든 인식합니다.</span>
+        <span class="help">예: <code>날짜</code>, <code>date</code>, <code>측정시각</code> — 2024-01-31 같은 형식이면 인식합니다.</span>
+      </div>`;
+  }
+  if (m.need.group !== 'none'){
+    const req = m.need.group === 'required';
+    html += `<div class="field" id="f_group_col">
+        <label for="group_col">${m.id === 'pareto' ? '분류(원인·항목) 컬럼' : '그룹(비교 기준) 컬럼'} ${req ? '<span class="req">필수</span>' : '<span class="opt">선택</span>'}</label>
+        ${columnSelectHTML('group_col', v.group_col, null, req ? '나눌 기준 컬럼을 고르세요' : '(선택)')}
+        <span class="help">${m.id === 'pareto'
+          ? '무엇별로 집계할지 정합니다. 예: <code>불량유형</code>, <code>생산라인</code>, <code>제품명</code>'
+          : '비교하고 싶은 <strong>집단을 구분하는</strong> 컬럼입니다. 예: <code>생산라인</code>, <code>교대조</code>, <code>공급업체</code>'}</span>
       </div>`;
   }
   if (m.need.target !== 'none'){
     const req = m.need.target === 'required';
     const kindHint = m.id === 'classify_xgb' ? null : ['number'];
-    const ph = req ? (m.id === 'classify_xgb' ? '맞히고 싶은 상태 컬럼 (예: 불량여부)' : '예측/분석할 숫자 컬럼') : '(선택) 특별히 주목할 컬럼';
-    html += `
-      <div class="field" id="f_target_col">
-        <label for="target_col">${m.id === 'classify_xgb' ? '분류할 상태 컬럼' : '타겟(예측·분석할) 컬럼'} ${req ? '<span class="req">필수</span>' : '<span class="opt">선택</span>'}</label>
+    let labelTxt = '타겟(예측·분석할) 컬럼', ph = '예측/분석할 숫자 컬럼', helpTxt =
+      '결과로 알고 싶은 <strong>숫자</strong> 컬럼입니다. (예: 매출, 수율, 온도)';
+    if (m.id === 'classify_xgb'){
+      labelTxt = '분류할 상태 컬럼'; ph = '맞히고 싶은 상태 컬럼 (예: 불량여부)';
+      helpTxt = '정상/불량, OK/NG, 0/1처럼 <strong>종류를 나타내는</strong> 컬럼을 고르세요.';
+    } else if (m.id === 'compare_groups'){
+      labelTxt = '비교할 숫자 컬럼'; ph = '그룹끼리 비교할 숫자 (예: 수율)';
+      helpTxt = '그룹 간에 <strong>차이가 있는지 보고 싶은 숫자</strong> 컬럼입니다.';
+    } else if (m.id === 'spc_control'){
+      labelTxt = '관리할 측정값 컬럼'; ph = '관리도로 감시할 숫자 (예: 수율)';
+      helpTxt = '<strong>일정 수준을 유지해야 하는 값</strong>이 적합합니다. 계속 늘어나는 누적값(매출·생산량)에는 맞지 않습니다.';
+    } else if (m.id === 'pareto'){
+      labelTxt = '집계할 값 컬럼'; ph = '(선택) 비우면 건수를 셉니다';
+      helpTxt = '금액·수량처럼 <strong>합칠 숫자</strong>가 있으면 지정하세요. 비워 두면 <strong>발생 건수</strong>를 셉니다.';
+    } else if (!req){
+      ph = '(선택) 특별히 주목할 컬럼';
+      helpTxt = '지정하면 이 컬럼을 중심으로 결과를 정리합니다.';
+    }
+    html += `<div class="field" id="f_target_col">
+        <label for="target_col">${labelTxt} ${req ? '<span class="req">필수</span>' : '<span class="opt">선택</span>'}</label>
         ${columnSelectHTML('target_col', v.target_col, kindHint, ph)}
-        <span class="help">${m.id === 'classify_xgb'
-          ? '정상/불량, OK/NG, 0/1처럼 <strong>종류를 나타내는</strong> 컬럼을 고르세요.'
-          : (req ? '결과로 알고 싶은 <strong>숫자</strong> 컬럼입니다. (예: 매출, 수율, 온도)' : '지정하면 이 컬럼을 중심으로 결과를 정리합니다.')}</span>
+        <span class="help">${helpTxt}</span>
       </div>`;
   }
-  host.innerHTML = html || `<p class="help" style="grid-column:1/-1">이 분석은 별도의 기준 컬럼이 필요 없습니다.</p>`;
+  host.innerHTML = html || `<p class="help" style="grid-column:1/-1">이 분석은 별도의 기준 컬럼이 필요 없습니다. 바로 실행하시면 됩니다.</p>`;
 
-  // 모듈 파라미터
-  const basic = m.params.slice(0, 3);
-  const adv   = m.params.slice(3);
+  const basic = m.params.slice(0, 3), adv = m.params.slice(3);
   let phtml = '';
   if (m.need.features !== 'none') phtml += `<div class="field-grid" style="margin-top:15px">${featureFieldHTML(v.feature_cols)}</div>`;
   phtml += `<div class="field-grid" style="margin-top:15px">${basic.map(p => paramHTML(m, p)).join('')}</div>`;
@@ -871,7 +1097,6 @@ function renderFields(){
   }
   phost.innerHTML = phtml;
 
-  // 이벤트 연결
   $$('[data-key]', host).forEach(bindInput);
   $$('[data-key]', phost).forEach(bindInput);
   bindFeatureChips();
@@ -895,12 +1120,11 @@ function paramHTML(m, p){
   } else if (p.type === 'number'){
     control = `<input type="number" id="${id}" data-key="${id}" value="${esc(cur)}" min="${p.min}" max="${p.max}" step="${p.step}">`;
   } else {
-    control = `<input type="text" id="${id}" data-key="${id}" value="${esc(cur)}">`;
+    control = `<input type="text" id="${id}" data-key="${id}" value="${esc(cur)}" placeholder="비워 두면 사용 안 함">`;
   }
   return `<div class="field">
-      <label for="${id}">${esc(p.label)}</label>
-      ${control}
-      <span class="help">${p.help}</span>
+      <label for="${id}">${esc(p.label)}</label>${control}
+      <span class="help">${linkTerms(p.help)}</span>
     </div>`;
 }
 
@@ -917,7 +1141,6 @@ function bindInput(el){
     save(); update();
   });
 }
-
 function currentFeatures(){
   return (state.values.feature_cols || '').split(',').map(s => s.trim()).filter(Boolean);
 }
@@ -925,18 +1148,14 @@ function bindFeatureChips(){
   const host = $('#featChips');
   if (!host) return;
   syncFeatureChips();
-  $$('.chip', host).forEach(chip => {
-    chip.addEventListener('click', () => {
-      const col = chip.dataset.col;
-      const list = currentFeatures();
-      const i = list.indexOf(col);
-      if (i >= 0) list.splice(i, 1); else list.push(col);
-      state.values.feature_cols = list.join(', ');
-      const input = $('#feature_cols');
-      if (input) input.value = state.values.feature_cols;
-      syncFeatureChips(); save(); update();
-    });
-  });
+  $$('.chip', host).forEach(chip => chip.addEventListener('click', () => {
+    const col = chip.dataset.col, list = currentFeatures(), i = list.indexOf(col);
+    if (i >= 0) list.splice(i, 1); else list.push(col);
+    state.values.feature_cols = list.join(', ');
+    const input = $('#feature_cols');
+    if (input) input.value = state.values.feature_cols;
+    syncFeatureChips(); save(); update();
+  }));
 }
 function syncFeatureChips(){
   const host = $('#featChips');
@@ -946,7 +1165,7 @@ function syncFeatureChips(){
 }
 
 /* ═══════════════════════════════════════════════════════════════
-   5. STEP 2 — CSV 헤더 읽기 (전부 브라우저 안에서만 처리)
+   6. STEP 2 — CSV 읽기 (전부 브라우저 안에서)
    ═══════════════════════════════════════════════════════════════ */
 const dz = $('#dropzone'), fileInput = $('#fileInput');
 dz.addEventListener('click', () => fileInput.click());
@@ -957,7 +1176,6 @@ dz.addEventListener('drop', e => { const f = e.dataTransfer.files[0]; if (f) rea
 fileInput.addEventListener('change', e => { const f = e.target.files[0]; if (f) readHeader(f); });
 
 function decodeBytes(buf){
-  // UTF-8로 먼저 시도하고, 깨지면 한글 인코딩(cp949/euc-kr)으로 다시 읽습니다.
   let txt = new TextDecoder('utf-8').decode(buf);
   if (txt.includes('�')){
     for (const enc of ['euc-kr','windows-949','cp949']){
@@ -969,7 +1187,6 @@ function decodeBytes(buf){
   }
   return { text: txt.replace(/^﻿/, ''), enc: 'utf-8' };
 }
-
 function splitCsvLine(line, delim){
   const out = []; let cur = '', inQ = false;
   for (let i = 0; i < line.length; i++){
@@ -986,22 +1203,17 @@ function splitCsvLine(line, delim){
   out.push(cur);
   return out.map(s => s.trim().replace(/^"|"$/g, ''));
 }
-
 function detectDelim(line){
-  const cands = [',', ';', '\t', '|'];
   let best = ',', bestN = 0;
-  cands.forEach(d => { const n = splitCsvLine(line, d).length; if (n > bestN){ bestN = n; best = d; } });
+  [',',';','\t','|'].forEach(d => { const n = splitCsvLine(line, d).length; if (n > bestN){ bestN = n; best = d; } });
   return best;
 }
-
 const DATE_RE = /^\s*(\d{4}[-/.]\d{1,2}[-/.]\d{1,2}|\d{1,2}[-/.]\d{1,2}[-/.]\d{2,4}|\d{4}년\s?\d{1,2}월|\d{8})([ T]\d{1,2}:\d{2})?/;
 function guessKind(vals){
   const v = vals.filter(x => x !== '' && x != null);
   if (!v.length) return 'text';
-  const isDate = v.filter(x => DATE_RE.test(x)).length / v.length;
-  if (isDate >= 0.7) return 'date';
-  const isNum = v.filter(x => x !== '' && !isNaN(Number(String(x).replace(/[,\s%₩$]/g, '')))).length / v.length;
-  if (isNum >= 0.8) return 'number';
+  if (v.filter(x => DATE_RE.test(x)).length / v.length >= 0.7) return 'date';
+  if (v.filter(x => x !== '' && !isNaN(Number(String(x).replace(/[,\s%₩$]/g,'')))).length / v.length >= 0.8) return 'number';
   return 'text';
 }
 
@@ -1010,62 +1222,176 @@ function readHeader(file){
   reader.onload = () => {
     try{
       const { text, enc } = decodeBytes(reader.result);
-      const lines = text.split(/\r\n|\n|\r/).filter(l => l.trim() !== '').slice(0, 60);
+      const lines = text.split(/\r\n|\n|\r/).filter(l => l.trim() !== '').slice(0, 80);
       if (!lines.length) throw new Error('빈 파일입니다.');
       const delim = detectDelim(lines[0]);
-      const header = splitCsvLine(lines[0], delim).map((h, i) => h || `열${i+1}`);
-      const rows = lines.slice(1, 40).map(l => splitCsvLine(l, delim));
-      state.columns = header.map((name, i) => ({ name, kind: guessKind(rows.map(r => r[i])) }));
+      const header = splitCsvLine(lines[0], delim).map((h,i) => h || `열${i+1}`);
+      const rows = lines.slice(1, 60).map(l => splitCsvLine(l, delim));
+      state.columns = header.map((name,i) => {
+        const colVals = rows.map(r => r[i]);
+        return { name, kind: guessKind(colVals),
+                 uniq: new Set(colVals.filter(x => x !== '' && x != null)).size };
+      });
+      state.preview = rows.slice(0, 5);
 
       $('#fileName').textContent = file.name;
       $('#fileMeta').textContent =
-        `컬럼 ${state.columns.length}개 인식 · 구분자 "${delim === '\t' ? 'Tab' : delim}" · 인코딩 ${enc}` +
-        ` · 날짜형 ${state.columns.filter(c=>c.kind==='date').length}개 / 숫자형 ${state.columns.filter(c=>c.kind==='number').length}개`;
+        `컬럼 ${state.columns.length}개 인식 · 구분자 "${delim === '\t' ? 'Tab' : delim}" · 인코딩 ${enc}`
+        + ` · 날짜형 ${state.columns.filter(c=>c.kind==='date').length}개 / 숫자형 ${state.columns.filter(c=>c.kind==='number').length}개`;
       $('#fileOk').classList.add('on');
 
-      // 좋은 기본값 자동 제안
+      renderPreview();
+      recommend();
+
       const d = state.columns.find(c => c.kind === 'date');
       if (d && !state.values.date_col) state.values.date_col = d.name;
       const n = state.columns.filter(c => c.kind === 'number');
       if (n.length && !state.values.target_col) state.values.target_col = n[0].name;
+      const g = state.columns.find(c => c.kind === 'text' && c.uniq >= 2 && c.uniq <= 12);
+      if (g && !state.values.group_col) state.values.group_col = g.name;
 
+      renderModules();
+      if (state.moduleId) $$('.mod').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.mod === state.moduleId)));
       renderFields(); save(); update();
-      toast(`✅ 컬럼 ${state.columns.length}개를 읽었습니다. 이제 목록에서 골라 쓰세요.`);
+      toast(`✅ 컬럼 ${state.columns.length}개를 읽었습니다.\n이제 목록에서 골라 쓰실 수 있습니다.`);
     }catch(err){
       toast('⚠️ 파일을 읽지 못했습니다: ' + err.message);
     }
   };
   reader.onerror = () => toast('⚠️ 파일을 읽지 못했습니다.');
-  reader.readAsArrayBuffer(file.slice(0, 256 * 1024)); // 앞부분만 읽습니다
+  reader.readAsArrayBuffer(file.slice(0, 256 * 1024));
 }
 
+function renderPreview(){
+  const w = $('#previewWrap');
+  if (!state.columns.length){ w.classList.remove('on'); return; }
+  w.innerHTML = `<table>
+    <thead><tr>${state.columns.map(c =>
+      `<th>${esc(c.name)}<span>${kindLabel(c.kind)}</span></th>`).join('')}</tr></thead>
+    <tbody>${state.preview.map(r =>
+      `<tr>${state.columns.map((c,i) => `<td>${esc(r[i] === undefined || r[i] === '' ? '—' : r[i])}</td>`).join('')}</tr>`).join('')}</tbody>
+  </table>`;
+  w.classList.add('on');
+}
+
+/** 데이터 생김새를 보고 어울리는 분석을 추천합니다. */
+function recommend(){
+  const cols = state.columns;
+  const dates = cols.filter(c => c.kind === 'date');
+  const nums = cols.filter(c => c.kind === 'number');
+  const cats = cols.filter(c => c.kind === 'text' && c.uniq >= 2 && c.uniq <= 12);
+  const rec = [];
+  rec.push('eda_summary');
+  rec.push('data_quality');
+  if (nums.length >= 2) rec.push('eda_corr');
+  if (dates.length && nums.length){ rec.push('ts_forecast'); rec.push('ts_smooth'); }
+  if (nums.length >= 2) rec.push('anomaly_iforest');
+  if (cats.length && nums.length) rec.push('compare_groups');
+  if (cats.length) rec.push('pareto');
+  if (nums.length) rec.push('spc_control');
+  if (nums.length >= 3) rec.push('regress_rf');
+  if (cats.length && nums.length >= 2) rec.push('classify_xgb');
+  if (nums.length >= 2) rec.push('cluster_kmeans');
+
+  state.recommended = rec.slice(0, 6);
+  const why = [];
+  if (dates.length) why.push(`날짜 컬럼 ${dates.length}개`);
+  if (nums.length) why.push(`숫자 컬럼 ${nums.length}개`);
+  if (cats.length) why.push(`그룹으로 쓸 만한 컬럼 ${cats.length}개`);
+  $('#recStrip .rs-t').innerHTML =
+    `💡 이 데이터에는 ${esc(why.join(' · '))} 가 있습니다 — 어울리는 분석을 눌러 바로 선택하세요`;
+  $('#recList').innerHTML = state.recommended.map(id => {
+    const m = MODULE_BY_ID[id];
+    return `<button type="button" class="rec-btn" data-rec="${id}">${m.icon} ${esc(m.name.replace(/\s*\(.*\)$/,''))}</button>`;
+  }).join('');
+  $$('#recList .rec-btn').forEach(b => b.addEventListener('click', () => {
+    selectModule(b.dataset.rec);
+    $('#modDetail').scrollIntoView({ behavior:'smooth', block:'center' });
+  }));
+  $('#recStrip').classList.add('on');
+}
+
+/* ── 연습용 예제 CSV 생성 (노트북의 예제 데이터와 같은 구조) ────────── */
+function makeSampleCsv(){
+  let seed = 42;
+  const rnd = () => { seed = (seed * 1664525 + 1013904223) % 4294967296; return seed / 4294967296; };
+  const gauss = () => { let s = 0; for (let i=0;i<6;i++) s += rnd(); return (s - 3) / 1.2; };
+  const lines = ['날짜,생산량,설비온도,습도,진동값,압력,라인속도,수율,불량여부,생산라인'];
+  const start = new Date(2024, 0, 1);
+  const lineNames = ['A라인','B라인','C라인'];
+  for (let t = 0; t < 180; t++){
+    const d = new Date(start.getTime() + t * 86400000);
+    const ds = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+    const weekly = 90 * Math.sin(2 * Math.PI * t / 7);
+    const yearly = 220 * Math.sin(2 * Math.PI * t / 365.25 - 0.8);
+    let prod = 1000 + 0.9 * t + weekly + yearly + gauss() * 45;
+    let temp = 62 + 8 * Math.sin(2 * Math.PI * t / 365.25 - 1.2) + gauss() * 2.2;
+    const hum = 48 + 12 * Math.sin(2 * Math.PI * t / 365.25 + 0.4) + gauss() * 4.5;
+    let vib = 2.4 + 0.018 * Math.pow(temp - 62, 2) + gauss() * 0.28;
+    const pres = 101 + gauss() * 1.1;
+    const spd = 120 + gauss() * 6 + 0.004 * t;
+    const line = lineNames[Math.floor(rnd() * 3)];
+    let yld = 99 - 0.42 * Math.abs(temp - 62) - 2.9 * Math.max(vib - 2.6, 0)
+              - 0.10 * Math.abs(pres - 101.5) - 0.012 * Math.pow(Math.max(spd - 125, 0), 1.4) + gauss() * 0.55;
+    if (line === 'C라인') yld -= 1.4; else if (line === 'B라인') yld -= 0.5;
+    if (rnd() < 0.02){ vib += 2 + rnd() * 2.5; temp += 6 + rnd() * 8; yld -= 5 + rnd() * 9; prod -= 150 + rnd() * 270; }
+    yld = Math.min(100, Math.max(60, yld));
+    lines.push([ds, prod.toFixed(1), temp.toFixed(2), hum.toFixed(2), vib.toFixed(3),
+                 pres.toFixed(2), spd.toFixed(1), yld.toFixed(2),
+                 yld < 93 ? '불량' : '정상', line].join(','));
+  }
+  return '﻿' + lines.join('\r\n');   // BOM: 엑셀에서 한글이 깨지지 않도록
+}
+$('#sampleBtn').addEventListener('click', () => {
+  const blob = new Blob([makeSampleCsv()], { type:'text/csv;charset=utf-8' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = '연습용_공장설비데이터.csv';
+  document.body.appendChild(a); a.click(); document.body.removeChild(a);
+  setTimeout(() => URL.revokeObjectURL(a.href), 1500);
+  toast('⬇️ 연습용 예제 파일을 내려받았습니다.\n이 파일을 왼쪽에 끌어다 놓아 보세요.');
+});
+
 /* ═══════════════════════════════════════════════════════════════
-   6. 검증 · 요약 · 실행 링크
+   7. 검증 · 요약 · 링크
    ═══════════════════════════════════════════════════════════════ */
 function validate(){
   const m = MODULE_BY_ID[state.moduleId];
   const problems = [], hints = [];
   if (!m){ problems.push('STEP 1에서 분석 종류를 선택해 주세요.'); return { problems, hints }; }
+  const V = k => (state.values[k] || '').trim();
 
-  if (m.need.date === 'required' && !(state.values.date_col || '').trim())
+  if (m.need.date === 'required' && !V('date_col'))
     problems.push('<strong>날짜/시간 컬럼</strong>을 지정해 주세요. 시계열 분석에는 반드시 필요합니다.');
-  if (m.need.target === 'required' && !(state.values.target_col || '').trim())
+  if (m.need.target === 'required' && !V('target_col'))
     problems.push('<strong>타겟 컬럼</strong>을 지정해 주세요.');
+  if (m.need.group === 'required' && !V('group_col'))
+    problems.push('<strong>' + (m.id === 'pareto' ? '분류 컬럼' : '그룹 컬럼') + '</strong>을 지정해 주세요.');
 
-  // 부드러운 주의사항
-  if (m.id === 'ts_forecast'){
-    const p = Number(state.values.p_periods ?? 30);
-    if (p > 365) hints.push('예측 기간이 매우 깁니다. 먼 미래일수록 오차가 급격히 커진다는 점을 감안하세요.');
-  }
-  if (m.id === 'anomaly_iforest'){
-    const c = Number(state.values.p_contamination ?? 2);
-    if (c > 10) hints.push('예상 이상치 비율이 10%를 넘습니다. 너무 많은 정상 데이터가 이상치로 표시될 수 있습니다.');
-  }
+  if (m.id === 'ts_forecast' && Number(state.values.p_periods ?? 30) > 365)
+    hints.push('예측 기간이 매우 깁니다. 먼 미래일수록 오차가 급격히 커진다는 점을 감안하세요.');
+  if (m.id === 'anomaly_iforest' && Number(state.values.p_contamination ?? 2) > 10)
+    hints.push('예상 이상치 비율이 10%를 넘습니다. 정상 데이터까지 이상치로 표시될 수 있습니다.');
   if (m.id === 'cluster_kmeans' && Number(state.values.p_k ?? 0) === 1)
     problems.push('그룹 수는 2 이상이거나, 자동 탐색(0)이어야 합니다.');
-  if (m.need.features !== 'none' && state.columns.length){
-    const bad = currentFeatures().filter(f => !state.columns.some(c => c.name === f));
-    if (bad.length) hints.push(`업로드한 CSV에 없는 컬럼명이 있습니다: <strong>${esc(bad.join(', '))}</strong>`);
+  if (m.id === 'compare_groups' && V('group_col') && V('group_col') === V('target_col'))
+    problems.push('그룹 컬럼과 비교할 숫자 컬럼은 <strong>서로 달라야</strong> 합니다.');
+  if (m.id === 'spc_control'){
+    const lo = state.values.p_lsl, hi = state.values.p_usl;
+    if (lo && hi && Number(lo) >= Number(hi))
+      problems.push('규격 하한(LSL)은 규격 상한(USL)보다 <strong>작아야</strong> 합니다.');
+  }
+  if (state.columns.length){
+    const known = new Set(state.columns.map(c => c.name));
+    ['date_col','target_col','group_col'].forEach(k => {
+      if (V(k) && !known.has(V(k))) hints.push(`업로드한 CSV에 <strong>${esc(V(k))}</strong> 컬럼이 없습니다. 오타를 확인해 주세요.`);
+    });
+    const bad = currentFeatures().filter(f => !known.has(f));
+    if (bad.length) hints.push(`CSV에 없는 컬럼명: <strong>${esc(bad.join(', '))}</strong>`);
+    // 타입이 맞는지도 가볍게 확인
+    const tcol = state.columns.find(c => c.name === V('target_col'));
+    if (tcol && m.id !== 'classify_xgb' && m.id !== 'pareto' && m.need.target === 'required' && tcol.kind === 'text')
+      hints.push(`<strong>${esc(tcol.name)}</strong> 은(는) 숫자가 아닌 것 같습니다. 숫자 컬럼을 고르시는 편이 좋습니다.`);
   }
   return { problems, hints };
 }
@@ -1076,25 +1402,23 @@ function buildParams(){
   q.set('module_id', m.id);
   if (m.need.date !== 'none' && state.values.date_col) q.set('date_col', state.values.date_col.trim());
   if (m.need.target !== 'none' && state.values.target_col) q.set('target_col', state.values.target_col.trim());
+  if (m.need.group !== 'none' && state.values.group_col) q.set('group_col', state.values.group_col.trim());
   if (m.need.features !== 'none' && currentFeatures().length) q.set('feature_cols', currentFeatures().join(','));
   m.params.forEach(p => {
     const raw = state.values['p_' + p.key];
-    const val = (raw === undefined || raw === '') ? p.def : raw;
-    q.set('p_' + p.key, p.type === 'bool' ? (val ? '1' : '0') : String(val));
+    const val = (raw === undefined || raw === null) ? p.def : raw;
+    if (p.type === 'bool') q.set('p_' + p.key, val ? '1' : '0');
+    else q.set('p_' + p.key, String(val === '' && p.type !== 'text' ? p.def : val));
   });
-  q.set('v', '1');
+  q.set('v', '2');
   return q;
 }
-
-/* 설정 코드(붙여넣기용) — URL 자동 인식이 안 될 때의 확실한 보험 */
 function buildToken(){
   const obj = Object.fromEntries(buildParams().entries());
-  const json = JSON.stringify(obj);
-  const b64 = btoa(String.fromCharCode(...new TextEncoder().encode(json)))
-    .replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+  const b64 = btoa(String.fromCharCode(...new TextEncoder().encode(JSON.stringify(obj))))
+    .replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'');
   return 'DAP1.' + b64;
 }
-
 function buildUrl(){
   const q = buildParams();
   q.set('cfg', buildToken());
@@ -1105,18 +1429,23 @@ function summarySentence(){
   const m = MODULE_BY_ID[state.moduleId];
   if (!m) return '먼저 STEP 1에서 분석을 선택해 주세요.';
   const t = state.values.target_col ? `<span class="hl">${esc(state.values.target_col)}</span>` : '<span class="hl">전체 데이터</span>';
+  const g = state.values.group_col ? `<span class="hl">${esc(state.values.group_col)}</span>` : '<span class="hl">그룹</span>';
   const d = state.values.date_col ? `<span class="hl">${esc(state.values.date_col)}</span> 기준으로 ` : '';
   const P = k => state.values['p_'+k] ?? (m.params.find(p=>p.key===k)||{}).def;
   const freqLabel = { D:'일', W:'주', MS:'개월', H:'시간', '15min':'×15분', QS:'분기' }[P('freq')] || '기간';
   switch (m.id){
-    case 'eda_summary':      return `${t}를 포함한 데이터 전체를 훑어 <span class="hl">구조·결측치·분포 요약 리포트</span>를 만듭니다.`;
-    case 'eda_corr':         return `숫자 컬럼들이 서로 얼마나 함께 움직이는지 <span class="hl">히트맵</span>으로 보고, 관계가 강한 상위 ${esc(P('top_n_pairs'))}쌍을 뽑습니다.`;
-    case 'ts_forecast':      return `${d}${t}의 <span class="hl">앞으로 ${esc(P('periods'))}${freqLabel}</span> 흐름을 예측하고 추세·계절 패턴을 분리해 보여줍니다.`;
-    case 'ts_smooth':        return `${d}${t}의 잡음을 걷어내고 <span class="hl">진짜 추세와 계절 패턴</span>을 분리합니다.`;
-    case 'anomaly_iforest':  return `데이터에서 <span class="hl">상위 ${esc(P('contamination'))}%</span>의 이상 징후를 찾아 순위와 원인 후보를 정리합니다.`;
-    case 'regress_rf':       return `여러 조건값으로 ${t} <span class="hl">수치를 예측</span>하고, 어떤 항목이 결정적인지 순위를 냅니다.`;
-    case 'classify_xgb':     return `여러 조건값으로 ${t} <span class="hl">상태를 분류</span>하고, 정확도와 판정 근거를 함께 제시합니다.`;
-    case 'cluster_kmeans':   return `비슷한 행끼리 <span class="hl">${Number(P('k')) === 0 ? '자동으로 찾은 개수만큼' : P('k')+'개 그룹으로'}</span> 묶고 각 그룹의 성격을 요약합니다.`;
+    case 'eda_summary':     return `${t}를 포함한 데이터 전체를 훑어 <span class="hl">구조·결측치·분포 요약 리포트</span>를 만듭니다.`;
+    case 'data_quality':    return `데이터의 <span class="hl">품질을 100점 만점으로 진단</span>하고, 고칠 수 있는 문제를 자동으로 정리한 깨끗한 CSV를 만듭니다.`;
+    case 'eda_corr':        return `숫자 컬럼들이 서로 얼마나 함께 움직이는지 <span class="hl">히트맵</span>으로 보고, 관계가 강한 상위 ${esc(P('top_n_pairs'))}쌍을 뽑습니다.`;
+    case 'compare_groups':  return `${g} 별로 ${t} 에 <span class="hl">진짜 차이가 있는지</span> 통계로 검정하고 한국어로 판정해 드립니다.`;
+    case 'ts_forecast':     return `${d}${t}의 <span class="hl">앞으로 ${esc(P('periods'))}${freqLabel}</span> 흐름을 예측하고 추세·계절 패턴을 분리해 보여줍니다.`;
+    case 'ts_smooth':       return `${d}${t}의 잡음을 걷어내고 <span class="hl">진짜 추세와 계절 패턴</span>을 분리합니다.`;
+    case 'anomaly_iforest': return `데이터에서 <span class="hl">상위 ${esc(P('contamination'))}%</span>의 이상 징후를 찾아 순위와 원인 후보를 정리합니다.`;
+    case 'spc_control':     return `${t}가 <span class="hl">관리 범위 안에서 안정적으로</span> 유지되는지 판정하고 이상 신호를 찾습니다.`;
+    case 'pareto':          return `${g} 별로 집계해 <span class="hl">상위 ${esc(P('cum_target'))}%를 차지하는 핵심 항목</span>을 찾아 개선 순서를 정합니다.`;
+    case 'regress_rf':      return `여러 조건값으로 ${t} <span class="hl">수치를 예측</span>하고, 어떤 항목이 결정적인지 순위를 냅니다.`;
+    case 'classify_xgb':    return `여러 조건값으로 ${t} <span class="hl">상태를 분류</span>하고, 정확도와 판정 근거를 함께 제시합니다.`;
+    case 'cluster_kmeans':  return `비슷한 행끼리 <span class="hl">${Number(P('k')) === 0 ? '자동으로 찾은 개수만큼' : P('k')+'개 그룹으로'}</span> 묶고 각 그룹의 성격을 요약합니다.`;
     default: return m.desc;
   }
 }
@@ -1124,22 +1453,18 @@ function summarySentence(){
 function update(){
   const m = MODULE_BY_ID[state.moduleId];
   const { problems, hints } = validate();
-
   $('#summaryLine').innerHTML = summarySentence();
 
-  // 경고
   const wb = $('#warnBox');
   const items = [...problems.map(p => `⚠️ ${p}`), ...hints.map(h => `💡 ${h}`)];
-  if (items.length && m){
-    wb.innerHTML = `<ul>${items.map(i => `<li>${i}</li>`).join('')}</ul>`;
-    wb.classList.add('on');
-  } else wb.classList.remove('on');
+  if (items.length && m){ wb.innerHTML = `<ul>${items.map(i => `<li>${i}</li>`).join('')}</ul>`; wb.classList.add('on'); }
+  else { wb.classList.remove('on'); wb.innerHTML = ''; }   // 숨길 때 옛 내용도 지웁니다
 
-  // 항목 표
   const kv = [];
   if (m){
     kv.push(['분석', m.name.replace(/\s*\(.*\)$/, '')]);
     if (m.need.date !== 'none')     kv.push(['날짜 컬럼', state.values.date_col || '— 미지정']);
+    if (m.need.group !== 'none')    kv.push([m.id === 'pareto' ? '분류 컬럼' : '그룹 컬럼', state.values.group_col || '— 미지정']);
     if (m.need.target !== 'none')   kv.push(['타겟 컬럼', state.values.target_col || '— 미지정']);
     if (m.need.features !== 'none') kv.push(['사용 컬럼', currentFeatures().length ? currentFeatures().join(', ') : '자동 선택']);
     m.params.slice(0, 3).forEach(p => {
@@ -1147,47 +1472,43 @@ function update(){
       let disp = raw;
       if (p.type === 'bool') disp = raw ? '예' : '아니오';
       if (p.type === 'select'){ const f = p.options.find(o => String(o[0]) === String(raw)); disp = f ? f[1].split('—')[0].trim() : raw; }
+      if (p.type === 'text' && !String(raw).trim()) disp = '— 사용 안 함';
       kv.push([p.label, String(disp)]);
     });
   }
-  $('#kvList').innerHTML = kv.map(([k, v]) =>
-    `<div class="kv"><span class="k">${esc(k)}</span><span class="v">${esc(v)}</span></div>`).join('');
+  $('#kvList').innerHTML = kv.map(([k,v]) => `<div class="kv"><span class="k">${esc(k)}</span><span class="v">${esc(v)}</span></div>`).join('');
 
-  // 필드 오류 표시
   $$('.field').forEach(f => f.classList.remove('invalid'));
   if (m){
     if (m.need.date === 'required' && !(state.values.date_col||'').trim()) $('#f_date_col')?.classList.add('invalid');
     if (m.need.target === 'required' && !(state.values.target_col||'').trim()) $('#f_target_col')?.classList.add('invalid');
+    if (m.need.group === 'required' && !(state.values.group_col||'').trim()) $('#f_group_col')?.classList.add('invalid');
   }
 
-  // 링크 미리보기 (+ 노트북 위치 확인 상태)
   const ok = m && problems.length === 0;
   const nbState = NB.verified
     ? `<span style="color:var(--good)">✔ 노트북 확인됨</span> · <code>${esc(NB.branch)}</code>`
     : `<span style="color:var(--muted)">노트북 위치 확인 중…</span>`;
   $('#urlPreview').innerHTML = `<div style="margin-bottom:5px">${nbState}</div>`
     + esc(ok ? buildUrl() : '필수 항목을 채우면 실행 링크가 만들어집니다.');
-  [$('#runBtn'), $('#runBtnMobile')].forEach(b => { b.disabled = false; b.style.opacity = ok ? '1' : '.6'; });
+  [$('#runBtn'), $('#runBtnMobile')].forEach(b => { b.style.opacity = ok ? '1' : '.6'; });
 }
 
 /* ═══════════════════════════════════════════════════════════════
-   7. 실행
+   8. 실행
    ═══════════════════════════════════════════════════════════════ */
 async function copyText(text){
-  try{
-    await navigator.clipboard.writeText(text);
-    return true;
-  }catch(_){
+  try{ await navigator.clipboard.writeText(text); return true; }
+  catch(_){
     const ta = document.createElement('textarea');
-    ta.value = text; ta.style.position = 'fixed'; ta.style.opacity = '0';
+    ta.value = text; ta.style.position='fixed'; ta.style.opacity='0';
     document.body.appendChild(ta); ta.select();
     let ok = false;
-    try { ok = document.execCommand('copy'); } catch(e){}
+    try{ ok = document.execCommand('copy'); }catch(e){}
     document.body.removeChild(ta);
     return ok;
   }
 }
-
 async function run(){
   const { problems } = validate();
   if (problems.length){
@@ -1195,16 +1516,14 @@ async function run(){
     $('#commonFields').scrollIntoView({ behavior:'smooth', block:'center' });
     return;
   }
-  await ensureBranch();          // 노트북이 있는 브랜치 확인이 끝난 뒤 열기
+  await ensureBranch();
   const url = buildUrl();
-  // 설정 코드를 미리 복사해 두면, Colab이 URL을 못 읽어도 붙여넣기 한 번으로 해결됩니다.
   const copied = await copyText(buildToken());
   window.open(url, '_blank', 'noopener');
   toast(copied
     ? '🚀 Colab을 열었습니다. [런타임 → 모두 실행]을 누르세요.\n설정 코드도 복사해 뒀으니, 물어보면 Ctrl+V 하세요.'
     : '🚀 Colab을 열었습니다. [런타임 → 모두 실행]을 누르세요.');
 }
-
 $('#runBtn').addEventListener('click', run);
 $('#runBtnMobile').addEventListener('click', run);
 $('#copyLinkBtn').addEventListener('click', async () => {
@@ -1220,14 +1539,68 @@ $('#copyCfgBtn').addEventListener('click', async () => {
 let toastTimer;
 function toast(msg){
   const t = $('#toast');
-  t.textContent = msg;
-  t.classList.add('on');
+  t.textContent = msg; t.classList.add('on');
   clearTimeout(toastTimer);
-  toastTimer = setTimeout(() => t.classList.remove('on'), 4200);
+  toastTimer = setTimeout(() => t.classList.remove('on'), 4600);
 }
 
 /* ═══════════════════════════════════════════════════════════════
-   8. 테마 · 저장 · 초기화
+   9. 모달 (용어 사전 · 사용법)
+   ═══════════════════════════════════════════════════════════════ */
+function renderGlossary(filter=''){
+  const f = filter.trim().toLowerCase();
+  const rows = Object.entries(GLOSSARY)
+    .filter(([k,v]) => !f || k.toLowerCase().includes(f) || v.toLowerCase().includes(f));
+  $('#glossList').innerHTML = rows.length
+    ? rows.map(([k,v]) => `<div class="gloss-item"><dt>${esc(k)}</dt><dd>${esc(v)}</dd></div>`).join('')
+    : `<p class="help" style="padding:14px 0">‘${esc(filter)}’ 에 해당하는 용어가 없습니다.</p>`;
+}
+function openModal(id){ $('#'+id).classList.add('on'); }
+function closeModal(id){ $('#'+id).classList.remove('on'); }
+$('#glossBtn').addEventListener('click', () => { renderGlossary(); openModal('glossModal'); $('#glossSearch').focus(); });
+$('#glossSearch').addEventListener('input', e => renderGlossary(e.target.value));
+$('#helpBtn').addEventListener('click', () => openModal('helpModal'));
+$$('[data-close]').forEach(b => b.addEventListener('click', () => closeModal(b.dataset.close)));
+$$('.modal').forEach(m => m.addEventListener('click', e => { if (e.target === m) m.classList.remove('on'); }));
+document.addEventListener('keydown', e => { if (e.key === 'Escape') $$('.modal').forEach(m => m.classList.remove('on')); });
+
+$('#helpBody').innerHTML = linkTerms(`
+  <h3 style="font-size:15px;margin-bottom:8px">1. 이 도구는 무엇인가요?</h3>
+  <p style="font-size:13.5px;color:var(--text-2);line-height:1.75;margin-bottom:16px">
+    엑셀(CSV) 파일 하나로 파이썬 데이터 분석을 대신 돌려 주는 도구입니다.
+    여기서 <b>무엇을 분석할지 고르면</b>, 구글 Colab(무료 파이썬 실행 환경)이 열리면서
+    분석 코드가 자동으로 실행됩니다. 코드를 읽거나 쓸 필요는 전혀 없습니다.</p>
+
+  <h3 style="font-size:15px;margin-bottom:8px">2. 순서대로 따라 하기</h3>
+  <ol style="font-size:13.5px;color:var(--text-2);line-height:1.85;margin:0 0 16px;padding-left:20px">
+    <li><b>분석 고르기</b> — 카드에 적힌 질문 문장을 보고 목적에 맞는 것을 하나 고릅니다.</li>
+    <li><b>CSV 올리기</b> — STEP 2에 파일을 끌어다 놓습니다. (전송되지 않고 브라우저 안에서만 읽습니다)</li>
+    <li><b>컬럼 고르기</b> — STEP 3에서 드롭다운으로 컬럼을 선택합니다. 세부 옵션은 기본값 그대로 두셔도 됩니다.</li>
+    <li><b>실행</b> — [Colab에서 분석 시작]을 누릅니다.</li>
+    <li><b>Colab에서</b> — [런타임] → [모두 실행] 을 누르고, 파일 선택 창이 뜨면 같은 CSV를 올립니다.</li>
+    <li><b>결과 확인</b> — 그래프와 한국어 해석이 나오고, 리포트가 ZIP으로 자동 저장됩니다.</li>
+  </ol>
+
+  <h3 style="font-size:15px;margin-bottom:8px">3. 어떤 분석부터 해야 할까요?</h3>
+  <p style="font-size:13.5px;color:var(--text-2);line-height:1.75;margin-bottom:8px">
+    처음이시라면 이 순서를 권합니다.</p>
+  <ol style="font-size:13.5px;color:var(--text-2);line-height:1.85;margin:0 0 16px;padding-left:20px">
+    <li><b>데이터 품질 진단</b> — 데이터에 문제가 없는지 먼저 확인합니다.</li>
+    <li><b>데이터 자동 요약 리포트</b> — 전체 모습을 파악합니다.</li>
+    <li><b>상관관계 분석</b> — 어떤 항목이 서로 관련 있는지 봅니다.</li>
+    <li>그다음 목적에 따라 <b>예측 · 이상 탐지 · 그룹 비교</b> 등으로 넘어갑니다.</li>
+  </ol>
+
+  <h3 style="font-size:15px;margin-bottom:8px">4. 자주 겪는 문제</h3>
+  <ul style="font-size:13.5px;color:var(--text-2);line-height:1.85;margin:0;padding-left:20px">
+    <li><b>Colab에서 설정을 못 알아봐요</b> → [🔑 설정 코드 복사]를 누르고 노트북 1단계 칸에 붙여넣으세요.</li>
+    <li><b>컬럼을 찾지 못한대요</b> → STEP 2에서 CSV를 올려 목록에서 직접 고르면 확실합니다.</li>
+    <li><b>그래프가 안 보여요</b> → Colab 상단 [런타임] → [세션 다시 시작 및 모두 실행]을 눌러 보세요.</li>
+    <li><b>결과가 이상해요</b> → 먼저 <b>데이터 품질 진단</b>을 돌려 데이터 문제가 없는지 확인하세요.</li>
+  </ul>`);
+
+/* ═══════════════════════════════════════════════════════════════
+   10. 테마 · 저장 · 초기화
    ═══════════════════════════════════════════════════════════════ */
 $('#themeBtn').addEventListener('click', () => {
   const cur = document.documentElement.getAttribute('data-theme');
@@ -1240,6 +1613,12 @@ try{
   const saved = localStorage.getItem('dap_theme');
   if (saved) document.documentElement.setAttribute('data-theme', saved);
 }catch(_){}
+
+$('#guideClose').addEventListener('click', () => {
+  $('#guideCard').style.display = 'none';
+  try{ localStorage.setItem('dap_guide_seen', '1'); }catch(_){}
+});
+try{ if (localStorage.getItem('dap_guide_seen')) $('#guideCard').style.display = 'none'; }catch(_){}
 
 function save(){
   try{ localStorage.setItem('dap_state', JSON.stringify({ moduleId: state.moduleId, values: state.values })); }catch(_){}
@@ -1254,6 +1633,7 @@ function load(){
 renderModules();
 load();
 if (state.moduleId) $$('.mod').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.mod === state.moduleId)));
+renderDetail();
 renderFields();
 update();
 </script>
