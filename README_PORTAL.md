@@ -26,22 +26,30 @@ Branch 를 `main` / `/ (root)` 로 지정하고 저장합니다.
 https://mioon1402.github.io/CourseInfographic/portal.html
 ```
 
-### ② 노트북 위치 확인
+### ② 노트북 위치 — 자동으로 찾습니다
 
-`portal.html` 맨 위쪽 자바스크립트에 노트북 위치가 적혀 있습니다.
-저장소 이름이나 브랜치가 바뀌면 **여기만** 고치면 됩니다.
+포털은 `candidates` 에 적힌 브랜치를 앞에서부터 확인해서 **노트북이 실제로 있는
+브랜치를 스스로 찾아 씁니다.** 브랜치를 손으로 고칠 필요가 없고, 작업 브랜치를
+`main` 에 머지하면 다음 접속부터 알아서 `main` 을 사용합니다.
 
 ```javascript
 const NB = {
-  owner:  'mioon1402',
-  repo:   'CourseInfographic',
-  branch: 'main',                    // ← 노트북이 올라가 있는 브랜치
-  path:   'analysis_portal.ipynb'
+  owner: 'mioon1402',
+  repo:  'CourseInfographic',
+  path:  'analysis_portal.ipynb',
+  candidates: ['main', 'claude/all-in-one-data-analysis-portal-t73xwf'],
+  ...
 };
 ```
 
-> 💡 아직 `main` 에 합치기 전이라면, 포털 주소 뒤에 `?nb_branch=브랜치이름` 을 붙여
-> 테스트할 수 있습니다. 예: `.../portal.html?nb_branch=claude/all-in-one-data-analysis-portal-t73xwf`
+확인 결과는 실행 요약 패널 아래에 `✔ 노트북 확인됨 · main` 처럼 표시되고,
+브라우저에 6시간 동안 기억됩니다.
+
+* **다른 저장소로 옮겼다면** `owner` / `repo` 만 고치세요.
+* **특정 브랜치를 강제하려면** 주소 뒤에 `?nb_branch=브랜치이름` 을 붙이세요.
+  (예: `.../portal.html?nb_branch=dev`) — 이 값이 항상 우선합니다.
+* 정리가 끝나 작업 브랜치를 지웠다면 `candidates` 에서 그 이름을 빼도 됩니다.
+  (남겨 둬도 `main` 을 먼저 찾으므로 문제 없습니다)
 
 ### ③ 동료에게 공유할 것
 

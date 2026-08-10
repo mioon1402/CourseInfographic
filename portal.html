@@ -481,20 +481,65 @@ details.adv .field-grid{margin-top:14px}
 "use strict";
 /* ═══════════════════════════════════════════════════════════════
    0. 노트북 위치 설정
-   ─ 저장소/브랜치가 바뀌면 여기만 고치면 됩니다.
-   ─ 테스트용으로 ?nb_branch=브랜치명 을 이 페이지 주소에 붙이면
-     다른 브랜치의 노트북으로 연결됩니다.
+   ─ candidates 에 적힌 브랜치를 앞에서부터 확인해, 노트북이 실제로
+     있는 브랜치를 자동으로 찾아 씁니다. 브랜치를 손으로 고칠 필요가
+     없고, 작업 브랜치를 main 에 머지하면 알아서 main 으로 넘어갑니다.
+   ─ 특정 브랜치를 강제하려면 이 페이지 주소 뒤에 ?nb_branch=브랜치명
    ═══════════════════════════════════════════════════════════════ */
 const NB = {
-  owner:  'mioon1402',
-  repo:   'CourseInfographic',
-  branch: 'main',
-  path:   'analysis_portal.ipynb'
+  owner: 'mioon1402',
+  repo:  'CourseInfographic',
+  path:  'analysis_portal.ipynb',
+  candidates: ['main', 'claude/all-in-one-data-analysis-portal-t73xwf'],
+  branch: null,        // 확인이 끝나면 여기에 채워집니다
+  verified: false
 };
-(function(){
-  const b = new URLSearchParams(location.search).get('nb_branch');
-  if (b) NB.branch = b;
-})();
+
+const NB_CACHE_KEY = 'dap_nb_branch';
+const NB_CACHE_TTL = 6 * 60 * 60 * 1000;   // 6시간
+
+function nbUrlFor(branch){
+  return `https://raw.githubusercontent.com/${NB.owner}/${NB.repo}/`
+       + `${branch.split('/').map(encodeURIComponent).join('/')}/${NB.path}`;
+}
+
+function nbCacheRead(){
+  try{
+    const o = JSON.parse(localStorage.getItem(NB_CACHE_KEY) || 'null');
+    if (o && Date.now() - o.t < NB_CACHE_TTL && NB.candidates.includes(o.b)) return o.b;
+  }catch(_){}
+  return null;
+}
+
+/** 노트북이 실제로 존재하는 브랜치를 찾습니다. (앞 후보 우선) */
+async function resolveBranch(){
+  const forced = new URLSearchParams(location.search).get('nb_branch');
+  if (forced){ NB.branch = forced; NB.verified = true; return forced; }
+
+  for (const b of NB.candidates){
+    try{
+      const r = await fetch(nbUrlFor(b), { method:'HEAD', cache:'no-store' });
+      if (r.ok){
+        NB.branch = b; NB.verified = true;
+        try{ localStorage.setItem(NB_CACHE_KEY, JSON.stringify({ b, t: Date.now() })); }catch(_){}
+        return b;
+      }
+    }catch(_){ break; }   // 네트워크 차단 등 — 캐시/기본값으로 진행
+  }
+  NB.branch = NB.branch || nbCacheRead() || NB.candidates[0];
+  return NB.branch;
+}
+
+let nbResolving = null;
+function ensureBranch(){
+  if (NB.verified) return Promise.resolve(NB.branch);
+  if (!nbResolving) nbResolving = resolveBranch().finally(() => { nbResolving = null; update(); });
+  return nbResolving;
+}
+
+// 화면이 뜨자마자 백그라운드로 확인 시작 (보통 0.5초 이내)
+NB.branch = nbCacheRead() || NB.candidates[0];
+ensureBranch();
 
 /* ═══════════════════════════════════════════════════════════════
    1. 카테고리 & 분석 모듈 정의  (이 객체가 UI 전체를 만듭니다)
@@ -1115,9 +1160,13 @@ function update(){
     if (m.need.target === 'required' && !(state.values.target_col||'').trim()) $('#f_target_col')?.classList.add('invalid');
   }
 
-  // 링크 미리보기
+  // 링크 미리보기 (+ 노트북 위치 확인 상태)
   const ok = m && problems.length === 0;
-  $('#urlPreview').textContent = ok ? buildUrl() : '필수 항목을 채우면 실행 링크가 만들어집니다.';
+  const nbState = NB.verified
+    ? `<span style="color:var(--good)">✔ 노트북 확인됨</span> · <code>${esc(NB.branch)}</code>`
+    : `<span style="color:var(--muted)">노트북 위치 확인 중…</span>`;
+  $('#urlPreview').innerHTML = `<div style="margin-bottom:5px">${nbState}</div>`
+    + esc(ok ? buildUrl() : '필수 항목을 채우면 실행 링크가 만들어집니다.');
   [$('#runBtn'), $('#runBtnMobile')].forEach(b => { b.disabled = false; b.style.opacity = ok ? '1' : '.6'; });
 }
 
@@ -1146,6 +1195,7 @@ async function run(){
     $('#commonFields').scrollIntoView({ behavior:'smooth', block:'center' });
     return;
   }
+  await ensureBranch();          // 노트북이 있는 브랜치 확인이 끝난 뒤 열기
   const url = buildUrl();
   // 설정 코드를 미리 복사해 두면, Colab이 URL을 못 읽어도 붙여넣기 한 번으로 해결됩니다.
   const copied = await copyText(buildToken());
@@ -1159,6 +1209,7 @@ $('#runBtn').addEventListener('click', run);
 $('#runBtnMobile').addEventListener('click', run);
 $('#copyLinkBtn').addEventListener('click', async () => {
   if (!state.moduleId) return toast('⚠️ 먼저 분석을 선택해 주세요.');
+  await ensureBranch();
   toast(await copyText(buildUrl()) ? '🔗 실행 링크를 복사했습니다.' : '⚠️ 복사에 실패했습니다.');
 });
 $('#copyCfgBtn').addEventListener('click', async () => {
