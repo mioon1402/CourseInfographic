@@ -450,7 +450,8 @@ details.adv .field-grid{margin-top:14px}
           </button>
           <div class="btn-row">
             <button class="btn btn-secondary" id="copyLinkBtn" type="button">🔗 링크 복사</button>
-            <button class="btn btn-secondary" id="copyCfgBtn" type="button">🔑 설정 코드 복사</button>
+            <button class="btn btn-secondary" id="copyCfgBtn" type="button"
+              title="Colab이 설정을 못 알아볼 때만 쓰는 예비 수단입니다. 보통은 필요 없습니다.">🔑 설정 코드</button>
           </div>
           <div class="url-preview" id="urlPreview">분석을 선택하면 실행 링크가 여기에 표시됩니다.</div>
         </div>
@@ -460,9 +461,13 @@ details.adv .field-grid{margin-top:14px}
         <div class="panel-head"><span aria-hidden="true">💡</span> Colab에서는 이렇게</div>
         <div class="panel-body" style="font-size:13px;color:var(--text-2);line-height:1.7">
           <div style="margin-bottom:8px"><strong style="color:var(--text)">1.</strong> 새 탭이 열리면 상단 메뉴 <strong>[런타임] → [모두 실행]</strong> 을 누르세요. (단축키 <code>Ctrl</code>+<code>F9</code>)</div>
-          <div style="margin-bottom:8px"><strong style="color:var(--text)">2.</strong> 설정은 <strong>자동으로 전달</strong>됩니다. 혹시 인식이 안 되면 <strong>🔑 설정 코드</strong>를 붙여넣는 칸이 나오니 <code>Ctrl</code>+<code>V</code> 하세요.</div>
-          <div style="margin-bottom:8px"><strong style="color:var(--text)">3.</strong> <strong>파일 선택</strong> 버튼이 뜨면 CSV를 올리세요. (없으면 <strong>취소</strong> → 예제 데이터로 진행)</div>
+          <div style="margin-bottom:8px"><strong style="color:var(--text)">2.</strong> <strong>파일 선택</strong> 버튼이 뜨면 CSV를 올리세요. (없으면 <strong>취소</strong> → 예제 데이터로 진행)</div>
+          <div style="margin-bottom:8px"><strong style="color:var(--text)">3.</strong> 컬럼은 <strong>드롭다운으로 고르면 됩니다.</strong> 타이핑할 것은 없습니다.</div>
           <div><strong style="color:var(--text)">4.</strong> 그래프와 <strong>한국어 해석 리포트</strong>가 자동으로 만들어지고 ZIP으로 저장됩니다.</div>
+          <div style="margin-top:10px;padding-top:9px;border-top:1px solid var(--border);font-size:12.5px">
+            💡 결과를 보고 <strong>컬럼을 바꾸고 싶으면</strong> 노트북 2단계 드롭다운만 바꾸고
+            <strong>3단계 셀만 다시 실행</strong>하세요. 파일을 다시 올릴 필요 없습니다.
+          </div>
         </div>
       </div>
 
@@ -522,16 +527,21 @@ details.adv .field-grid{margin-top:14px}
 const NB = {
   owner: 'mioon1402',
   repo:  'CourseInfographic',
-  path:  'analysis_portal.ipynb',
+  // 분석마다 전용 노트북이 있습니다. 파일이 작아(약 5KB) 열자마자 실행되고,
+  // 고른 분석에 필요한 라이브러리만 설치합니다.
+  pathFor: id => `notebooks/${id}.ipynb`,
+  probe: 'dap_engine.py',        // 브랜치 확인용 (항상 있는 파일)
   candidates: ['main', 'claude/all-in-one-data-analysis-portal-t73xwf'],
   branch: null, verified: false
 };
 const NB_CACHE_KEY = 'dap_nb_branch', NB_CACHE_TTL = 6 * 60 * 60 * 1000;
 
-function nbUrlFor(branch){
+function rawUrl(branch, path){
   return `https://raw.githubusercontent.com/${NB.owner}/${NB.repo}/`
-       + `${branch.split('/').map(encodeURIComponent).join('/')}/${NB.path}`;
+       + `${branch.split('/').map(encodeURIComponent).join('/')}/`
+       + path.split('/').map(encodeURIComponent).join('/');
 }
+function nbUrlFor(branch){ return rawUrl(branch, NB.probe); }
 function nbCacheRead(){
   try{
     const o = JSON.parse(localStorage.getItem(NB_CACHE_KEY) || 'null');
@@ -627,7 +637,7 @@ const CATEGORIES = [
 /* need: 'required' | 'optional' | 'none'  (date · target · group · features) */
 const MODULES = [
   {
-    id:'eda_summary', cat:'eda', icon:'📋', tag:'가장 먼저', level:'입문', time:'약 1분',
+    id:'eda_summary', cat:'eda', icon:'📋', tag:'가장 먼저', level:'입문', time:'약 30초',
     name:'데이터 자동 요약 리포트',
     desc:'행·열 개수, 결측치, 이상값, 분포를 한 장으로 정리해 드립니다.',
     q:'“이 데이터, 일단 어떻게 생겼지?”',
@@ -646,7 +656,7 @@ const MODULES = [
     ]
   },
   {
-    id:'data_quality', cat:'eda', icon:'🧹', tag:'정리가 먼저', level:'입문', time:'약 1분',
+    id:'data_quality', cat:'eda', icon:'🧹', tag:'정리가 먼저', level:'입문', time:'약 30초',
     name:'데이터 품질 진단 및 자동 정제',
     desc:'빠진 값·중복·공백·이상치를 찾아 점수를 매기고, 자동으로 고쳐 줍니다.',
     q:'“이 데이터 그냥 써도 될까?”',
@@ -670,7 +680,7 @@ const MODULES = [
     ]
   },
   {
-    id:'eda_corr', cat:'eda', icon:'🔗', tag:'핵심 기능', level:'입문', time:'약 1분',
+    id:'eda_corr', cat:'eda', icon:'🔗', tag:'핵심 기능', level:'입문', time:'약 30초',
     name:'다중 변수 상관관계 분석 (Heatmap)',
     desc:'어떤 항목끼리 같이 오르내리는지 히트맵과 순위표로 보여줍니다.',
     q:'“온도가 오르면 불량률도 오를까?”',
@@ -693,7 +703,7 @@ const MODULES = [
     ]
   },
   {
-    id:'compare_groups', cat:'compare', icon:'⚖️', tag:'현업 필수', level:'중급', time:'약 1분',
+    id:'compare_groups', cat:'compare', icon:'⚖️', tag:'현업 필수', level:'중급', time:'약 40초',
     name:'그룹 간 차이 비교 (통계 검정)',
     desc:'A라인과 B라인의 차이가 진짜인지, 우연인지 통계로 판정합니다.',
     q:'“A라인이 B라인보다 정말 좋은 걸까?”',
@@ -714,7 +724,7 @@ const MODULES = [
     ]
   },
   {
-    id:'ts_forecast', cat:'ts', icon:'🔮', tag:'핵심 기능', level:'중급', time:'약 2~3분',
+    id:'ts_forecast', cat:'ts', icon:'🔮', tag:'핵심 기능', level:'중급', time:'약 1~2분',
     name:'미래 추세 및 계절성 예측 (Prophet)',
     desc:'과거 흐름에서 추세·요일·계절 패턴을 배워 앞으로의 값을 예측합니다.',
     q:'“다음 달 판매량은 얼마나 될까?”',
@@ -743,7 +753,7 @@ const MODULES = [
     ]
   },
   {
-    id:'ts_smooth', cat:'ts', icon:'〰️', level:'입문', time:'약 1분',
+    id:'ts_smooth', cat:'ts', icon:'〰️', level:'입문', time:'약 30초',
     name:'데이터 평활화 및 트렌드 추출',
     desc:'들쭉날쭉한 값에서 잡음을 걷어내고 진짜 추세와 계절 패턴을 분리합니다.',
     q:'“매일 오르내리는데, 큰 흐름은 오르는 중일까?”',
@@ -768,7 +778,7 @@ const MODULES = [
     ]
   },
   {
-    id:'anomaly_iforest', cat:'anomaly', icon:'🚨', tag:'핵심 기능', level:'중급', time:'약 1분',
+    id:'anomaly_iforest', cat:'anomaly', icon:'🚨', tag:'핵심 기능', level:'중급', time:'약 40초',
     name:'장비 불량 · 스파이크 이상치 감지 (Isolation Forest)',
     desc:'정상 패턴에서 벗어난 데이터를 자동으로 찾아 순위와 원인 후보까지 제시합니다.',
     q:'“어제 설비에서 이상한 신호가 있었을까?”',
@@ -790,7 +800,7 @@ const MODULES = [
     ]
   },
   {
-    id:'spc_control', cat:'quality', icon:'📐', tag:'제조 필수', level:'중급', time:'약 1분',
+    id:'spc_control', cat:'quality', icon:'📐', tag:'제조 필수', level:'중급', time:'약 40초',
     name:'공정 관리도 (SPC)',
     desc:'공정이 안정적인지 판정하고, 규격을 만족하는 능력(Cpk)까지 계산합니다.',
     q:'“우리 공정, 지금 정상인가?”',
@@ -810,7 +820,7 @@ const MODULES = [
     ]
   },
   {
-    id:'pareto', cat:'quality', icon:'📊', tag:'개선 우선순위', level:'입문', time:'약 30초',
+    id:'pareto', cat:'quality', icon:'📊', tag:'개선 우선순위', level:'입문', time:'약 20초',
     name:'파레토 분석 (80 / 20)',
     desc:'어떤 항목이 문제의 대부분을 차지하는지 찾아 개선 순서를 정해 줍니다.',
     q:'“어디부터 손대야 효과가 클까?”',
@@ -829,7 +839,7 @@ const MODULES = [
     ]
   },
   {
-    id:'regress_rf', cat:'regress', icon:'🎯', level:'중급', time:'약 1~2분',
+    id:'regress_rf', cat:'regress', icon:'🎯', level:'중급', time:'약 40초',
     name:'다중 변수 기반 결과 수치 예측 (Random Forest 회귀)',
     desc:'여러 조건값으로 결과 숫자를 예측하고, 어떤 조건이 결정적인지 보여줍니다.',
     q:'“온도·습도·속도를 알면 수율이 몇 %일까?”',
@@ -853,7 +863,7 @@ const MODULES = [
     ]
   },
   {
-    id:'classify_xgb', cat:'classify', icon:'🏷️', level:'중급', time:'약 1~2분',
+    id:'classify_xgb', cat:'classify', icon:'🏷️', level:'중급', time:'약 40초',
     name:'정상 / 불량 상태 패턴 분류 (XGBoost)',
     desc:'조건값으로 상태를 판정하고, 판정 근거와 정확도를 함께 제시합니다.',
     q:'“이 조건이면 불량이 날까, 안 날까?”',
@@ -877,7 +887,7 @@ const MODULES = [
     ]
   },
   {
-    id:'cluster_kmeans', cat:'cluster', icon:'🧩', level:'중급', time:'약 1분',
+    id:'cluster_kmeans', cat:'cluster', icon:'🧩', level:'중급', time:'약 40초',
     name:'유사 특성 데이터 자동 그룹핑 (K-Means)',
     desc:'비슷한 성격의 행끼리 묶고, 각 그룹의 특징을 한국어로 요약해 줍니다.',
     q:'“우리 고객(설비)은 몇 가지 유형으로 나뉠까?”',
@@ -1422,7 +1432,8 @@ function buildToken(){
 function buildUrl(){
   const q = buildParams();
   q.set('cfg', buildToken());
-  return `https://colab.research.google.com/github/${NB.owner}/${NB.repo}/blob/${NB.branch}/${NB.path}?${q.toString()}`;
+  const path = NB.pathFor(state.moduleId);
+  return `https://colab.research.google.com/github/${NB.owner}/${NB.repo}/blob/${NB.branch}/${path}?${q.toString()}`;
 }
 
 function summarySentence(){
@@ -1518,11 +1529,8 @@ async function run(){
   }
   await ensureBranch();
   const url = buildUrl();
-  const copied = await copyText(buildToken());
   window.open(url, '_blank', 'noopener');
-  toast(copied
-    ? '🚀 Colab을 열었습니다. [런타임 → 모두 실행]을 누르세요.\n설정 코드도 복사해 뒀으니, 물어보면 Ctrl+V 하세요.'
-    : '🚀 Colab을 열었습니다. [런타임 → 모두 실행]을 누르세요.');
+  toast('🚀 Colab을 열었습니다.\n[런타임 → 모두 실행]을 누르고, 파일 선택 창이 뜨면 CSV를 올리세요.');
 }
 $('#runBtn').addEventListener('click', run);
 $('#runBtnMobile').addEventListener('click', run);
@@ -1576,8 +1584,9 @@ $('#helpBody').innerHTML = linkTerms(`
     <li><b>분석 고르기</b> — 카드에 적힌 질문 문장을 보고 목적에 맞는 것을 하나 고릅니다.</li>
     <li><b>CSV 올리기</b> — STEP 2에 파일을 끌어다 놓습니다. (전송되지 않고 브라우저 안에서만 읽습니다)</li>
     <li><b>컬럼 고르기</b> — STEP 3에서 드롭다운으로 컬럼을 선택합니다. 세부 옵션은 기본값 그대로 두셔도 됩니다.</li>
-    <li><b>실행</b> — [Colab에서 분석 시작]을 누릅니다.</li>
-    <li><b>Colab에서</b> — [런타임] → [모두 실행] 을 누르고, 파일 선택 창이 뜨면 같은 CSV를 올립니다.</li>
+    <li><b>실행</b> — [Colab에서 분석 시작]을 누릅니다. 고른 분석 전용 노트북이 열립니다.</li>
+    <li><b>Colab에서</b> — [런타임] → [모두 실행] 을 누르고, 파일 선택 창이 뜨면 같은 CSV를 올립니다.
+        컬럼은 <b>드롭다운으로 고르면 되고 타이핑은 필요 없습니다.</b></li>
     <li><b>결과 확인</b> — 그래프와 한국어 해석이 나오고, 리포트가 ZIP으로 자동 저장됩니다.</li>
   </ol>
 
@@ -1593,8 +1602,8 @@ $('#helpBody').innerHTML = linkTerms(`
 
   <h3 style="font-size:15px;margin-bottom:8px">4. 자주 겪는 문제</h3>
   <ul style="font-size:13.5px;color:var(--text-2);line-height:1.85;margin:0;padding-left:20px">
-    <li><b>Colab에서 설정을 못 알아봐요</b> → [🔑 설정 코드 복사]를 누르고 노트북 1단계 칸에 붙여넣으세요.</li>
-    <li><b>컬럼을 찾지 못한대요</b> → STEP 2에서 CSV를 올려 목록에서 직접 고르면 확실합니다.</li>
+    <li><b>컬럼이 잘못 골라졌어요</b> → 노트북 2단계 <b>드롭다운</b>에서 바꾸고 <b>3단계 셀만</b> 다시 실행하세요.</li>
+    <li><b>Colab이 느려요</b> → 분석마다 전용 노트북이라 필요한 것만 설치합니다. 첫 실행만 조금 걸립니다.</li>
     <li><b>그래프가 안 보여요</b> → Colab 상단 [런타임] → [세션 다시 시작 및 모두 실행]을 눌러 보세요.</li>
     <li><b>결과가 이상해요</b> → 먼저 <b>데이터 품질 진단</b>을 돌려 데이터 문제가 없는지 확인하세요.</li>
   </ul>`);
