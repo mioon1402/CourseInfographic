@@ -349,7 +349,8 @@ details.adv .field-grid{margin-top:14px}
     <button class="icon-btn hide-sm" id="abBtn" type="button">🧪 <span>A/B 설계</span></button>
     <button class="icon-btn hide-sm" id="glossBtn" type="button">📖 <span>용어 사전</span></button>
     <button class="icon-btn hide-sm" id="helpBtn" type="button">❓ <span>사용법</span></button>
-    <a class="ghost-link hide-sm" href="index.html">📚 학습 자료</a>
+    <a class="ghost-link hide-sm" href="learn.html">📘 배우기</a>
+    <a class="ghost-link hide-sm" href="index.html">🏠 홈</a>
     <button class="icon-btn" id="themeBtn" type="button" title="화면 밝기 전환" aria-label="화면 밝기 전환">🌗</button>
   </div>
 </header>
@@ -2074,10 +2075,34 @@ function load(){
 
 renderModules();
 load();
+
+/* 배우기 페이지·외부 링크에서 넘어올 때: ?mod=분석 &demo=1 &wizard=1 */
+(function applyDeepLink(){
+  const q = new URLSearchParams(location.search);
+  if (q.get('demo') === '1') state.useDemo = true;
+  const mod = q.get('mod');
+  if (mod && MODULE_BY_ID[mod]) state.moduleId = mod;
+  if (state.useDemo){
+    state.columns = DEMO_COLUMNS.map(c => ({ ...c, uniq: c.uniq ?? 50 }));
+    state.values.date_col   = state.values.date_col   || '날짜';
+    state.values.target_col = state.values.target_col || '수율';
+    state.values.group_col  = state.values.group_col  || '생산라인';
+    renderModules();
+  }
+  if (q.get('wizard') === '1') setTimeout(openWizard, 250);
+})();
+
 if (state.moduleId) $$('.mod').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.mod === state.moduleId)));
 renderDetail();
 renderFields();
 update();
+if (state.useDemo){
+  $('#demoBanner').classList.add('on');
+  recommend();
+}
+if (state.moduleId && new URLSearchParams(location.search).get('mod')){
+  setTimeout(() => $('#modDetail').scrollIntoView({ behavior:'smooth', block:'center' }), 350);
+}
 </script>
 </body>
 </html>

@@ -1,177 +1,326 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>시계열 데이터 분석 인포그래픽 모음</title>
-    <!-- Tailwind CSS CDN -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
-    <style>
-        body {
-            font-family: 'Inter', sans-serif;
-            background-color: #f0f4f8; /* Light blue-gray background */
-            display: flex;
-            justify-content: center;
-            align-items: flex-start; /* Align to top for longer content */
-            min-height: 100vh;
-            padding: 20px;
-        }
-        .container {
-            background-color: #ffffff;
-            border-radius: 20px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-            padding: 30px;
-            max-width: 600px; /* Max width for single column to look good */
-            width: 100%;
-            text-align: center;
-        }
-        .header-title {
-            font-size: 2.5rem;
-            font-weight: 700;
-            color: #1e3a8a;
-            margin-bottom: 10px;
-        }
-        .header-subtitle {
-            font-size: 1.2rem;
-            color: #4a5568;
-            margin-bottom: 30px;
-        }
-        .grid-container { /* Renamed to list-container conceptually, but kept for ID */
-            display: block; /* Change to block for list layout */
-            gap: 20px; /* Keep gap for spacing between items */
-        }
-        .infographic-card {
-            background-color: #e2f0f9; /* Lighter blue for cards */
-            border-radius: 15px;
-            padding: 20px;
-            text-align: center;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            align-items: center;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
-            transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
-            min-height: 120px; /* Adjusted height for list items */
-            margin-bottom: 20px; /* Add margin to separate list items */
-            max-width: 100%; /* Ensure it fits within its container */
-        }
-        .infographic-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
-        }
-        .card-title {
-            font-size: 1.25rem;
-            font-weight: 600;
-            color: #1e3a8a;
-            margin-bottom: 15px;
-            flex-grow: 1;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        .card-button {
-            display: inline-block;
-            background-color: #3b82f6; /* Blue button */
-            color: #ffffff;
-            padding: 10px 20px;
-            border-radius: 10px;
-            text-decoration: none;
-            font-weight: 600;
-            transition: background-color 0.3s ease-in-out;
-        }
-        .card-button:hover {
-            background-color: #2563eb; /* Darker blue on hover */
-        }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>올인원 데이터 분석 포털</title>
+<meta name="description" content="코딩 없이 엑셀 파일 하나로 데이터 분석을 하고, 데이터 보는 법도 함께 배우는 곳. 데이터를 처음 다루는 분을 위해 만들었습니다.">
+<style>
+:root{
+  color-scheme: light;
+  --bg:#f9f9f7; --surface:#fcfcfb; --surface-2:#f2f2ee; --surface-3:#e9e9e3;
+  --border:rgba(11,11,11,.12); --border-strong:rgba(11,11,11,.22);
+  --text:#0b0b0b; --text-2:#52514e; --muted:#898781;
+  --accent:#2a78d6; --accent-ink:#184f95; --accent-wash:rgba(42,120,214,.10);
+  --good:#0ca30c; --good-ink:#046b04;
+  --s1:#2a78d6; --s2:#eb6834; --s3:#1baf7a; --s5:#e87ba4;
+  --shadow:0 1px 2px rgba(11,11,11,.05), 0 8px 24px rgba(11,11,11,.06);
+  --shadow-lg:0 2px 4px rgba(11,11,11,.06), 0 18px 44px rgba(11,11,11,.11);
+}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){
+  color-scheme: dark;
+  --bg:#0d0d0d; --surface:#1a1a19; --surface-2:#222220; --surface-3:#2c2c2a;
+  --border:rgba(255,255,255,.12); --border-strong:rgba(255,255,255,.24);
+  --text:#fff; --text-2:#c3c2b7; --muted:#898781;
+  --accent:#3987e5; --accent-ink:#9ec5f4; --accent-wash:rgba(57,135,229,.16);
+  --good:#0ca30c; --good-ink:#5fd35f;
+  --s1:#3987e5; --s2:#d95926; --s3:#199e70; --s5:#d55181;
+  --shadow:0 1px 2px rgba(0,0,0,.4), 0 8px 24px rgba(0,0,0,.35);
+  --shadow-lg:0 2px 4px rgba(0,0,0,.5), 0 18px 44px rgba(0,0,0,.45);
+}}
+:root[data-theme="dark"]{
+  color-scheme: dark;
+  --bg:#0d0d0d; --surface:#1a1a19; --surface-2:#222220; --surface-3:#2c2c2a;
+  --border:rgba(255,255,255,.12); --border-strong:rgba(255,255,255,.24);
+  --text:#fff; --text-2:#c3c2b7; --muted:#898781;
+  --accent:#3987e5; --accent-ink:#9ec5f4; --accent-wash:rgba(57,135,229,.16);
+  --good:#0ca30c; --good-ink:#5fd35f;
+  --s1:#3987e5; --s2:#d95926; --s3:#199e70; --s5:#d55181;
+  --shadow:0 1px 2px rgba(0,0,0,.4), 0 8px 24px rgba(0,0,0,.35);
+  --shadow-lg:0 2px 4px rgba(0,0,0,.5), 0 18px 44px rgba(0,0,0,.45);
+}
+*,*::before,*::after{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--text);
+  font-family:system-ui,-apple-system,'Segoe UI','Apple SD Gothic Neo','Malgun Gothic',sans-serif;
+  font-size:15px;line-height:1.7;word-break:keep-all}
+h1,h2,h3{margin:0;line-height:1.3;letter-spacing:-.015em}
+p{margin:0}
+a{color:var(--accent)}
+button{font:inherit;color:inherit}
+code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:.9em;
+  background:var(--surface-2);border:1px solid var(--border);border-radius:5px;padding:1px 5px}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:6px}
+
+.topbar{position:sticky;top:0;z-index:50;background:color-mix(in srgb,var(--bg) 90%,transparent);
+  backdrop-filter:saturate(180%) blur(12px);border-bottom:1px solid var(--border)}
+.topbar-inner{max-width:1100px;margin:0 auto;padding:11px 20px;display:flex;align-items:center;gap:10px}
+.brand{display:flex;align-items:center;gap:10px;font-weight:700;font-size:15.5px;text-decoration:none;color:inherit}
+.brand-mark{width:29px;height:29px;border-radius:9px;flex:none;
+  background:linear-gradient(135deg,var(--accent),var(--s5));display:grid;place-items:center;color:#fff;font-size:14px}
+.sp{flex:1}
+.nav-link{font-size:13.5px;color:var(--text-2);text-decoration:none;padding:7px 12px;border-radius:9px}
+.nav-link:hover{background:var(--surface-2)}
+.icon-btn{background:var(--surface);border:1px solid var(--border);border-radius:9px;width:34px;height:34px;
+  display:grid;place-items:center;cursor:pointer;font-size:14px}
+.icon-btn:hover{background:var(--surface-2)}
+@media (max-width:640px){ .hide-sm{display:none} }
+
+.wrap{max-width:1100px;margin:0 auto;padding:0 20px 80px}
+
+/* 히어로 */
+.hero{padding:64px 0 44px;text-align:center}
+.hero .eyebrow{display:inline-block;font-size:12.5px;font-weight:700;letter-spacing:.05em;
+  color:var(--accent-ink);background:var(--accent-wash);border-radius:999px;padding:6px 15px;margin-bottom:18px}
+.hero h1{font-size:clamp(30px,5.5vw,50px);font-weight:700;margin-bottom:16px}
+.hero h1 .g{background:linear-gradient(100deg,var(--accent),var(--s5));
+  -webkit-background-clip:text;background-clip:text;color:transparent}
+.hero p{color:var(--text-2);font-size:17px;max-width:60ch;margin:0 auto}
+
+/* 3갈래 진입 */
+.paths{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px;margin-top:40px}
+.path{background:var(--surface);border:1px solid var(--border);border-radius:18px;padding:26px 24px;
+  box-shadow:var(--shadow);text-decoration:none;color:inherit;display:flex;flex-direction:column;
+  gap:9px;text-align:left;transition:transform .15s,box-shadow .15s,border-color .15s;position:relative}
+.path:hover{transform:translateY(-3px);box-shadow:var(--shadow-lg);border-color:var(--pc)}
+.path .ic{width:46px;height:46px;border-radius:13px;display:grid;place-items:center;font-size:22px;
+  background:color-mix(in srgb,var(--pc) 15%,transparent);margin-bottom:4px}
+.path h2{font-size:19px;font-weight:700}
+.path .who{font-size:12.5px;font-weight:700;color:var(--pc)}
+.path p{font-size:13.5px;color:var(--text-2);line-height:1.65}
+.path .arrow{margin-top:auto;padding-top:10px;font-size:13.5px;font-weight:700;color:var(--pc)}
+.path.primary{border-color:var(--pc);box-shadow:0 0 0 1px var(--pc) inset, var(--shadow)}
+.path .badge{position:absolute;top:-10px;right:18px;background:var(--pc);color:#fff;
+  font-size:11px;font-weight:700;border-radius:999px;padding:3px 11px}
+
+/* 섹션 */
+.sec{margin-top:64px}
+.sec-head{text-align:center;margin-bottom:26px}
+.sec-head h2{font-size:25px;font-weight:700;margin-bottom:9px}
+.sec-head p{color:var(--text-2);font-size:14.5px;max-width:60ch;margin:0 auto}
+
+/* 흐름 */
+.flow{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:14px}
+.step{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:19px 20px;
+  box-shadow:var(--shadow);position:relative}
+.step .n{width:26px;height:26px;border-radius:8px;background:var(--accent);color:#fff;
+  display:grid;place-items:center;font-size:13px;font-weight:700;margin-bottom:10px}
+.step h3{font-size:15px;font-weight:700;margin-bottom:5px}
+.step p{font-size:13px;color:var(--text-2);line-height:1.6}
+
+/* 분석 목록 */
+.cats{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:12px}
+.cat{background:var(--surface);border:1px solid var(--border);border-radius:13px;padding:17px 19px;box-shadow:var(--shadow)}
+.cat h3{font-size:14.5px;font-weight:700;margin-bottom:9px;display:flex;align-items:center;gap:8px}
+.cat ul{margin:0;padding-left:17px;font-size:13px;color:var(--text-2);line-height:1.85}
+.cat li b{color:var(--text);font-weight:600}
+
+/* 강조 박스 */
+.callout{background:var(--surface);border:1px solid var(--border);border-radius:16px;
+  padding:26px 28px;box-shadow:var(--shadow);display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:22px}
+.callout .item h3{font-size:15px;font-weight:700;margin-bottom:7px;display:flex;align-items:center;gap:8px}
+.callout .item p{font-size:13.5px;color:var(--text-2);line-height:1.7}
+
+.cta-band{margin-top:64px;background:linear-gradient(120deg,var(--accent-wash),transparent 75%),var(--surface);
+  border:1px solid var(--accent);border-radius:18px;padding:34px 30px;text-align:center;box-shadow:var(--shadow)}
+.cta-band h2{font-size:23px;font-weight:700;margin-bottom:10px}
+.cta-band p{color:var(--text-2);font-size:14.5px;margin-bottom:20px}
+.btn-row{display:flex;gap:11px;justify-content:center;flex-wrap:wrap}
+.btn{display:inline-flex;align-items:center;gap:8px;border-radius:12px;padding:13px 24px;
+  font-size:15px;font-weight:700;border:1px solid transparent;cursor:pointer;text-decoration:none}
+.btn-primary{background:var(--accent);color:#fff;box-shadow:0 4px 16px color-mix(in srgb,var(--accent) 35%,transparent)}
+.btn-primary:hover{filter:brightness(1.08)}
+.btn-ghost{background:var(--surface);border-color:var(--border-strong);color:var(--text)}
+.btn-ghost:hover{background:var(--surface-2)}
+
+.faq{margin-top:14px}
+.faq details{background:var(--surface);border:1px solid var(--border);border-radius:12px;
+  padding:15px 19px;margin-bottom:9px;box-shadow:var(--shadow)}
+.faq summary{cursor:pointer;font-weight:650;font-size:14.5px;list-style:none;display:flex;
+  align-items:center;gap:9px}
+.faq summary::-webkit-details-marker{display:none}
+.faq summary::before{content:"＋";color:var(--accent);font-weight:700;flex:none}
+.faq details[open] summary::before{content:"−"}
+.faq p{margin-top:10px;font-size:13.5px;color:var(--text-2);line-height:1.75}
+
+.footer{margin-top:60px;padding-top:24px;border-top:1px solid var(--border);
+  text-align:center;color:var(--muted);font-size:12.5px;line-height:1.9}
+</style>
 </head>
 <body>
-    <div class="container">
-        <!-- Header Section -->
-        <div class="header-section">
-            <h1 class="header-title">📊 시계열 데이터 분석 인포그래픽 모음 📊</h1>
-            <p class="header-subtitle">시계열 데이터에 대한 핵심 개념과 파이썬 코드를 시각적으로 정리한 인포그래픽들을 한곳에서 만나보세요!</p>
-        </div>
 
-        <!-- Infographic Links List (Dynamically populated by JavaScript) -->
-        <div id="infographic-grid" class="grid-container">
-            <!-- Infographic cards will be inserted here by JavaScript -->
-        </div>
+<header class="topbar">
+  <div class="topbar-inner">
+    <a class="brand" href="index.html">
+      <span class="brand-mark" aria-hidden="true">📊</span>
+      <span>올인원 데이터 분석 포털</span>
+    </a>
+    <div class="sp"></div>
+    <a class="nav-link hide-sm" href="learn.html">배우기</a>
+    <a class="nav-link hide-sm" href="portal.html">분석하기</a>
+    <button class="icon-btn" id="themeBtn" type="button" title="화면 밝기 전환" aria-label="화면 밝기 전환">🌗</button>
+  </div>
+</header>
+
+<div class="wrap">
+  <section class="hero">
+    <span class="eyebrow">코딩 없이 · 설치 없이 · 구글 계정만 있으면</span>
+    <h1>엑셀 파일 하나로<br><span class="g">전문가 수준의 데이터 분석</span></h1>
+    <p>데이터를 한 번도 다뤄본 적 없어도 괜찮습니다.
+       분석을 대신 해드리고, <strong>결과를 읽는 법까지 한국어로</strong> 알려 드립니다.</p>
+
+    <div class="paths">
+      <a class="path primary" href="learn.html" style="--pc:var(--s3)">
+        <span class="badge">처음이라면 여기</span>
+        <span class="ic" aria-hidden="true">📘</span>
+        <span class="who">데이터가 처음이신 분</span>
+        <h2>먼저 배우기</h2>
+        <p>평균의 함정부터 상관관계·인과관계까지. 수식 없이, 직접 만져보는 예제로
+           <strong>실무에서 틀리는 지점</strong>만 골라 설명합니다.</p>
+        <span class="arrow">배우러 가기 →</span>
+      </a>
+
+      <a class="path" href="portal.html?wizard=1" style="--pc:var(--s2)">
+        <span class="ic" aria-hidden="true">🧭</span>
+        <span class="who">목표는 있는데 방법을 모르는 분</span>
+        <h2>질문부터 정하기</h2>
+        <p>“불량을 줄이고 싶다” 같은 막연한 목표를 세 번의 클릭으로
+           <strong>답할 수 있는 질문</strong>과 분석 순서로 바꿔 드립니다.</p>
+        <span class="arrow">질문 만들러 가기 →</span>
+      </a>
+
+      <a class="path" href="portal.html" style="--pc:var(--s1)">
+        <span class="ic" aria-hidden="true">🚀</span>
+        <span class="who">무엇을 할지 이미 아는 분</span>
+        <h2>바로 분석하기</h2>
+        <p>15가지 분석 중 하나를 고르고 CSV만 올리면 끝. 그래프와 해석 리포트가
+           <strong>자동으로</strong> 만들어집니다.</p>
+        <span class="arrow">분석하러 가기 →</span>
+      </a>
     </div>
+  </section>
 
-    <script>
-        // GitHub 사용자 이름과 저장소 이름을 여기에 입력하세요!
-        const repoOwner = 'mioon1402'; // 업데이트됨
-        const repoName = 'CourseInfographic'; // 업데이트됨
+  <section class="sec">
+    <div class="sec-head">
+      <h2>이렇게 진행됩니다</h2>
+      <p>설치할 프로그램은 없습니다. 브라우저와 구글 계정만 있으면 됩니다.</p>
+    </div>
+    <div class="flow">
+      <div class="step"><div class="n">1</div><h3>분석 고르기</h3>
+        <p>“다음 달 판매량은 얼마나 될까?” 같은 <b>질문 문장</b>을 보고 카드를 고릅니다.</p></div>
+      <div class="step"><div class="n">2</div><h3>CSV 올리기</h3>
+        <p>엑셀에서 저장한 파일을 그대로. 한글이 깨져도 자동으로 알아봅니다.
+           <b>파일이 없으면 예제로</b> 연습할 수 있습니다.</p></div>
+      <div class="step"><div class="n">3</div><h3>Colab에서 실행</h3>
+        <p>새 탭이 열리면 <b>[런타임] → [모두 실행]</b> 한 번. 컬럼은 드롭다운으로 고릅니다.</p></div>
+      <div class="step"><div class="n">4</div><h3>결과 받기</h3>
+        <p>그래프와 <b>한국어 해석</b>이 나오고, 리포트가 ZIP으로 저장됩니다.</p></div>
+    </div>
+  </section>
 
-        const apiBaseUrl = `https://api.github.com/repos/${repoOwner}/${repoName}/contents/`;
+  <section class="sec">
+    <div class="sec-head">
+      <h2>무엇을 분석할 수 있나요</h2>
+      <p>데이터를 <strong>합치고 점검하는 것부터</strong>, 예측하고 원인을 따지는 것까지 15가지입니다.</p>
+    </div>
+    <div class="cats">
+      <div class="cat"><h3>🧬 데이터 준비</h3><ul>
+        <li><b>여러 파일 합치기</b> — 흩어진 표를 하나로</li>
+        <li><b>품질 진단·자동 정제</b> — 빈칸·중복·오타</li>
+        <li><b>정의·단위 점검</b> — 숫자의 뜻이 맞는지</li></ul></div>
+      <div class="cat"><h3>🔍 전체 파악</h3><ul>
+        <li><b>자동 요약 리포트</b> — 데이터 첫인상</li>
+        <li><b>상관관계 히트맵</b> — 무엇이 함께 움직이나</li></ul></div>
+      <div class="cat"><h3>⚖️ 비교·검정</h3><ul>
+        <li><b>그룹 간 차이 비교</b> — 차이가 진짜인가</li>
+        <li><b>교란변수·층화 비교</b> — 정말 그 탓인가</li></ul></div>
+      <div class="cat"><h3>📈 시간 흐름</h3><ul>
+        <li><b>미래 예측 (Prophet)</b> — 앞으로의 값</li>
+        <li><b>평활화·트렌드 추출</b> — 진짜 흐름</li></ul></div>
+      <div class="cat"><h3>🏭 감시·품질</h3><ul>
+        <li><b>이상치 감지</b> — 평소와 다른 신호</li>
+        <li><b>공정 관리도 (SPC)</b> — 안정적인가</li>
+        <li><b>파레토 분석</b> — 무엇부터 고칠까</li></ul></div>
+      <div class="cat"><h3>🤖 예측 모델</h3><ul>
+        <li><b>수치 예측</b> — 결과 값 맞히기</li>
+        <li><b>상태 분류</b> — 정상/불량 판정</li>
+        <li><b>군집화</b> — 유형별로 묶기</li></ul></div>
+    </div>
+  </section>
 
-        document.addEventListener('DOMContentLoaded', () => {
-            const gridContainer = document.getElementById('infographic-grid');
+  <section class="sec">
+    <div class="sec-head"><h2>이런 점이 다릅니다</h2></div>
+    <div class="callout">
+      <div class="item"><h3>🧭 결과를 읽어 드립니다</h3>
+        <p>숫자만 던지지 않습니다. <b>“실제 불량 100건 중 87건을 잡아내고 13건을 놓칩니다”</b> 처럼
+           현업 언어로 풀어서 설명합니다.</p></div>
+      <div class="item"><h3>⚠️ 잘못된 사용을 말립니다</h3>
+        <p>계속 늘어나는 값에 관리도를 쓰면 <b>왜 맞지 않는지</b> 먼저 알려 드립니다.
+           결과를 그대로 내놓지 않습니다.</p></div>
+      <div class="item"><h3>🔒 데이터는 내 손을 떠나지 않습니다</h3>
+        <p>이 사이트는 컬럼 이름만 브라우저 안에서 읽습니다. 실제 데이터는
+           <b>본인의 구글 Colab</b> 에만 올라가고 세션이 끝나면 사라집니다.</p></div>
+      <div class="item"><h3>📦 리포트를 그대로 공유</h3>
+        <p>결과는 <b>인터넷 없이도 열리는</b> HTML 파일로 저장됩니다.
+           동료에게 그냥 보내면 그래프까지 그대로 보입니다.</p></div>
+    </div>
+  </section>
 
-            // GitHub API를 통해 저장소의 파일 목록을 가져옵니다.
-            fetch(apiBaseUrl)
-                .then(response => {
-                    if (!response.ok) {
-                        throw new Error(`GitHub API HTTP 오류! 상태: ${response.status}. 사용자 이름과 저장소 이름이 올바른지 확인하고, 저장소가 공개(Public) 상태인지 확인해주세요.`);
-                    }
-                    return response.json();
-                })
-                .then(files => {
-                    // .html 파일만 필터링하고 index.html은 제외합니다.
-                    const infographicFiles = files
-                        .filter(file => file.name.endsWith('.html') && file.name !== 'index.html')
-                        .map(file => {
-                            // 파일 이름에서 확장자를 제거하고, 하이픈(-)이나 언더스코어(_)를 공백으로 바꾼 후
-                            // 각 단어의 첫 글자를 대문자로 만들어 제목을 만듭니다.
-                            let title = file.name.replace('.html', '').replace(/[-_]/g, ' ');
-                            title = title.split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
+  <section class="sec">
+    <div class="sec-head"><h2>자주 묻는 질문</h2></div>
+    <div class="faq">
+      <details><summary>프로그램을 설치해야 하나요?</summary>
+        <p>아니요. 브라우저만 있으면 됩니다. 분석은 구글 Colab(무료)에서 실행되므로
+           <b>구글 계정</b>만 필요합니다.</p></details>
+      <details><summary>파이썬을 몰라도 되나요?</summary>
+        <p>네. 코드를 읽거나 쓸 일이 없습니다. 버튼과 드롭다운만 쓰시면 되고,
+           타이핑할 것도 없습니다.</p></details>
+      <details><summary>제 데이터가 외부로 나가나요?</summary>
+        <p>이 사이트에 올린 파일은 <b>전송되지 않습니다.</b> 컬럼 이름을 알아내려고
+           브라우저 안에서 앞부분만 읽습니다. 실제 분석 데이터는 본인 구글 계정의
+           Colab에만 올라가며, 세션이 끝나면 함께 사라집니다.</p></details>
+      <details><summary>분석할 파일이 없는데 구경만 해볼 수 있나요?</summary>
+        <p>가능합니다. 분석하기 화면에서 <b>[🧪 예제 데이터로 연습]</b> 을 누르면
+           공장 설비 기록 예제로 모든 기능을 체험할 수 있습니다. 파일을 올릴 필요도 없습니다.</p></details>
+      <details><summary>결과가 이상하게 나옵니다.</summary>
+        <p>대부분 데이터 자체의 문제입니다. <b>데이터 품질 진단</b>을 먼저 돌려 보시고,
+           여러 라인·기간을 섞어 비교하신다면 <b>정의·단위 일관성 점검</b>도 함께 확인해 보세요.</p></details>
+      <details><summary>어떤 분석을 골라야 할지 모르겠습니다.</summary>
+        <p>두 가지 방법이 있습니다. <a href="portal.html?wizard=1">질문 만들기</a> 로 세 번 클릭해
+           추천을 받거나, CSV를 올리면 데이터 구성을 보고 <b>어울리는 분석을 자동으로 추천</b>해 드립니다.</p></details>
+    </div>
+  </section>
 
-                            // 특정 파일 이름에 대한 더 정확한 한글 제목 매핑 (필요시 추가/수정)
-                            const customTitles = {
-                                "Time Series Infographic": "시계열 데이터 인포그래픽",
-                                "Python Setup Infographic": "Python 튜토리얼 환경 설정 인포그래픽",
-                                "Time Series Index Infographic": "시계열 데이터 인덱스 설정 및 활용 인포그래픽",
-                                "Eda Infographic": "시계열 데이터 탐색적 데이터 분석(EDA) 인포그래픽",
-                                "Eda Part2 Infographic": "시계열 데이터 EDA Part 2: 기간별 변화율 분석 인포그래픽",
-                                "Data Viz Correlation Infographic": "시계열 데이터 시각화 및 상관관계 분석 인포그래픽",
-                                "Data Manipulation Infographic": "시계열 데이터 조작: 결측값 처리 & 핵심 문법",
-                                "Seasonal Decomposition Infographic Updated": "시계열 데이터 계절 분해 인포그래픽", 
-                                "Autocorrelation Infographic": "시계열 데이터 자기 상관(Autocorrelation) 인포그래픽",
-                                "Pacf Applied Infographic": "시계열 데이터 편자기 상관(PACF) 분석 및 적용 인포그래픽"
-                            };
-                            title = customTitles[title] || title; // 커스텀 제목이 있으면 사용, 없으면 가공된 제목 사용
+  <div class="cta-band">
+    <h2>준비되셨나요?</h2>
+    <p>파일이 없어도 예제로 바로 시작할 수 있습니다.</p>
+    <div class="btn-row">
+      <a class="btn btn-primary" href="portal.html">🚀 분석하러 가기</a>
+      <a class="btn btn-ghost" href="learn.html">📘 먼저 배우기</a>
+    </div>
+  </div>
 
-                            return {
-                                title: title,
-                                href: file.name
-                            };
-                        });
+  <div class="footer">
+    실행 환경: Google Colab (무료) · 분석 엔진: Python · pandas · scikit-learn · Prophet · XGBoost · SciPy · Plotly<br>
+    <a href="learn.html#ch7">시계열 인포그래픽 자료 16편</a> ·
+    <a href="README_PORTAL.md">관리자 안내</a>
+  </div>
+</div>
 
-                    // 인포그래픽 목록을 페이지에 추가합니다.
-                    infographicFiles.forEach(info => {
-                        const cardDiv = document.createElement('div');
-                        cardDiv.className = 'infographic-card';
-
-                        const titleH3 = document.createElement('h3');
-                        titleH3.className = 'card-title';
-                        titleH3.textContent = info.title;
-
-                        const linkA = document.createElement('a');
-                        linkA.href = info.href;
-                        linkA.className = 'card-button';
-                        linkA.textContent = '자세히 보기';
-
-                        cardDiv.appendChild(titleH3);
-                        cardDiv.appendChild(linkA);
-                        gridContainer.appendChild(cardDiv);
-                    });
-                })
-                .catch(error => {
-                    console.error('인포그래픽 목록을 불러오는 중 오류 발생:', error);
-                    gridContainer.innerHTML = `<p class="text-red-500">인포그래픽 목록을 불러오는 데 실패했습니다: ${error.message}<br>GitHub 사용자 이름과 저장소 이름이 올바른지 확인하거나, 저장소가 공개(Public) 상태인지 확인해 주세요. (GitHub API 사용)</p>`;
-                });
-        });
-    </script>
+<script>
+const btn = document.getElementById('themeBtn');
+btn.addEventListener('click', () => {
+  const cur = document.documentElement.getAttribute('data-theme');
+  const sysDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+  const next = cur ? (cur === 'dark' ? 'light' : 'dark') : (sysDark ? 'light' : 'dark');
+  document.documentElement.setAttribute('data-theme', next);
+  try{ localStorage.setItem('dap_theme', next); }catch(_){}
+});
+try{
+  const saved = localStorage.getItem('dap_theme');
+  if (saved) document.documentElement.setAttribute('data-theme', saved);
+}catch(_){}
+</script>
 </body>
 </html>
