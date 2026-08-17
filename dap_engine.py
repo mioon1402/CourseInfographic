@@ -374,20 +374,37 @@ def _read_any(name, content):
 # ═══════════════════════════════════════════════════════════════════════
 #  2단계 · 데이터 올리기
 # ═══════════════════════════════════════════════════════════════════════
-def load_data(path=None, use_demo=False):
-    """CSV 를 올려 받습니다. 파일이 없으면 연습용 예제 데이터를 만듭니다."""
+def load_data(path=None, source="auto", use_demo=False):
+    """분석할 데이터를 준비합니다.
+
+    source
+        "auto"   포털 설정을 따릅니다. (예제 데이터로 연습을 골랐으면 업로드 창을 띄우지 않습니다)
+        "upload" 내 컴퓨터에서 CSV 올리기
+        "demo"   연습용 예제 데이터를 그 자리에서 생성 (업로드 불필요)
+    """
     global df, DATA_SOURCE_NAME, RAW_ROWS, RAW_COLS
     import pandas as pd
+
+    if use_demo:
+        source = "demo"
+    if source == "auto":
+        source = "demo" if P_bool("use_demo") else "upload"
 
     data = None
     if path:
         data = _read_any(str(path), open(path, "rb").read())
         DATA_SOURCE_NAME = os.path.basename(str(path))
-    elif IN_COLAB and not use_demo:
+    elif source == "demo":
+        # 예제 데이터는 코드로 만들어 냅니다 — 내려받거나 올릴 필요가 없습니다.
+        print("🧪 연습용 예제 데이터를 만드는 중입니다. (파일 업로드 없이 바로 진행)")
+
+    if data is None and source == "upload" and IN_COLAB:
         try:
             from google.colab import files as colab_files
             print("📂 분석할 CSV 파일을 선택하세요.")
-            print("   (파일이 없으면 [취소] → 연습용 예제 데이터로 진행합니다)\n")
+            print("   포털에 올리신 파일은 브라우저 안에서 컬럼 이름만 읽은 것이라,")
+            print("   실제 분석을 위해 여기서 한 번 더 올려 주셔야 합니다. (같은 파일을 그대로 고르세요)")
+            print("   ※ 연습만 해보실 거면 [취소] → 예제 데이터로 진행합니다.\n")
             uploaded = colab_files.upload()
         except Exception as exc:
             print(f"업로드 창을 열지 못했습니다({exc}). 예제 데이터로 진행합니다.")
@@ -399,7 +416,6 @@ def load_data(path=None, use_demo=False):
             DATA_SOURCE_NAME = fname
 
     if data is None:
-        print("\n🧪 연습용 예제 데이터(공장 설비 일별 기록)를 생성합니다.")
         data = _make_demo_data()
         DATA_SOURCE_NAME = "예제 데이터 (공장 설비 일별 기록)"
 

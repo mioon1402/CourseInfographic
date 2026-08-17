@@ -237,6 +237,12 @@ select{appearance:none;background-image:linear-gradient(45deg,transparent 50%,va
   border-bottom:1.5px solid var(--border);white-space:nowrap;background:var(--surface-2)}
 .preview-wrap th span{display:block;font-weight:500;color:var(--muted);font-size:10.5px}
 .preview-wrap td{padding:6px 11px;border-bottom:1px solid var(--border);white-space:nowrap;color:var(--text-2)}
+.demo-on{display:none;gap:9px;align-items:flex-start;margin-top:12px;font-size:12.5px;
+  color:var(--text);background:color-mix(in srgb,var(--good) 11%,transparent);
+  border:1px solid color-mix(in srgb,var(--good) 40%,transparent);border-radius:9px;padding:11px 13px;line-height:1.6}
+.demo-on.on{display:flex}
+.linkish{background:none;border:0;color:var(--accent);cursor:pointer;text-decoration:underline;
+  padding:0 2px;font-size:12.5px}
 .rec-strip{display:none;margin-top:14px;background:color-mix(in srgb,var(--good) 8%,transparent);
   border:1px solid color-mix(in srgb,var(--good) 32%,transparent);border-radius:10px;padding:12px 14px}
 .rec-strip.on{display:block}
@@ -371,7 +377,8 @@ details.adv .field-grid{margin-top:14px}
     </p>
     <div class="guide-grid">
       <div class="guide-item"><span class="gi-num">1</span><div>
-        <b>파일이 없어도 시작할 수 있어요.</b><br>아래 <b>[연습용 예제 파일 받기]</b>를 눌러 샘플 CSV로 먼저 연습해 보세요.</div></div>
+        <b>파일이 없어도 시작할 수 있어요.</b><br>STEP 2의 <b>[🧪 예제 데이터로 연습]</b>을 누르면
+        Colab에 파일을 올리지 않고 바로 체험할 수 있습니다.</div></div>
       <div class="guide-item"><span class="gi-num">2</span><div>
         <b>뭘 골라야 할지 모르겠다면?</b><br>CSV를 올리면 데이터를 살펴보고 <b>어울리는 분석을 추천</b>해 드립니다.</div></div>
       <div class="guide-item"><span class="gi-num">3</span><div>
@@ -404,17 +411,30 @@ details.adv .field-grid{margin-top:14px}
             <div class="dz-sub">엑셀에서 저장한 한글 CSV(cp949/euc-kr)도 자동 인식합니다</div>
           </div>
           <div class="sample-box">
-            <div class="sb-t">🧪 연습용 예제 파일</div>
-            <div class="sb-d">공장 설비 1년치 기록(180일). 모든 분석을 바로 시험해 볼 수 있습니다.</div>
-            <button class="btn btn-secondary" id="sampleBtn" type="button" style="width:100%">⬇️ 예제 파일 받기</button>
+            <div class="sb-t">🧪 파일 없이 연습하기</div>
+            <div class="sb-d">공장 설비 기록 예제로 모든 분석을 바로 시험해 볼 수 있습니다.
+              <strong>Colab에서 파일을 올릴 필요가 없습니다.</strong></div>
+            <button class="btn btn-secondary" id="demoBtn" type="button" style="width:100%">🧪 예제 데이터로 연습</button>
+            <button class="btn btn-secondary" id="sampleBtn" type="button"
+              style="width:100%;font-size:12.5px;padding:7px 10px">⬇️ 예제를 CSV로 받아보기</button>
           </div>
         </div>
         <input type="file" id="fileInput" accept=".csv,.txt,.tsv" class="visually-hidden">
 
+        <div class="demo-on" id="demoBanner">
+          <span aria-hidden="true">🧪</span>
+          <span><strong>예제 데이터로 실행합니다.</strong> Colab이 예제를 직접 만들어 내므로
+            <strong>파일을 올리실 필요가 없습니다.</strong>
+            <button type="button" id="demoOff" class="linkish">내 파일로 바꾸기</button></span>
+        </div>
+
         <div class="privacy">
           <span aria-hidden="true">🔒</span>
-          <span><strong>파일은 어디에도 전송되지 않습니다.</strong> 첫 몇 줄만 브라우저 안에서 읽어 컬럼 이름을 파악할 뿐이며,
-          실제 데이터는 나중에 Colab에서 직접 업로드합니다.</span>
+          <span><strong>올리신 파일은 어디에도 전송되지 않습니다.</strong> 컬럼 이름을 알아내려고
+          브라우저 안에서 앞부분만 읽을 뿐입니다.
+          <br>그래서 <strong>Colab에서 같은 파일을 한 번 더 선택해 주셔야 합니다.</strong>
+          포털(내 컴퓨터)과 Colab(구글 서버)은 서로 다른 곳이라, 데이터를 자동으로 넘기려면
+          파일을 외부 서버에 올려야 하기 때문입니다.</span>
         </div>
 
         <div class="file-ok" id="fileOk">
@@ -915,7 +935,17 @@ const CAT_BY_ID = Object.fromEntries(CATEGORIES.map(c => [c.id, c]));
 /* ═══════════════════════════════════════════════════════════════
    3. 상태 & 유틸
    ═══════════════════════════════════════════════════════════════ */
-const state = { moduleId:null, columns:[], preview:[], values:{}, recommended:[] };
+const state = { moduleId:null, columns:[], preview:[], values:{}, recommended:[], useDemo:false };
+
+/* Colab 엔진이 만들어 내는 예제 데이터의 컬럼 구성과 똑같이 맞춰 둡니다. */
+const DEMO_COLUMNS = [
+  { name:'날짜', kind:'date' },   { name:'생산량', kind:'number' },
+  { name:'설비온도', kind:'number' }, { name:'습도', kind:'number' },
+  { name:'진동값', kind:'number' },   { name:'압력', kind:'number' },
+  { name:'라인속도', kind:'number' }, { name:'수율', kind:'number' },
+  { name:'불량여부', kind:'text', uniq:2 }, { name:'생산라인', kind:'text', uniq:3 },
+  { name:'설비코드', kind:'text', uniq:1 },  { name:'비고', kind:'text', uniq:3 },
+];
 const $  = (s, r=document) => r.querySelector(s);
 const $$ = (s, r=document) => Array.from(r.querySelectorAll(s));
 const esc = s => String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -1244,6 +1274,8 @@ function readHeader(file){
       });
       state.preview = rows.slice(0, 5);
 
+      state.useDemo = false;
+      $('#demoBanner').classList.remove('on');
       $('#fileName').textContent = file.name;
       $('#fileMeta').textContent =
         `컬럼 ${state.columns.length}개 인식 · 구분자 "${delim === '\t' ? 'Tab' : delim}" · 인코딩 ${enc}`
@@ -1326,7 +1358,7 @@ function makeSampleCsv(){
   let seed = 42;
   const rnd = () => { seed = (seed * 1664525 + 1013904223) % 4294967296; return seed / 4294967296; };
   const gauss = () => { let s = 0; for (let i=0;i<6;i++) s += rnd(); return (s - 3) / 1.2; };
-  const lines = ['날짜,생산량,설비온도,습도,진동값,압력,라인속도,수율,불량여부,생산라인'];
+  const lines = ['날짜,생산량,설비온도,습도,진동값,압력,라인속도,수율,불량여부,생산라인,설비코드,비고'];
   const start = new Date(2024, 0, 1);
   const lineNames = ['A라인','B라인','C라인'];
   for (let t = 0; t < 180; t++){
@@ -1346,12 +1378,42 @@ function makeSampleCsv(){
     if (line === 'C라인') yld -= 1.4; else if (line === 'B라인') yld -= 0.5;
     if (rnd() < 0.02){ vib += 2 + rnd() * 2.5; temp += 6 + rnd() * 8; yld -= 5 + rnd() * 9; prod -= 150 + rnd() * 270; }
     yld = Math.min(100, Math.max(60, yld));
+    const memo = ['', '', '', ' 정기점검 ', '교대근무'][Math.floor(rnd() * 5)];
     lines.push([ds, prod.toFixed(1), temp.toFixed(2), hum.toFixed(2), vib.toFixed(3),
                  pres.toFixed(2), spd.toFixed(1), yld.toFixed(2),
-                 yld < 93 ? '불량' : '정상', line].join(','));
+                 yld < 93 ? '불량' : '정상', line, 'EQ-100', memo].join(','));
   }
   return '﻿' + lines.join('\r\n');   // BOM: 엑셀에서 한글이 깨지지 않도록
 }
+function setDemoMode(on){
+  state.useDemo = on;
+  $('#demoBanner').classList.toggle('on', on);
+  if (on){
+    state.columns = DEMO_COLUMNS.map(c => ({ ...c, uniq: c.uniq ?? 50 }));
+    state.preview = [];
+    $('#previewWrap').classList.remove('on');
+    $('#fileOk').classList.remove('on');
+    // 예제 데이터에 맞는 기본 컬럼을 골라 둡니다.
+    state.values.date_col   = state.values.date_col   || '날짜';
+    state.values.target_col = state.values.target_col || '수율';
+    state.values.group_col  = state.values.group_col  || '생산라인';
+    recommend();
+  } else {
+    state.columns = []; state.preview = [];
+    $('#previewWrap').classList.remove('on');
+    $('#recStrip').classList.remove('on');
+  }
+  renderModules();
+  if (state.moduleId) $$('.mod').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.mod === state.moduleId)));
+  renderFields(); save(); update();
+}
+$('#demoBtn').addEventListener('click', () => {
+  setDemoMode(true);
+  toast('🧪 예제 데이터로 실행합니다.\nColab에서는 파일을 올리지 않으셔도 됩니다.');
+  $('#modDetail').scrollIntoView({ behavior:'smooth', block:'center' });
+});
+$('#demoOff').addEventListener('click', () => setDemoMode(false));
+
 $('#sampleBtn').addEventListener('click', () => {
   const blob = new Blob([makeSampleCsv()], { type:'text/csv;charset=utf-8' });
   const a = document.createElement('a');
@@ -1420,6 +1482,7 @@ function buildParams(){
     if (p.type === 'bool') q.set('p_' + p.key, val ? '1' : '0');
     else q.set('p_' + p.key, String(val === '' && p.type !== 'text' ? p.def : val));
   });
+  if (state.useDemo) q.set('p_use_demo', '1');   // Colab 이 예제를 직접 생성
   q.set('v', '2');
   return q;
 }
@@ -1474,6 +1537,8 @@ function update(){
   const kv = [];
   if (m){
     kv.push(['분석', m.name.replace(/\s*\(.*\)$/, '')]);
+    kv.push(['데이터', state.useDemo ? '예제 데이터 (업로드 불필요)'
+                                     : (state.columns.length ? '내 CSV 파일' : '내 CSV 파일 (Colab에서 선택)')]);
     if (m.need.date !== 'none')     kv.push(['날짜 컬럼', state.values.date_col || '— 미지정']);
     if (m.need.group !== 'none')    kv.push([m.id === 'pareto' ? '분류 컬럼' : '그룹 컬럼', state.values.group_col || '— 미지정']);
     if (m.need.target !== 'none')   kv.push(['타겟 컬럼', state.values.target_col || '— 미지정']);
