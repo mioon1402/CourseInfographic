@@ -49,6 +49,9 @@ MODULE_CATALOG = [
     ("regress_rf",      "결과 수치 예측 (Random Forest)",    "여러 조건으로 숫자를 예측합니다"),
     ("classify_xgb",    "정상/불량 상태 분류 (XGBoost)",     "여러 조건으로 상태를 판정합니다"),
     ("cluster_kmeans",  "유사 데이터 자동 그룹핑 (K-Means)", "비슷한 것끼리 묶습니다"),
+    ("data_merge",      "여러 파일 합치기",                  "흩어진 표를 하나의 분석용 표로 만듭니다"),
+    ("definition_check", "컬럼 정의·단위 일관성 점검",       "숫자의 뜻이 어긋나지 않았는지 봅니다"),
+    ("confound_check",  "교란변수 점검 & 층화 비교",         "그 차이가 정말 그룹 때문인지 확인합니다"),
 ]
 MODULE_NAMES = {m[0]: m[1] for m in MODULE_CATALOG}
 
@@ -66,9 +69,14 @@ MODULE_NEEDS = {
     "regress_rf":      {"date": "none",     "target": "required", "group": "none",     "features": "optional"},
     "classify_xgb":    {"date": "none",     "target": "required", "group": "none",     "features": "optional"},
     "cluster_kmeans":  {"date": "none",     "target": "optional", "group": "none",     "features": "optional"},
+    "data_merge":      {"date": "none",     "target": "none",     "group": "none",     "features": "none"},
+    "definition_check": {"date": "optional", "target": "none",    "group": "optional", "features": "optional"},
+    "confound_check":  {"date": "none",     "target": "required", "group": "required", "features": "optional"},
 }
 
 # 분석별 추가 설치 패키지 — 고른 분석에 필요한 것만 설치해 시작 시간을 줄입니다.
+MULTI_FILE_MODULES = {"data_merge"}
+
 MODULE_DEPS = {
     "ts_forecast":  [("prophet", "prophet", "Prophet(시계열 예측)")],
     "ts_smooth":    [("statsmodels", "statsmodels", "statsmodels")],
@@ -3297,6 +3305,633 @@ def run_data_quality():
     return work
 
 
+FRAMES = {}          # 여러 파일을 올렸을 때 {파일이름: 데이터프레임}
+
+
+def _make_demo_tables():
+    """연습용: 실무처럼 '세 시스템에 흩어진' 표 3개를 만듭니다."""
+    base = _make_demo_data(n_days=400, seed=7)
+    base = base.drop_duplicates(subset=["날짜"]).reset_index(drop=True)
+    rng = np.random.default_rng(7)
+
+    생산실적 = base[["날짜", "생산라인", "생산량", "수율"]].copy()
+
+    설비로그 = base[["날짜", "생산라인", "설비온도", "습도", "진동값", "압력"]].copy()
+    drop = rng.choice(len(설비로그), size=int(len(설비로그) * 0.08), replace=False)
+    설비로그 = 설비로그.drop(index=drop).reset_index(drop=True)   # 일부 날짜 기록 누락
+
+    검사결과 = base[["날짜", "생산라인", "불량여부"]].copy()
+    검사결과["검사수량"] = rng.integers(80, 200, len(검사결과))
+    검사결과 = 검사결과.iloc[: int(len(검사결과) * 0.9)].reset_index(drop=True)  # 최근 기록 아직 없음
+
+    return {"생산실적.csv": 생산실적, "설비로그.csv": 설비로그, "검사결과.csv": 검사결과}
+
+
+def load_many(source="auto"):
+    """여러 개의 CSV 를 한 번에 올려 받습니다. (파일 합치기 전용)"""
+    global FRAMES
+    FRAMES = {}
+    if source == "auto":
+        source = "demo" if P_bool("use_demo") else "upload"
+
+    if source == "upload" and IN_COLAB:
+        try:
+            from google.colab import files as colab_files
+            print("📂 합칠 CSV 파일들을 한 번에 여러 개 선택하세요.")
+            print("   (Ctrl 또는 Shift 를 누른 채 클릭하면 여러 개를 고를 수 있습니다)")
+            print("   ※ 연습만 해보실 거면 [취소] → 예제 표 3개로 진행합니다.\n")
+            uploaded = colab_files.upload()
+        except Exception as exc:
+            print(f"업로드 창을 열지 못했습니다({exc}). 예제로 진행합니다.")
+            uploaded = {}
+        for name, content in uploaded.items():
+            try:
+                FRAMES[name] = _read_any(name, content)
+            except Exception as exc:
+                print(f"  ⚠️  '{name}' 을(를) 읽지 못했습니다: {exc}")
+
+    if not FRAMES:
+        print("🧪 연습용 예제 표 3개(생산실적·설비로그·검사결과)를 만듭니다.")
+        FRAMES = _make_demo_tables()
+
+    for name, frame in FRAMES.items():
+        frame.columns = [str(c).strip() for c in frame.columns]
+        FRAMES[name] = _coerce_numeric(frame)
+
+    print(f"\n✅ 표 {len(FRAMES)}개를 불러왔습니다.")
+    for name, frame in FRAMES.items():
+        print(f"   · {name}: {len(frame):,}행 × {frame.shape[1]}열 "
+              f"({', '.join(map(str, frame.columns[:6]))}{' …' if frame.shape[1] > 6 else ''})")
+    return FRAMES
+
+
+def _guess_keys(frames):
+    """어느 컬럼으로 연결해야 할지 추측합니다. (이름이 같고 값도 겹치는 컬럼)"""
+    names = list(frames)
+    common = set(frames[names[0]].columns)
+    for n in names[1:]:
+        common &= set(frames[n].columns)
+    scored = []
+    for c in common:
+        overlaps = []
+        for i in range(len(names) - 1):
+            a = set(frames[names[i]][c].dropna().astype(str))
+            b = set(frames[names[i + 1]][c].dropna().astype(str))
+            if a and b:
+                overlaps.append(len(a & b) / max(1, min(len(a), len(b))))
+        if not overlaps:
+            continue
+        ov = float(np.mean(overlaps))
+        uniq = float(np.mean([frames[n][c].nunique() / max(len(frames[n]), 1) for n in names]))
+        # 값이 잘 겹치고, 종류가 많을수록(=식별자에 가까울수록) 연결 키로 적합
+        scored.append((c, ov, uniq, ov * 0.7 + min(uniq, 1.0) * 0.3))
+    scored.sort(key=lambda x: -x[3])
+    keys = [c for c, ov, uq, s in scored if ov >= 0.5]
+    return keys[:3], scored
+
+
+def run_data_merge():
+    """[데이터 준비] 여러 파일을 하나의 분석용 표로 합칩니다."""
+    h_title("🧬 여러 파일 합치기",
+            f"불러온 표 {len(FRAMES)}개 · 생성 시각: {datetime.now():%Y-%m-%d %H:%M}")
+
+    if not FRAMES:
+        h_note("합칠 파일이 없습니다. 2단계에서 CSV 를 <b>여러 개</b> 선택해 주세요.", "crit")
+        return None
+    if len(FRAMES) < 2:
+        h_note("파일이 하나뿐입니다. 합치려면 2개 이상 필요합니다. "
+               "2단계에서 <b>Ctrl 또는 Shift</b> 를 누른 채 여러 개를 고르세요.", "warn")
+        return list(FRAMES.values())[0]
+
+    mode = P_str("merge_mode", "auto")
+    how = P_str("join_type", "left")
+    key_input = P_list("key_cols")
+    time_align = P_str("time_align", "none")
+    agg = P_str("agg", "mean")
+
+    names = list(FRAMES)
+    frames = {n: FRAMES[n].copy() for n in names}
+
+    # ── 어떤 방식으로 합칠지 ──────────────────────────────────────────────
+    col_sets = [set(frames[n].columns) for n in names]
+    shared = set.intersection(*col_sets)
+    same_shape = all(len(s ^ col_sets[0]) == 0 for s in col_sets)
+    if mode == "auto":
+        mode = "concat" if same_shape else "join"
+        h_note(f"컬럼 구성이 {'같아서' if same_shape else '달라서'} "
+               f"<b>{'세로로 이어붙이기' if mode == 'concat' else '가로로 붙이기(연결)'}</b> 로 자동 판단했습니다.")
+
+    h_sub("① 불러온 표")
+    info = pd.DataFrame([{
+        "파일": n, "행": f"{len(frames[n]):,}", "열": frames[n].shape[1],
+        "컬럼": ", ".join(map(str, frames[n].columns[:8])) + (" …" if frames[n].shape[1] > 8 else ""),
+    } for n in names])
+    h_table(info, "합치기 전 상태", max_rows=20, highlight="파일")
+
+    # ── 세로로 이어붙이기 ────────────────────────────────────────────────
+    if mode == "concat":
+        h_sub("② 세로로 이어붙이기")
+        merged = pd.concat([frames[n].assign(**{"출처파일": n}) for n in names],
+                           ignore_index=True, sort=False)
+        only = {n: sorted(col_sets[i] - shared) for i, n in enumerate(names)}
+        odd = {n: v for n, v in only.items() if v}
+        if odd:
+            h_note("일부 파일에만 있는 컬럼이 있어, 없는 쪽은 빈칸으로 채웠습니다: "
+                   + "; ".join(f"<b>{_html.escape(n)}</b> → {_html.escape(', '.join(map(str, v[:5])))}"
+                               for n, v in odd.items()), "warn")
+        h_metrics([
+            ("합친 표", f"{len(merged):,}행", f"{merged.shape[1]}열"),
+            ("원본 합계", f"{sum(len(frames[n]) for n in names):,}행", "단순 합"),
+            ("중복 행", f"{int(merged.duplicated().sum()):,}", "같은 내용이 두 번 들어갔는지"),
+            ("빈칸", f"{merged.isna().mean().mean()*100:.1f}%", "이어붙이며 생긴 빈칸 포함"),
+        ])
+
+    # ── 가로로 붙이기 (연결) ─────────────────────────────────────────────
+    else:
+        h_sub("② 연결 기준 찾기")
+        auto_keys, scored = _guess_keys(frames)
+        keys = [k for k in key_input if all(k in frames[n].columns for n in names)] or auto_keys
+        if not keys:
+            h_note("모든 파일에 공통으로 들어 있는 <b>연결 기준 컬럼</b>을 찾지 못했습니다.<br>"
+                   "파일마다 컬럼 이름이 다르면(예: <code>날짜</code> vs <code>일자</code>) "
+                   "먼저 이름을 같게 맞춰 주세요.", "crit")
+            return None
+
+        cand = pd.DataFrame([{
+            "컬럼": c, "값이 겹치는 정도": f"{ov*100:.0f}%",
+            "값의 다양함": f"{uq*100:.0f}%",
+            "판정": "🔑 연결 기준으로 사용" if c in keys else "",
+        } for c, ov, uq, s in scored[:10]])
+        h_table(cand, "어떤 컬럼으로 연결할지 (겹치는 정도가 높을수록 적합)", highlight="판정")
+        h_note(f"<b>{_html.escape(', '.join(map(str, keys)))}</b> 을(를) 기준으로 연결합니다."
+               + ("" if key_input else " (자동으로 고른 것입니다. 포털에서 직접 지정할 수도 있습니다)"))
+
+        # 시간 단위 맞추기
+        date_key = next((k for k in keys
+                         if pd.to_datetime(frames[names[0]][k], errors="coerce").notna().mean() > 0.8), None)
+        if time_align != "none" and date_key:
+            freq = normalize_freq(time_align)
+            for n in names:
+                f = frames[n]
+                f[date_key] = pd.to_datetime(f[date_key], errors="coerce")
+                f = f.dropna(subset=[date_key])
+                other_keys = [k for k in keys if k != date_key]
+                num = [c for c in f.columns if pd.api.types.is_numeric_dtype(f[c])]
+                grouper = [pd.Grouper(key=date_key, freq=freq)] + other_keys
+                if num:
+                    f = f.groupby(grouper, as_index=False)[num].agg(agg)
+                else:
+                    f = f.drop_duplicates(subset=keys)
+                frames[n] = f
+            h_note(f"기록 간격이 달라 <b>{FREQ_LABEL.get(freq, time_align)} 단위</b>로 먼저 묶은 뒤 "
+                   f"({agg}) 연결했습니다.")
+
+        # 중복 키 경고 (행 폭발의 원인)
+        dup_warn = []
+        for n in names:
+            d = int(frames[n].duplicated(subset=keys).sum())
+            if d:
+                dup_warn.append(f"{n} {d:,}건")
+        if dup_warn:
+            h_note("연결 기준이 같은 행이 여러 개 있는 파일이 있습니다: "
+                   f"<b>{_html.escape(', '.join(dup_warn))}</b>. "
+                   "이런 경우 합친 뒤 행 수가 크게 불어날 수 있으니 결과 행 수를 꼭 확인하세요.", "warn")
+
+        how_map = {"left": "left", "inner": "inner", "outer": "outer"}
+        merged = frames[names[0]]
+        match_rows = []
+        for n in names[1:]:
+            before = len(merged)
+            right = frames[n]
+            left_keys = set(map(tuple, merged[keys].astype(str).itertuples(index=False, name=None)))
+            right_keys = set(map(tuple, right[keys].astype(str).itertuples(index=False, name=None)))
+            inter = len(left_keys & right_keys)
+            merged = merged.merge(right, on=keys, how=how_map.get(how, "left"),
+                                  suffixes=("", f"_{n.split('.')[0]}"))
+            match_rows.append({
+                "붙인 파일": n,
+                "왼쪽 키 종류": f"{len(left_keys):,}",
+                "오른쪽 키 종류": f"{len(right_keys):,}",
+                "일치한 키": f"{inter:,}",
+                "일치율": f"{inter/max(len(left_keys),1)*100:.1f}%",
+                "행 변화": f"{before:,} → {len(merged):,}",
+            })
+
+        h_sub("③ 얼마나 잘 붙었나")
+        h_table(pd.DataFrame(match_rows), "일치율이 낮으면 기준 컬럼이나 표기 방식을 확인하세요",
+                highlight="일치율")
+
+        worst = min((float(r["일치율"].rstrip("%")) for r in match_rows), default=100.0)
+        na_after = merged.isna().mean().mean() * 100
+        h_metrics([
+            ("합친 표", f"{len(merged):,}행", f"{merged.shape[1]}열"),
+            ("기준 표", f"{len(frames[names[0]]):,}행", names[0]),
+            ("최저 일치율", f"{worst:.1f}%", "가장 안 붙은 파일 기준"),
+            ("빈칸", f"{na_after:.1f}%", "못 붙어서 생긴 빈칸 포함"),
+        ])
+
+        fig = go.Figure()
+        fig.add_trace(go.Bar(
+            x=[r["붙인 파일"] for r in match_rows],
+            y=[float(r["일치율"].rstrip("%")) for r in match_rows],
+            marker=dict(color=[PALETTE[0] if float(r["일치율"].rstrip("%")) >= 90 else "#e08800"
+                               for r in match_rows], line=dict(width=0)),
+            text=[r["일치율"] for r in match_rows], textposition="outside", cliponaxis=False,
+            hovertemplate="%{x}<br>일치율 %{y:.1f}%<extra></extra>"))
+        fig.update_layout(title="파일별 연결 성공률", yaxis_title="일치율 (%)",
+                          yaxis=dict(range=[0, 108]), height=340, showlegend=False)
+        show(fig)
+
+    # ── 결과 ─────────────────────────────────────────────────────────────
+    h_sub("④ 합쳐진 결과")
+    h_table(merged.head(8), "미리보기 (앞 8행)", max_rows=8)
+
+    tips = [
+        f"표 <b>{len(names)}개</b>를 합쳐 <b>{len(merged):,}행 × {merged.shape[1]}열</b>의 "
+        f"분석용 표를 만들었습니다.",
+        "합쳐진 CSV 가 저장됩니다. <b>이 파일을 다시 올려</b> 상관관계·예측·이상 탐지 같은 "
+        "다른 분석을 이어서 하시면 됩니다.",
+    ]
+    if mode == "join":
+        if worst < 90:
+            tips.append(f"⚠️ 일치율이 <b>{worst:.0f}%</b> 까지 떨어집니다. 흔한 원인은 "
+                        f"<b>표기 차이</b>(‘A라인’ vs ‘A-라인’), <b>공백</b>, <b>기간 불일치</b>입니다. "
+                        f"먼저 <b>데이터 품질 진단</b>으로 정리한 뒤 다시 합쳐 보세요.")
+        else:
+            tips.append(f"일치율이 <b>{worst:.0f}%</b> 로 양호합니다.")
+        if na_after > 20:
+            tips.append(f"합친 뒤 빈칸이 <b>{na_after:.0f}%</b> 입니다. 한쪽에만 있는 기간·항목이 많다는 뜻이니, "
+                        f"분석 전에 기간을 맞추거나 <b>양쪽 모두 있는 것만(inner)</b> 으로 바꿔 보세요.")
+    else:
+        if int(merged.duplicated().sum()) > 0:
+            tips.append(f"완전히 같은 행이 <b>{int(merged.duplicated().sum()):,}건</b> 있습니다. "
+                        f"같은 파일을 두 번 올리지 않았는지 확인하세요.")
+    tips.append("❗ 합치기는 <b>기준 컬럼의 뜻이 양쪽에서 같을 때만</b> 옳습니다. "
+                "같은 ‘날짜’라도 한쪽은 생산일, 다른 쪽은 검사일이면 붙여도 의미가 없습니다.")
+    h_insight(tips)
+
+    RESULT_FILES.append(("합쳐진_데이터.csv", merged))
+    return merged
+
+
+def run_definition_check():
+    """[데이터 준비] 같은 컬럼이 그룹·기간마다 다른 뜻으로 쓰이지 않았는지 점검."""
+    h_title("🔍 컬럼 정의 · 단위 일관성 점검",
+            f"파일: {_html.escape(str(DATA_SOURCE_NAME))} · 생성 시각: {datetime.now():%Y-%m-%d %H:%M}")
+
+    group_col = resolve_col(GROUP_COL, kind="category", purpose="비교할 그룹 컬럼") if GROUP_COL else None
+    date_col = resolve_col(DATE_COL, kind="date") if DATE_COL else None
+    cols = [c for c in pick_features(exclude=[c for c in [group_col, date_col] if c])
+            if pd.api.types.is_numeric_dtype(df[c])]
+    if not cols:
+        h_note("점검할 숫자 컬럼이 없습니다.", "crit")
+        return None
+
+    h_note("이 점검은 <b>형식</b>이 아니라 <b>뜻</b>을 봅니다. "
+           "같은 이름의 컬럼이 그룹이나 기간에 따라 다른 기준으로 기록되지 않았는지 찾아, "
+           "<b>의심되는 것을 질문 형태로</b> 알려 드립니다. 최종 판단은 현장을 아는 분만 할 수 있습니다.")
+
+    findings = []
+
+    # ── ① 그룹별 자릿수(스케일) 차이 ─────────────────────────────────────
+    if group_col:
+        h_sub("① 그룹마다 값의 크기 자체가 다른가")
+        rows = []
+        for c in cols:
+            g = df.groupby(group_col)[c].agg(["count", "median", "min", "max"]).dropna()
+            g = g[g["count"] >= 5]
+            if len(g) < 2:
+                continue
+            med = g["median"].replace(0, np.nan).dropna()
+            if len(med) < 2:
+                continue
+            ratio = float(med.max() / med.min()) if med.min() != 0 else np.inf
+            rows.append({"컬럼": c, "배율": ratio,
+                         "가장 큰 그룹": f"{med.idxmax()} ({med.max():,.4g})",
+                         "가장 작은 그룹": f"{med.idxmin()} ({med.min():,.4g})"})
+            if ratio >= 8:
+                findings.append({
+                    "심각도": "높음", "컬럼": str(c), "유형": "단위·기준 의심",
+                    "확인 질문": f"'{med.idxmax()}' 의 {c} 중앙값이 '{med.idxmin()}' 보다 "
+                                 f"{ratio:.0f}배 큽니다. 같은 단위·같은 계산식이 맞습니까? "
+                                 f"(예: 한쪽은 0~1 비율, 다른 쪽은 0~100 퍼센트)"})
+        if rows:
+            tbl = pd.DataFrame(rows).sort_values("배율", ascending=False)
+            tbl["배율"] = tbl["배율"].map(lambda v: "∞" if np.isinf(v) else f"{v:.1f}배")
+            h_table(tbl, "그룹 간 중앙값 배율 — 8배 이상이면 단위가 다를 수 있습니다",
+                    max_rows=25, highlight="컬럼")
+
+    # ── ② 값의 범위가 서로 다른 규격인가 ─────────────────────────────────
+    h_sub("② 값의 범위가 이상하지 않은가")
+    rng_rows = []
+    for c in cols:
+        s = df[c].dropna()
+        if s.empty:
+            continue
+        lo, hi = float(s.min()), float(s.max())
+        hint = ""
+        if 0 <= lo and hi <= 1.0 and s.nunique() > 5:
+            hint = "0~1 비율로 보입니다 (퍼센트라면 100을 곱해야 할 수 있음)"
+        elif 0 <= lo and hi <= 100 and ("율" in str(c) or "률" in str(c) or "%" in str(c)):
+            hint = "퍼센트로 보입니다"
+        if lo < 0 and any(k in str(c) for k in ("량", "수", "개수", "금액", "율", "률")):
+            hint = "음수가 있습니다 — 이 항목에 음수가 나올 수 있습니까?"
+            findings.append({"심각도": "높음", "컬럼": str(c), "유형": "불가능한 값",
+                             "확인 질문": f"{c} 에 음수({lo:,.4g})가 있습니다. 정상적인 값입니까? "
+                                          f"입력 오류나 부호 규칙 차이는 아닙니까?"})
+        rng_rows.append({"컬럼": c, "최솟값": lo, "최댓값": hi,
+                         "소수 자릿수": int(s.astype(str).str.split(".").str[-1].str.len().max()
+                                          if s.dtype.kind == "f" else 0),
+                         "메모": hint})
+    if rng_rows:
+        h_table(pd.DataFrame(rng_rows), "컬럼별 값의 범위", max_rows=30, highlight="컬럼")
+
+    # ── ③ 기간에 따라 정의가 바뀌었는가 ──────────────────────────────────
+    if date_col:
+        h_sub("③ 도중에 기준이 바뀐 흔적이 있는가")
+        d = pd.to_datetime(df[date_col], errors="coerce")
+        ok = d.notna()
+        shifted = []
+        for c in cols:
+            s = pd.to_numeric(df.loc[ok, c], errors="coerce")
+            tmp = pd.DataFrame({"d": d[ok], "v": s}).dropna().sort_values("d")
+            if len(tmp) < 40:
+                continue
+            half = len(tmp) // 2
+            a, b = tmp["v"].iloc[:half], tmp["v"].iloc[half:]
+            if a.std() == 0 and b.std() == 0:
+                continue
+            pooled = np.sqrt((a.var() + b.var()) / 2) or np.nan
+            if pooled and not np.isnan(pooled):
+                gap = abs(a.mean() - b.mean()) / pooled
+                if gap > 2.0:
+                    shifted.append({"컬럼": c, "전반부 평균": a.mean(), "후반부 평균": b.mean(),
+                                    "차이(표준편차 배수)": round(float(gap), 1)})
+                    findings.append({
+                        "심각도": "보통", "컬럼": str(c), "유형": "기간별 수준 변화",
+                        "확인 질문": f"{c} 이(가) 기간 전·후로 크게 달라집니다 "
+                                     f"({a.mean():,.4g} → {b.mean():,.4g}). 실제 변화입니까, "
+                                     f"아니면 측정 방법·설비·집계 기준이 바뀐 것입니까?"})
+        if shifted:
+            h_table(pd.DataFrame(shifted), "전반부와 후반부의 수준 차이", highlight="컬럼")
+            fig = make_subplots(rows=min(len(shifted), 3), cols=1, shared_xaxes=False,
+                                subplot_titles=[s["컬럼"] for s in shifted[:3]],
+                                vertical_spacing=0.12)
+            for i, s in enumerate(shifted[:3], start=1):
+                tmp = pd.DataFrame({"d": d[ok], "v": pd.to_numeric(df.loc[ok, s["컬럼"]],
+                                                                   errors="coerce")}).dropna().sort_values("d")
+                fig.add_trace(go.Scattergl(x=tmp["d"], y=tmp["v"], mode="markers",
+                                           marker=dict(size=4, color=PALETTE[0], opacity=0.5),
+                                           showlegend=False,
+                                           hovertemplate="%{x|%Y-%m-%d}<br>%{y:,.4g}<extra></extra>"),
+                              row=i, col=1)
+            fig.update_layout(height=220 * min(len(shifted), 3) + 90,
+                              title="기준이 바뀐 것으로 의심되는 컬럼")
+            fig.update_annotations(font=dict(size=12.5, color=INK_2))
+            show(fig)
+        else:
+            h_note("기간에 따라 수준이 크게 달라진 컬럼은 없습니다.", "good")
+
+    # ── ④ 그룹별 결측·기록 방식 차이 ─────────────────────────────────────
+    if group_col:
+        h_sub("④ 특정 그룹만 기록이 빠져 있지는 않은가")
+        miss = df.groupby(group_col)[cols].apply(lambda g: g.isna().mean() * 100)
+        gap = (miss.max() - miss.min()).sort_values(ascending=False)
+        bad = gap[gap > 20]
+        for c in bad.index:
+            findings.append({
+                "심각도": "보통", "컬럼": str(c), "유형": "그룹별 기록 누락 차이",
+                "확인 질문": f"{c} 의 빈칸 비율이 그룹마다 최대 {bad[c]:.0f}%p 차이 납니다. "
+                             f"특정 라인·기간만 측정을 안 하고 있지 않습니까?"})
+        if len(bad):
+            fig = go.Figure(go.Heatmap(
+                z=miss[bad.index].values, x=[str(c) for c in bad.index],
+                y=[str(i) for i in miss.index], colorscale=SEQ_BLUE,
+                text=np.round(miss[bad.index].values, 1), texttemplate="%{text}%",
+                textfont=dict(size=11), colorbar=dict(title="빈칸 %", thickness=13),
+                hovertemplate="%{y} · %{x}<br>빈칸 %{z:.1f}%<extra></extra>", xgap=2, ygap=2))
+            fig.update_layout(title="그룹별 빈칸 비율 — 한쪽만 비어 있으면 기록 방식이 다른 것입니다",
+                              height=max(300, 46 * len(miss) + 200),
+                              xaxis=dict(tickangle=-30, showgrid=False),
+                              yaxis=dict(showgrid=False))
+            show(fig)
+        else:
+            h_note("그룹별로 기록 누락 차이가 크지 않습니다.", "good")
+
+    # ── 결과 정리 ────────────────────────────────────────────────────────
+    h_sub("⑤ 확인이 필요한 항목")
+    if findings:
+        ft = pd.DataFrame(findings)
+        order = {"높음": 0, "보통": 1, "낮음": 2}
+        ft = ft.sort_values("심각도", key=lambda s: s.map(order)).reset_index(drop=True)
+        h_table(ft, "현장 담당자에게 물어봐야 할 것들", max_rows=40, highlight="심각도")
+    else:
+        h_note("정의가 어긋난 것으로 의심되는 항목은 발견되지 않았습니다.", "good")
+
+    tips = [
+        f"숫자 컬럼 <b>{len(cols)}개</b>를 점검해 <b>{len(findings)}건</b>의 확인할 점을 찾았습니다.",
+        "여기 나온 것은 <b>오류가 아니라 질문</b>입니다. 정상일 수도 있고, 실제로 기준이 다를 수도 있습니다. "
+        "표의 ‘확인 질문’을 그대로 현장 담당자에게 물어보시면 됩니다.",
+        "❗ 이 점검이 <b>모든 정의 오류를 잡아내지는 못합니다.</b> 값의 크기·범위·기록 패턴처럼 "
+        "숫자로 드러나는 단서만 볼 수 있고, 겉보기에 자연스러운 정의 차이는 알 수 없습니다.",
+        "가장 확실한 방법은 <b>컬럼마다 뜻·단위·계산식을 문서로 적어 두는 것</b>입니다. "
+        "한 번 만들어 두면 두고두고 씁니다.",
+    ]
+    h_insight(tips)
+
+    if findings:
+        RESULT_FILES.append(("정의점검_확인목록.csv", pd.DataFrame(findings)))
+    return findings
+
+
+def run_confound_check():
+    """[비교·검정] 그룹 차이가 진짜 그 그룹 때문인지, 다른 요인 때문인지 확인."""
+    from scipy import stats
+
+    h_title("🔀 교란변수 점검 & 층화 비교",
+            f"파일: {_html.escape(str(DATA_SOURCE_NAME))} · 생성 시각: {datetime.now():%Y-%m-%d %H:%M}")
+
+    group_col = resolve_col(GROUP_COL, kind="category", required=True, purpose="비교할 그룹 컬럼")
+    target_col = resolve_col(TARGET_COL, kind="number", required=True, purpose="결과(비교할 값) 컬럼")
+    n_strata = min(max(P_int("n_strata", 3), 2), 5)
+    alpha = min(max(P_float("alpha", 0.05), 0.001), 0.2)
+
+    cand = [c for c in pick_features(exclude=[group_col, target_col])
+            if pd.api.types.is_numeric_dtype(df[c])]
+    work = df[[group_col, target_col] + cand].copy()
+    work[target_col] = pd.to_numeric(work[target_col], errors="coerce")
+    work = work.dropna(subset=[group_col, target_col])
+    work[group_col] = work[group_col].astype(str)
+
+    counts = work[group_col].value_counts()
+    keep = counts[counts >= 5].head(2)
+    if len(keep) < 2:
+        h_note("비교할 그룹이 2개 이상 필요합니다. (각 그룹에 최소 5건)", "crit")
+        return None
+    if len(counts) > 2:
+        h_note(f"그룹이 {len(counts)}개라 데이터가 가장 많은 두 그룹 "
+               f"<b>{_html.escape(str(keep.index[0]))}</b> vs <b>{_html.escape(str(keep.index[1]))}</b> "
+               f"만 비교합니다.", "warn")
+    g1, g2 = str(keep.index[0]), str(keep.index[1])
+    work = work[work[group_col].isin([g1, g2])]
+    a = work[work[group_col] == g1][target_col]
+    b = work[work[group_col] == g2][target_col]
+    raw_diff = float(a.mean() - b.mean())
+    _, raw_p = stats.ttest_ind(a, b, equal_var=False)
+
+    h_metrics([
+        ("비교", f"{g1} vs {g2}", f"{len(a):,}건 vs {len(b):,}건"),
+        ("겉보기 차이", fmt(raw_diff), f"{target_col} 평균 차이"),
+        ("통계적 판정", "차이 있음" if raw_p < alpha else "차이 없음", f"p = {raw_p:.4g}"),
+        ("점검할 후보 요인", f"{len(cand)}개", "그룹과 함께 달라지는 항목"),
+    ])
+    h_note("여기서 묻는 것은 <b>“정말 그룹 때문인가?”</b> 입니다. "
+           "두 그룹이 애초에 다른 조건에서 돌아갔다면, 차이의 원인은 그룹이 아니라 그 조건일 수 있습니다.")
+
+    # ── ① 두 그룹이 애초에 비슷한 조건이었나 ─────────────────────────────
+    h_sub("① 두 그룹의 조건이 애초에 같았나 (균형 점검)")
+    rows = []
+    for c in cand:
+        x = pd.to_numeric(work.loc[work[group_col] == g1, c], errors="coerce").dropna()
+        y = pd.to_numeric(work.loc[work[group_col] == g2, c], errors="coerce").dropna()
+        if len(x) < 5 or len(y) < 5:
+            continue
+        pooled = np.sqrt((x.var(ddof=1) + y.var(ddof=1)) / 2)
+        smd = abs(x.mean() - y.mean()) / pooled if pooled > 0 else 0.0
+        try:
+            corr = float(pd.to_numeric(work[c], errors="coerce").corr(work[target_col]))
+        except Exception:
+            corr = np.nan
+        rows.append({"항목": c, "그룹 간 차이(표준화)": float(smd),
+                     f"{target_col}와의 상관": float(corr) if pd.notna(corr) else 0.0,
+                     f"{g1} 평균": float(x.mean()), f"{g2} 평균": float(y.mean())})
+    if not rows:
+        h_note("점검할 숫자 항목이 없습니다. 그룹 차이 외의 요인을 확인할 수 없습니다.", "warn")
+        return None
+
+    bal = pd.DataFrame(rows)
+    # 교란변수 = 그룹에 따라 다르면서(SMD 큼) 결과와도 관련 있는(상관 큼) 항목
+    bal["교란 위험도"] = bal["그룹 간 차이(표준화)"] * bal[f"{target_col}와의 상관"].abs()
+    bal = bal.sort_values("교란 위험도", ascending=False).reset_index(drop=True)
+    confounders = bal[(bal["그룹 간 차이(표준화)"] > 0.2) &
+                      (bal[f"{target_col}와의 상관"].abs() > 0.2)]
+
+    view = bal.copy()
+    for c in ("그룹 간 차이(표준화)", f"{target_col}와의 상관", "교란 위험도"):
+        view[c] = view[c].map(lambda v: f"{v:.2f}")
+    view["판정"] = ["⚠️ 교란 의심" if i in confounders.index else "" for i in bal.index]
+    h_table(view, "그룹에 따라 다르면서 결과에도 영향을 주는 항목이 있으면 위험합니다",
+            max_rows=25, highlight="판정")
+
+    plot = bal.head(12).iloc[::-1]
+    fig = go.Figure()
+    fig.add_trace(go.Bar(
+        x=plot["그룹 간 차이(표준화)"], y=[str(i) for i in plot["항목"]], orientation="h",
+        marker=dict(color=[("#d03b3b" if v > 0.2 else PALETTE[0])
+                           for v in plot["그룹 간 차이(표준화)"]], line=dict(width=0)),
+        text=[f"{v:.2f}" for v in plot["그룹 간 차이(표준화)"]],
+        textposition="outside", cliponaxis=False, showlegend=False,
+        hovertemplate="%{y}<br>그룹 간 차이 %{x:.2f}<extra></extra>"))
+    fig.add_vline(x=0.2, line=dict(color=MUTED, width=1.2, dash="dot"))
+    fig.add_annotation(x=0.2, y=1, yref="paper", text="0.2 넘으면 조건이 다름",
+                       showarrow=False, xanchor="left", xshift=5, font=dict(size=11, color=MUTED))
+    fig.update_layout(title="두 그룹의 조건 차이 (0에 가까울수록 공정한 비교)",
+                      xaxis_title="표준화된 차이", height=max(320, 28 * len(plot) + 160))
+    show(fig)
+
+    # ── ② 교란변수를 통제하고 다시 비교 ──────────────────────────────────
+    strat_summary = None
+    reversed_dir = False
+    if len(confounders):
+        top = str(confounders.iloc[0]["항목"])
+        h_sub(f"② '{top}' 조건을 맞추고 다시 비교 (층화 비교)")
+        h_note(f"<b>{_html.escape(top)}</b> 이(가) 두 그룹에서 다르고 결과와도 관련이 있습니다. "
+               f"그래서 <b>{_html.escape(top)} 이 비슷한 것끼리 묶어서</b>, 묶음 안에서 다시 비교합니다. "
+               f"조건을 맞추고도 차이가 남으면 그룹 자체의 영향일 가능성이 커집니다.")
+        vals = pd.to_numeric(work[top], errors="coerce")
+        try:
+            work["_층"] = pd.qcut(vals, q=n_strata, duplicates="drop")
+        except Exception:
+            work["_층"] = pd.cut(vals, bins=n_strata)
+        rows = []
+        for lvl, part in work.groupby("_층", observed=True):
+            x = part[part[group_col] == g1][target_col]
+            y = part[part[group_col] == g2][target_col]
+            if len(x) < 3 or len(y) < 3:
+                continue
+            _, pv = stats.ttest_ind(x, y, equal_var=False)
+            rows.append({f"{top} 구간": str(lvl), f"{g1} 평균": float(x.mean()),
+                         f"{g2} 평균": float(y.mean()), "차이": float(x.mean() - y.mean()),
+                         "건수": f"{len(x):,} vs {len(y):,}",
+                         "p값": float(pv),
+                         "판정": "차이 있음" if pv < alpha else "차이 없음"})
+        if rows:
+            strat_summary = pd.DataFrame(rows)
+            view2 = strat_summary.copy()
+            view2["p값"] = view2["p값"].map(lambda v: f"{v:.3g}")
+            for c in (f"{g1} 평균", f"{g2} 평균", "차이"):
+                view2[c] = view2[c].map(lambda v: f"{v:,.4g}")
+            h_table(view2, f"{top} 구간별로 나눠서 본 결과", highlight="판정")
+
+            fig = go.Figure()
+            fig.add_trace(go.Bar(
+                x=strat_summary[f"{top} 구간"], y=strat_summary["차이"],
+                marker=dict(color=[PALETTE[0] if v > 0 else "#b3241a"
+                                   for v in strat_summary["차이"]], line=dict(width=0)),
+                text=[f"{v:+,.3g}" for v in strat_summary["차이"]],
+                textposition="outside", cliponaxis=False, showlegend=False,
+                hovertemplate="%{x}<br>차이 %{y:,.4g}<extra></extra>"))
+            fig.add_hline(y=raw_diff, line=dict(color=MUTED, width=1.4, dash="dot"))
+            fig.add_annotation(x=1, xref="paper", y=raw_diff, text=f"조건 안 맞췄을 때 {raw_diff:+,.3g}",
+                               showarrow=False, xanchor="right", yshift=10,
+                               font=dict(size=11, color=MUTED))
+            fig.add_hline(y=0, line=dict(color="#c3c2b7", width=1))
+            fig.update_layout(title=f"{top} 조건을 맞춘 뒤에도 차이가 남아 있는가",
+                              yaxis_title=f"{g1} − {g2} ({target_col})", height=400)
+            show(fig)
+
+            signs = np.sign(strat_summary["차이"])
+            reversed_dir = bool((signs > 0).any() and (signs < 0).any()) or \
+                bool(np.sign(raw_diff) != np.sign(strat_summary["차이"].mean()))
+    else:
+        h_sub("② 층화 비교")
+        h_note("두 그룹의 조건이 대체로 비슷합니다. 교란이 의심되는 항목이 없어 층화 비교는 생략합니다. "
+               "겉보기 차이를 비교적 그대로 받아들여도 좋습니다.", "good")
+
+    # ── 자동 해석 ────────────────────────────────────────────────────────
+    tips = []
+    tips.append(f"조건을 따지지 않고 보면 <b>{g1}</b> 이(가) <b>{g2}</b> 보다 "
+                f"{target_col} 이(가) <b>{fmt(raw_diff)}</b> 만큼 "
+                f"{'높습니다' if raw_diff > 0 else '낮습니다'}. (p = {raw_p:.3g})")
+    if len(confounders):
+        names = ", ".join(map(str, confounders["항목"].head(3)))
+        tips.append(f"그런데 <b>{_html.escape(names)}</b> 이(가) 두 그룹에서 서로 다릅니다. "
+                    f"이 항목들은 결과에도 영향을 주므로, 위 차이가 <b>그룹 때문인지 이 조건들 때문인지 "
+                    f"구분되지 않습니다.</b>")
+    if strat_summary is not None and len(strat_summary):
+        still = int((strat_summary["판정"] == "차이 있음").sum())
+        tips.append(f"조건을 맞춰 {len(strat_summary)}개 구간으로 나눠 보니, "
+                    f"<b>{still}개 구간에서 차이가 남았습니다.</b> "
+                    + ("조건을 맞춰도 차이가 유지되므로 <b>그룹 자체의 영향일 가능성이 큽니다.</b>"
+                       if still >= len(strat_summary) - 1 else
+                       "차이가 대부분 사라졌습니다. <b>겉보기 차이는 다른 조건 때문이었을 가능성이 큽니다.</b>"
+                       if still == 0 else
+                       "구간에 따라 결과가 엇갈립니다. 단정하기 어렵습니다."))
+        if reversed_dir:
+            tips.append("⚠️ <b>구간마다 차이의 방향이 뒤바뀝니다(심슨의 역설).</b> "
+                        "전체를 뭉뚱그려 보면 정반대 결론이 날 수 있으니, 반드시 구간별로 보고하세요.")
+    tips.append("❗ 이 점검은 <b>데이터에 들어 있는 항목만</b> 확인할 수 있습니다. "
+                "기록되지 않은 요인(작업자 숙련도, 원자재 로트 등)은 여전히 숨어 있을 수 있습니다.")
+    tips.append("가장 확실한 방법은 <b>조건을 맞춘 실험</b>입니다. 같은 조건에서 그룹만 바꿔 돌려 보세요. "
+                "포털의 <b>A/B 테스트 설계 계산기</b>로 필요한 표본 수를 구할 수 있습니다.")
+    h_insight(tips)
+
+    RESULT_FILES.append(("교란변수_점검.csv", bal))
+    if strat_summary is not None:
+        RESULT_FILES.append(("층화비교_결과.csv", strat_summary))
+    return bal
+
+
 # ═══════════════════════════════════════════════════════════════════════
 #  분석 설정 고르기 — 타이핑 없이 드롭다운으로
 # ═══════════════════════════════════════════════════════════════════════
@@ -3346,6 +3981,9 @@ def choose_options(show_widgets=True):
     포털에서 설정이 넘어왔으면 그 값이 미리 선택돼 있습니다.
     그대로 두고 다음 셀을 실행하면 됩니다.
     """
+    if MODULE_ID in MULTI_FILE_MODULES:
+        print("여러 파일을 합치는 분석입니다. 컬럼 선택 없이 3단계를 실행하시면 됩니다.")
+        return None
     if df is None:
         print("⚠️  먼저 데이터를 올려 주세요. (2단계 셀)")
         return None
@@ -3512,6 +4150,12 @@ def run_module():
             RESULT = run_classify_xgb()
         elif MODULE_ID == "cluster_kmeans":       # [군집화] K-Means
             RESULT = run_cluster_kmeans()
+        elif MODULE_ID == "data_merge":           # [데이터 준비] 여러 파일 합치기
+            RESULT = run_data_merge()
+        elif MODULE_ID == "definition_check":     # [데이터 준비] 정의·단위 일관성
+            RESULT = run_definition_check()
+        elif MODULE_ID == "confound_check":       # [비교·검정] 교란변수·층화 비교
+            RESULT = run_confound_check()
         # 새 분석은 여기에 elif 를 한 줄 추가하세요.
         else:
             h_note(f"'{MODULE_ID}' 는 아직 준비되지 않은 분석입니다.", "crit")
@@ -3641,11 +4285,16 @@ def save_report(download=True):
 def run_and_report(download=True):
     """3단계 — 분석 실행 + 리포트 저장까지 한 번에."""
     global REPORT_PARTS, RESULT_FILES, REPORT_TOC
-    if df is None:
+    if MODULE_ID in MULTI_FILE_MODULES and not FRAMES:
+        print("⚠️  먼저 2단계에서 합칠 파일들을 올려 주세요.")
+        return None
+    if MODULE_ID not in MULTI_FILE_MODULES and df is None:
         print("⚠️  먼저 2단계에서 데이터를 올려 주세요.")
         return None
 
     ok, msg = _check_ready()
+    if MODULE_ID in MULTI_FILE_MODULES:
+        ok, msg = True, ""
     if not ok:
         h_note(f"<b>{msg}</b><br>위 2단계 셀의 드롭다운에서 컬럼을 고른 뒤, "
                f"<b>이 셀만 다시 실행</b>하시면 됩니다.", "warn")

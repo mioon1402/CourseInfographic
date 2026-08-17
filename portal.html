@@ -18,7 +18,7 @@
   --good:#0ca30c; --good-ink:#046b04; --warn:#e08800; --crit:#d03b3b;
   --shadow:0 1px 2px rgba(11,11,11,.05), 0 8px 24px rgba(11,11,11,.06);
   --shadow-lg:0 2px 4px rgba(11,11,11,.06), 0 16px 40px rgba(11,11,11,.10);
-  --cat-eda:#2a78d6; --cat-compare:#4a3aa7; --cat-ts:#1baf7a; --cat-anomaly:#e34948;
+  --cat-prep:#008300; --cat-eda:#2a78d6; --cat-compare:#4a3aa7; --cat-ts:#1baf7a; --cat-anomaly:#e34948;
   --cat-quality:#eda100; --cat-regress:#eb6834; --cat-classify:#008300; --cat-cluster:#e87ba4;
   --radius:14px; --radius-sm:10px;
 }
@@ -32,7 +32,7 @@
     --good:#0ca30c; --good-ink:#5fd35f; --warn:#fab219; --crit:#e66767;
     --shadow:0 1px 2px rgba(0,0,0,.4), 0 8px 24px rgba(0,0,0,.35);
     --shadow-lg:0 2px 4px rgba(0,0,0,.5), 0 16px 40px rgba(0,0,0,.45);
-    --cat-eda:#3987e5; --cat-compare:#9085e9; --cat-ts:#199e70; --cat-anomaly:#e66767;
+    --cat-prep:#199e70; --cat-eda:#3987e5; --cat-compare:#9085e9; --cat-ts:#199e70; --cat-anomaly:#e66767;
     --cat-quality:#c98500; --cat-regress:#d95926; --cat-classify:#008300; --cat-cluster:#d55181;
   }
 }
@@ -45,7 +45,7 @@
   --good:#0ca30c; --good-ink:#5fd35f; --warn:#fab219; --crit:#e66767;
   --shadow:0 1px 2px rgba(0,0,0,.4), 0 8px 24px rgba(0,0,0,.35);
   --shadow-lg:0 2px 4px rgba(0,0,0,.5), 0 16px 40px rgba(0,0,0,.45);
-  --cat-eda:#3987e5; --cat-compare:#9085e9; --cat-ts:#199e70; --cat-anomaly:#e66767;
+  --cat-prep:#199e70; --cat-eda:#3987e5; --cat-compare:#9085e9; --cat-ts:#199e70; --cat-anomaly:#e66767;
   --cat-quality:#c98500; --cat-regress:#d95926; --cat-classify:#008300; --cat-cluster:#d55181;
 }
 
@@ -345,6 +345,8 @@ details.adv .field-grid{margin-top:14px}
       <span>올인원 데이터 분석 포털<small>코딩 없이 클릭 몇 번으로 · Colab 연동</small></span>
     </div>
     <div class="topbar-spacer"></div>
+    <button class="icon-btn hide-sm" id="wizardBtn" type="button">🧭 <span>질문 만들기</span></button>
+    <button class="icon-btn hide-sm" id="abBtn" type="button">🧪 <span>A/B 설계</span></button>
     <button class="icon-btn hide-sm" id="glossBtn" type="button">📖 <span>용어 사전</span></button>
     <button class="icon-btn hide-sm" id="helpBtn" type="button">❓ <span>사용법</span></button>
     <a class="ghost-link hide-sm" href="index.html">📚 학습 자료</a>
@@ -364,6 +366,12 @@ details.adv .field-grid{margin-top:14px}
       <span class="step-chip"><span class="step-num">2</span> 데이터 연결하기</span>
       <span class="step-chip"><span class="step-num">3</span> 컬럼·옵션 지정</span>
       <span class="step-chip"><span class="step-num">4</span> Colab에서 실행 &amp; 결과 확인</span>
+    </div>
+    <div style="margin-top:16px">
+      <button class="btn btn-secondary" id="wizardBtn2" type="button"
+        style="width:auto;font-size:14px;padding:11px 18px">
+        🧭 뭘 골라야 할지 모르겠다면 — 질문 만들기부터
+      </button>
     </div>
   </section>
 
@@ -528,6 +536,24 @@ details.adv .field-grid{margin-top:14px}
   </div>
 </div>
 
+<!-- 질문 만들기 마법사 -->
+<div class="modal" id="wizardModal">
+  <div class="modal-box">
+    <div class="modal-head"><span aria-hidden="true">🧭</span> 질문 만들기
+      <button class="m-close" data-close="wizardModal" type="button" aria-label="닫기">×</button></div>
+    <div class="modal-body" id="wizardBody"></div>
+  </div>
+</div>
+
+<!-- A/B 테스트 설계 -->
+<div class="modal" id="abModal">
+  <div class="modal-box">
+    <div class="modal-head"><span aria-hidden="true">🧪</span> A/B 테스트 설계 계산기
+      <button class="m-close" data-close="abModal" type="button" aria-label="닫기">×</button></div>
+    <div class="modal-body" id="abBody"></div>
+  </div>
+</div>
+
 <!-- 사용법 -->
 <div class="modal" id="helpModal">
   <div class="modal-box">
@@ -646,6 +672,7 @@ const TERM_RE = new RegExp('(' + Object.keys(GLOSSARY)
    2. 카테고리 & 분석 모듈
    ═══════════════════════════════════════════════════════════════ */
 const CATEGORIES = [
+  { id:'prep',     name:'데이터 준비', icon:'🧬', color:'var(--cat-prep)',     note:'분석 전에 표를 만들고 점검할 때' },
   { id:'eda',      name:'탐색적 분석', icon:'🔍', color:'var(--cat-eda)',      note:'데이터의 성격부터 파악하고 싶을 때' },
   { id:'compare',  name:'비교·검정',   icon:'⚖️', color:'var(--cat-compare)',  note:'A와 B의 차이가 진짜인지 확인할 때' },
   { id:'ts',       name:'시계열 분석', icon:'📈', color:'var(--cat-ts)',       note:'날짜/시간에 따라 변하는 데이터' },
@@ -658,6 +685,68 @@ const CATEGORIES = [
 
 /* need: 'required' | 'optional' | 'none'  (date · target · group · features) */
 const MODULES = [
+  {
+    id:'data_merge', cat:'prep', icon:'🧬', tag:'실무 1순위', level:'입문', time:'약 30초',
+    name:'여러 파일 합치기',
+    desc:'설비로그·생산실적·검사결과처럼 흩어진 표를 하나의 분석용 표로 만듭니다.',
+    q:'“자료가 여기저기 흩어져 있는데 어떻게 합치지?”',
+    about:'실무 데이터는 깨끗한 CSV 한 장으로 오지 않습니다. 여러 파일을 올리면 어떤 컬럼으로 연결해야 할지 자동으로 찾아 붙이고, <b>얼마나 잘 붙었는지(일치율)</b>까지 알려 드립니다. 결과 CSV를 다시 올려 다른 분석을 이어서 하시면 됩니다.',
+    dataNeed:'CSV 2개 이상. 서로 연결할 공통 컬럼(날짜, 라인, 제품코드 등)이 있어야 합니다.',
+    outputs:['연결 기준 컬럼 자동 탐색','파일별 연결 성공률(일치율)','행 수 변화·빈칸 진단','합쳐진 CSV'],
+    need:{ date:'none', target:'none', group:'none', features:'none' },
+    params:[
+      { key:'merge_mode', label:'합치는 방식', type:'select', def:'auto',
+        options:[['auto','자동 판단 (권장)'],['join','가로로 붙이기 — 항목을 늘림'],['concat','세로로 잇기 — 행을 늘림']],
+        help:'월별 파일 12개를 이어붙이려면 “세로로 잇기”, 설비로그와 생산실적을 연결하려면 “가로로 붙이기”입니다.' },
+      { key:'join_type', label:'연결 범위', type:'select', def:'left',
+        options:[['left','첫 파일 기준으로 붙이기 (권장)'],['inner','양쪽 모두 있는 것만'],['outer','한쪽에만 있어도 모두']],
+        help:'“첫 파일 기준”은 기준 표의 행을 유지하고 나머지를 붙입니다. 데이터가 줄지 않아 안전합니다.' },
+      { key:'time_align', label:'시간 단위 맞추기', type:'select', def:'none',
+        options:[['none','맞추지 않음'],['D','일 단위로'],['W','주 단위로'],['MS','월 단위로']],
+        help:'한쪽은 시간별, 다른 쪽은 일별처럼 기록 간격이 다를 때 같은 단위로 묶은 뒤 연결합니다.' },
+      { key:'key_cols', label:'연결 기준 컬럼 (직접 지정)', type:'text', def:'',
+        help:'비워 두면 자동으로 찾습니다. 여러 개면 쉼표로 구분하세요. (예: 날짜, 생산라인)' },
+      { key:'agg', label:'시간 단위 맞출 때 집계 방식', type:'select', def:'mean',
+        options:[['mean','평균'],['sum','합계'],['max','최댓값'],['min','최솟값']],
+        help:'온도는 평균, 생산량은 합계가 자연스럽습니다.' }
+    ]
+  },
+  {
+    id:'definition_check', cat:'prep', icon:'🔍', level:'중급', time:'약 30초',
+    name:'컬럼 정의 · 단위 일관성 점검',
+    desc:'같은 컬럼이 라인·기간마다 다른 뜻으로 기록되지 않았는지 찾아 질문으로 알려 줍니다.',
+    q:'“이 숫자들, 정말 같은 기준으로 잰 걸까?”',
+    about:'품질 진단이 <b>형식</b>(빈칸·중복)을 본다면, 이 분석은 <b>뜻</b>을 봅니다. A라인 수율은 0~1, B라인은 0~100으로 기록돼 있는 식의 함정을 찾아냅니다. 오류라고 단정하지 않고 <b>“이게 맞습니까?”라는 확인 질문</b>을 만들어 드립니다.',
+    dataNeed:'숫자 컬럼. 그룹 컬럼(라인 등)이나 날짜가 있으면 훨씬 정확해집니다.',
+    outputs:['그룹 간 값 크기 배율 비교','불가능한 값·범위 점검','기간에 따른 기준 변화 탐지','현장에 물어볼 확인 질문 목록'],
+    need:{ date:'optional', target:'none', group:'optional', features:'optional' },
+    params:[
+      { key:'scale_ratio', label:'단위 의심 배율 기준', type:'number', def:8, min:2, max:100, step:1,
+        help:'그룹 간 중앙값이 이 배율 이상 차이 나면 단위가 다를 수 있다고 봅니다.' },
+      { key:'shift_sigma', label:'기간 변화 민감도', type:'number', def:2, min:1, max:5, step:0.5,
+        help:'전·후반부 평균이 표준편차의 몇 배 이상 벌어지면 기준이 바뀐 것으로 의심할지 정합니다.' },
+      { key:'missing_gap', label:'그룹별 결측 차이 기준 (%p)', type:'number', def:20, min:5, max:80, step:5,
+        help:'특정 그룹만 기록이 빠져 있는지 판단하는 기준입니다.' }
+    ]
+  },
+  {
+    id:'confound_check', cat:'compare', icon:'🔀', tag:'인과 판단', level:'고급', time:'약 40초',
+    name:'교란변수 점검 & 층화 비교',
+    desc:'그 차이가 정말 그룹 때문인지, 애초에 조건이 달랐던 탓인지 갈라 줍니다.',
+    q:'“신형 설비가 더 나쁘게 나왔는데, 정말 설비 탓일까?”',
+    about:'“A가 B보다 낫다”는 결과가 나와도, 두 그룹이 애초에 다른 조건에서 돌아갔다면 원인은 그룹이 아닐 수 있습니다. 조건이 비슷한 것끼리 묶어 다시 비교해서, 차이가 <b>살아남는지</b> 확인합니다. 결론이 정반대로 뒤집히는 <b>심슨의 역설</b>도 잡아냅니다.',
+    dataNeed:'그룹 컬럼, 결과 숫자 컬럼, 그리고 조건이 될 만한 숫자 컬럼들이 필요합니다.',
+    outputs:['두 그룹의 조건 균형 점검','교란 의심 항목 순위','조건을 맞춘 층화 비교','심슨의 역설 경고'],
+    need:{ date:'none', target:'required', group:'required', features:'optional' },
+    params:[
+      { key:'n_strata', label:'나눌 구간 수', type:'number', def:3, min:2, max:5, step:1,
+        help:'교란변수를 몇 개 구간으로 나눠 비교할지 정합니다. 데이터가 적으면 2~3개가 안전합니다.' },
+      { key:'alpha', label:'유의수준 (기준선)', type:'number', def:0.05, min:0.001, max:0.2, step:0.005,
+        help:'“우연일 확률”이 이 값보다 작으면 진짜 차이로 판정합니다.' },
+      { key:'smd_cut', label:'조건 차이 판정 기준', type:'number', def:0.2, min:0.05, max:1, step:0.05,
+        help:'표준화된 차이가 이 값을 넘으면 두 그룹의 조건이 다르다고 봅니다. 보통 0.2를 씁니다.' }
+    ]
+  },
   {
     id:'eda_summary', cat:'eda', icon:'📋', tag:'가장 먼저', level:'입문', time:'약 30초',
     name:'데이터 자동 요약 리포트',
@@ -1674,6 +1763,283 @@ $('#helpBody').innerHTML = linkTerms(`
     <li><b>그래프가 안 보여요</b> → Colab 상단 [런타임] → [세션 다시 시작 및 모두 실행]을 눌러 보세요.</li>
     <li><b>결과가 이상해요</b> → 먼저 <b>데이터 품질 진단</b>을 돌려 데이터 문제가 없는지 확인하세요.</li>
   </ul>`);
+
+/* ═══════════════════════════════════════════════════════════════
+   9-b. 질문 만들기 마법사 — "무엇을 물어볼까"를 정하는 것을 돕습니다
+   ═══════════════════════════════════════════════════════════════ */
+const WIZARD = [
+  { q:'지금 가장 하고 싶은 일은 무엇인가요?', key:'goal', opts:[
+      ['understand','데이터가 어떻게 생겼는지 우선 파악하고 싶다'],
+      ['reduce','불량·비용·불만 같은 <b>나쁜 것을 줄이고</b> 싶다'],
+      ['predict','앞으로 어떻게 될지 <b>미리 알고</b> 싶다'],
+      ['compare','A와 B 중 <b>어느 쪽이 나은지</b> 알고 싶다'],
+      ['watch','평소와 다른 일이 생기면 <b>빨리 알아채고</b> 싶다'],
+      ['segment','대상을 <b>몇 가지 유형으로 나눠</b> 보고 싶다'] ] },
+  { q:'데이터는 지금 어떤 상태인가요?', key:'state', opts:[
+      ['one','정리된 표(CSV) 한 장으로 있다'],
+      ['many','여러 파일·시스템에 흩어져 있다'],
+      ['dirty','한 장이지만 빠진 값·오타가 많아 못 믿겠다'] ] },
+  { q:'시간에 따라 변하는 데이터인가요?', key:'time', opts:[
+      ['yes','날짜/시각 컬럼이 있고, 시간 흐름이 중요하다'],
+      ['no','시간과는 관계없다 (또는 잘 모르겠다)'] ] },
+];
+
+/* 답 조합 → 추천 순서. 앞에 있을수록 먼저 하시길 권합니다. */
+function wizardPlan(a){
+  const plan = [];
+  const add = (id, why) => { if (id && !plan.some(p => p.id === id)) plan.push({ id, why }); };
+  if (a.state === 'many') add('data_merge', '자료가 흩어져 있으니 먼저 하나의 표로 합쳐야 합니다.');
+  if (a.state === 'dirty') add('data_quality', '데이터를 믿을 수 있게 만드는 것이 먼저입니다.');
+  if (a.state !== 'dirty') add('eda_summary', '어떤 컬럼이 있고 값이 어떻게 퍼져 있는지 먼저 봅니다.');
+
+  if (a.goal === 'reduce'){
+    add('pareto', '어디부터 손대야 효과가 큰지 우선순위를 정합니다.');
+    add('eda_corr', '무엇이 그 문제와 함께 움직이는지 후보를 찾습니다.');
+    add('classify_xgb', '어떤 조건에서 문제가 생기는지 판정 규칙을 만듭니다.');
+    add('confound_check', '찾은 원인이 진짜인지, 다른 조건 탓인지 확인합니다.');
+  }
+  if (a.goal === 'predict'){
+    if (a.time === 'yes'){ add('ts_smooth', '먼저 큰 흐름과 반복 패턴을 확인합니다.');
+                           add('ts_forecast', '추세·계절성을 배워 앞으로의 값을 예측합니다.'); }
+    else { add('eda_corr', '결과와 관련 있는 항목을 먼저 찾습니다.');
+           add('regress_rf', '여러 조건으로 결과 숫자를 예측합니다.'); }
+  }
+  if (a.goal === 'compare'){
+    add('definition_check', '비교 전에 양쪽 숫자가 같은 기준인지 반드시 확인합니다.');
+    add('compare_groups', '차이가 우연인지 진짜인지 통계로 판정합니다.');
+    add('confound_check', '그 차이가 정말 그룹 때문인지 갈라 봅니다.');
+  }
+  if (a.goal === 'watch'){
+    add('anomaly_iforest', '평소와 다른 데이터를 자동으로 찾아냅니다.');
+    if (a.time === 'yes') add('spc_control', '공정이 관리 범위 안에 있는지 지속적으로 감시합니다.');
+  }
+  if (a.goal === 'segment'){
+    add('cluster_kmeans', '비슷한 것끼리 자동으로 묶습니다.');
+    add('eda_corr', '유형을 가르는 항목이 무엇인지 확인합니다.');
+  }
+  if (a.goal === 'understand'){
+    add('eda_corr', '항목들이 서로 어떤 관계인지 봅니다.');
+    if (a.time === 'yes') add('ts_smooth', '시간에 따른 큰 흐름을 봅니다.');
+  }
+  return plan.slice(0, 5);
+}
+
+const REFRAME = {
+  understand:['이 데이터에 어떤 항목이 있고, 값이 어떻게 퍼져 있는가?'],
+  reduce:['불량의 몇 %가 어떤 유형에서 나오는가?',
+          '불량이 날 때 함께 달라지는 설비 조건은 무엇인가?',
+          '어떤 조건 범위에서 불량률이 급격히 올라가는가?'],
+  predict:['다음 30일 동안 이 값은 얼마 정도가 될 것인가?',
+           '지금 조건이 이러할 때 결과 값은 얼마로 예상되는가?'],
+  compare:['A와 B의 평균 차이가 우연으로 설명될 수 있는 크기인가?',
+           '두 그룹의 다른 조건을 맞춰도 그 차이가 남는가?'],
+  watch:['평소 범위를 벗어난 기록은 언제, 어떤 항목에서 나왔는가?',
+         '이 공정은 관리 한계 안에서 안정적으로 유지되고 있는가?'],
+  segment:['대상은 몇 개 유형으로 나뉘며, 각 유형의 특징은 무엇인가?'],
+};
+
+let wizStep = 0, wizAns = {};
+function renderWizard(){
+  const body = $('#wizardBody');
+  if (wizStep < WIZARD.length){
+    const w = WIZARD[wizStep];
+    body.innerHTML = `
+      <div style="font-size:12px;color:var(--muted);font-weight:700;letter-spacing:.04em;margin-bottom:6px">
+        ${wizStep + 1} / ${WIZARD.length}</div>
+      <h3 style="font-size:17px;margin-bottom:14px">${esc(w.q)}</h3>
+      <div style="display:flex;flex-direction:column;gap:8px">
+        ${w.opts.map(([v, label]) => `
+          <button type="button" class="wiz-opt" data-v="${v}"
+            style="text-align:left;background:var(--surface-2);border:1px solid var(--border);
+                   border-radius:10px;padding:13px 15px;cursor:pointer;font-size:14px">
+            ${label}</button>`).join('')}
+      </div>
+      ${wizStep > 0 ? `<button type="button" id="wizBack" class="linkish" style="margin-top:14px">← 이전</button>` : ''}`;
+    $$('.wiz-opt', body).forEach(b => b.addEventListener('click', () => {
+      wizAns[w.key] = b.dataset.v; wizStep++; renderWizard();
+    }));
+    const back = $('#wizBack', body);
+    if (back) back.addEventListener('click', () => { wizStep--; renderWizard(); });
+    return;
+  }
+  const plan = wizardPlan(wizAns);
+  const qs = REFRAME[wizAns.goal] || [];
+  body.innerHTML = `
+    <div style="background:var(--accent-wash);border-radius:10px;padding:14px 16px;margin-bottom:16px">
+      <div style="font-weight:700;font-size:14px;margin-bottom:6px">📝 이렇게 질문을 바꿔 보세요</div>
+      <div style="font-size:13.5px;color:var(--text-2);line-height:1.8">
+        ${qs.map(q => `· “${esc(q)}”`).join('<br>')}
+      </div>
+      <div style="font-size:12.5px;color:var(--muted);margin-top:8px">
+        막연한 목표를 <b>데이터로 답할 수 있는 문장</b>으로 바꾸는 것이 분석의 시작입니다.</div>
+    </div>
+    <div style="font-weight:700;font-size:14px;margin-bottom:8px">🧭 추천 순서</div>
+    <div style="display:flex;flex-direction:column;gap:8px">
+      ${plan.map((p, i) => {
+        const m = MODULE_BY_ID[p.id];
+        return `<button type="button" class="wiz-pick" data-id="${p.id}"
+          style="text-align:left;background:var(--surface-2);border:1px solid var(--border);
+                 border-radius:10px;padding:12px 15px;cursor:pointer">
+          <div style="font-weight:650;font-size:14px">${i + 1}. ${m.icon} ${esc(m.name.replace(/\s*\(.*\)$/,''))}</div>
+          <div style="font-size:12.5px;color:var(--text-2);margin-top:3px">${esc(p.why)}</div>
+        </button>`; }).join('')}
+    </div>
+    <p style="font-size:12.5px;color:var(--muted);margin-top:14px;line-height:1.7">
+      순서대로 하나씩 해보시길 권합니다. 위 항목을 누르면 그 분석이 선택됩니다.<br>
+      ❗ 이 추천은 <b>일반적인 순서</b>일 뿐입니다. 무엇이 중요한지는 현장을 아는 분이 가장 잘 압니다.</p>
+    <button type="button" id="wizRestart" class="linkish" style="margin-top:10px">↺ 처음부터 다시</button>`;
+  $$('.wiz-pick', body).forEach(b => b.addEventListener('click', () => {
+    selectModule(b.dataset.id); closeModal('wizardModal');
+    $('#modDetail').scrollIntoView({ behavior:'smooth', block:'center' });
+  }));
+  $('#wizRestart', body).addEventListener('click', () => { wizStep = 0; wizAns = {}; renderWizard(); });
+}
+function openWizard(){ wizStep = 0; wizAns = {}; renderWizard(); openModal('wizardModal'); }
+$('#wizardBtn').addEventListener('click', openWizard);
+$('#wizardBtn2').addEventListener('click', openWizard);
+
+/* ═══════════════════════════════════════════════════════════════
+   9-c. A/B 테스트 설계 계산기 — 인과를 확인하려면 실험이 답입니다
+   ═══════════════════════════════════════════════════════════════ */
+/* 표준정규 분포의 역함수 (Acklam 근사) */
+function zQuantile(p){
+  const a=[-3.969683028665376e+01,2.209460984245205e+02,-2.759285104469687e+02,
+           1.383577518672690e+02,-3.066479806614716e+01,2.506628277459239e+00];
+  const b=[-5.447609879822406e+01,1.615858368580409e+02,-1.556989798598866e+02,
+           6.680131188771972e+01,-1.328068155288572e+01];
+  const c=[-7.784894002430293e-03,-3.223964580411365e-01,-2.400758277161838e+00,
+           -2.549732539343734e+00,4.374664141464968e+00,2.938163982698783e+00];
+  const d=[7.784695709041462e-03,3.224671290700398e-01,2.445134137142996e+00,3.754408661907416e+00];
+  const pl=0.02425;
+  let q,r;
+  if (p<pl){ q=Math.sqrt(-2*Math.log(p));
+    return (((((c[0]*q+c[1])*q+c[2])*q+c[3])*q+c[4])*q+c[5])/((((d[0]*q+d[1])*q+d[2])*q+d[3])*q+1); }
+  if (p>1-pl){ q=Math.sqrt(-2*Math.log(1-p));
+    return -(((((c[0]*q+c[1])*q+c[2])*q+c[3])*q+c[4])*q+c[5])/((((d[0]*q+d[1])*q+d[2])*q+d[3])*q+1); }
+  q=p-0.5; r=q*q;
+  return (((((a[0]*r+a[1])*r+a[2])*r+a[3])*r+a[4])*r+a[5])*q /
+         (((((b[0]*r+b[1])*r+b[2])*r+b[3])*r+b[4])*r+1);
+}
+
+function renderAB(){
+  $('#abBody').innerHTML = `
+    <p style="font-size:13.5px;color:var(--text-2);line-height:1.75;margin-bottom:16px">
+      상관관계만으로는 <b>원인을 증명할 수 없습니다.</b> 확실하게 알려면 조건을 맞추고 한쪽만 바꿔서
+      직접 실험해야 합니다. 그때 <b>“몇 개나 모아야 하는지”</b> 를 계산해 드립니다.<br>
+      표본이 너무 적으면 <b>진짜 효과가 있어도 못 잡아냅니다.</b></p>
+
+    <div class="field-grid">
+      <div class="field">
+        <label for="ab_kind">무엇을 비교하나요?</label>
+        <select id="ab_kind">
+          <option value="rate">비율 — 불량률·전환율 등 (%)</option>
+          <option value="mean">평균 — 수율·시간·금액 등</option>
+        </select>
+        <span class="help">불량이 났다/안 났다처럼 세는 것이면 “비율”, 값을 재는 것이면 “평균”입니다.</span>
+      </div>
+      <div class="field" id="ab_f1">
+        <label for="ab_base">현재 값</label>
+        <input type="number" id="ab_base" value="5" step="0.1">
+        <span class="help" id="ab_base_help">지금의 불량률(%)입니다. 예: 5</span>
+      </div>
+      <div class="field" id="ab_f2">
+        <label for="ab_delta">감지하고 싶은 개선폭</label>
+        <input type="number" id="ab_delta" value="1" step="0.1">
+        <span class="help" id="ab_delta_help">이만큼 좋아지면 반드시 알아채고 싶다는 값(%p). 예: 5% → 4%면 1</span>
+      </div>
+      <div class="field" id="ab_f3" style="display:none">
+        <label for="ab_sd">표준편차</label>
+        <input type="number" id="ab_sd" value="3" step="0.1">
+        <span class="help">평소 값이 얼마나 들쭉날쭉한지. 모르면 [데이터 자동 요약]에서 확인하세요.</span>
+      </div>
+      <div class="field">
+        <label for="ab_alpha">유의수준</label>
+        <select id="ab_alpha">
+          <option value="0.05" selected>5% (기본)</option>
+          <option value="0.01">1% (더 엄격하게)</option>
+          <option value="0.10">10% (탐색용)</option>
+        </select>
+        <span class="help">차이가 없는데 있다고 잘못 말할 위험입니다.</span>
+      </div>
+      <div class="field">
+        <label for="ab_power">검정력</label>
+        <select id="ab_power">
+          <option value="0.8" selected>80% (기본)</option>
+          <option value="0.9">90% (더 확실하게)</option>
+          <option value="0.7">70% (표본을 줄이려면)</option>
+        </select>
+        <span class="help">진짜 효과가 있을 때 그것을 잡아낼 확률입니다.</span>
+      </div>
+    </div>
+    <div id="abResult" style="margin-top:18px"></div>
+    <div style="margin-top:16px;font-size:12.5px;color:var(--text-2);line-height:1.75;
+                background:var(--surface-2);border:1px solid var(--border);border-radius:10px;padding:13px 15px">
+      <b>실험할 때 지켜야 할 것</b><br>
+      · 어느 쪽에 넣을지는 <b>무작위로</b> 정하세요. 편한 것부터 고르면 결과가 오염됩니다.<br>
+      · 두 조건을 <b>같은 기간에 나란히</b> 돌리세요. 순서대로 하면 계절·설비 변화가 섞입니다.<br>
+      · <b>필요한 수를 다 모으기 전에 결과를 엿보고 중단하지 마세요.</b> 우연한 차이를 진짜로 착각하게 됩니다.<br>
+      · 끝나면 포털의 <b>[그룹 간 차이 비교]</b> 로 결과를 판정하세요.
+    </div>`;
+
+  const calc = () => {
+    const kind = $('#ab_kind').value;
+    const alpha = Number($('#ab_alpha').value), power = Number($('#ab_power').value);
+    const za = zQuantile(1 - alpha / 2), zb = zQuantile(power);
+    let n = NaN, detail = '';
+    if (kind === 'rate'){
+      const p1 = Number($('#ab_base').value) / 100;
+      const d  = Number($('#ab_delta').value) / 100;
+      const p2 = Math.max(0.0001, Math.min(0.9999, p1 - d));
+      if (d > 0 && p1 > 0 && p1 < 1){
+        const pbar = (p1 + p2) / 2;
+        n = Math.pow(za * Math.sqrt(2 * pbar * (1 - pbar)) +
+                     zb * Math.sqrt(p1 * (1 - p1) + p2 * (1 - p2)), 2) / Math.pow(p1 - p2, 2);
+        detail = `${(p1*100).toFixed(1)}% → ${(p2*100).toFixed(1)}% 차이를 잡아내려면`;
+      }
+    } else {
+      const sd = Number($('#ab_sd').value), d = Number($('#ab_delta').value);
+      if (sd > 0 && d > 0){
+        n = 2 * Math.pow(za + zb, 2) * sd * sd / (d * d);
+        detail = `표준편차 ${sd} 인 값에서 ${d} 만큼의 차이를 잡아내려면`;
+      }
+    }
+    const box = $('#abResult');
+    if (!isFinite(n) || n <= 0){
+      box.innerHTML = `<div class="warnbox on">⚠️ 값을 확인해 주세요. 개선폭은 0보다 커야 하고,
+        비율은 0~100% 사이여야 합니다.</div>`;
+      return;
+    }
+    const per = Math.ceil(n);
+    box.innerHTML = `
+      <div style="background:var(--accent-wash);border-radius:12px;padding:16px 18px">
+        <div style="font-size:12.5px;color:var(--text-2)">${esc(detail)}</div>
+        <div style="font-size:28px;font-weight:700;color:var(--accent-ink);margin:6px 0 2px">
+          각 그룹당 ${per.toLocaleString()}개</div>
+        <div style="font-size:13px;color:var(--text-2)">
+          총 <b>${(per * 2).toLocaleString()}개</b> 가 필요합니다
+          (유의수준 ${(alpha*100)}% · 검정력 ${(power*100)}%)</div>
+      </div>
+      <p style="font-size:12.5px;color:var(--muted);margin-top:10px;line-height:1.7">
+        하루 100개를 검사한다면 각 조건에 50개씩 → 약 <b>${Math.ceil(per / 50).toLocaleString()}일</b> 걸립니다.
+        수가 너무 많다면 감지하려는 개선폭을 키우거나, 검정력을 70%로 낮춰 보세요.</p>`;
+  };
+
+  const sync = () => {
+    const rate = $('#ab_kind').value === 'rate';
+    $('#ab_f3').style.display = rate ? 'none' : 'flex';
+    $('#ab_base').parentElement.style.display = rate ? 'flex' : 'none';
+    $('#ab_delta_help').textContent = rate
+      ? '이만큼 좋아지면 반드시 알아채고 싶다는 값(%p). 예: 5% → 4%면 1'
+      : '이만큼 차이 나면 반드시 알아채고 싶다는 값. 예: 수율 1%p면 1';
+    calc();
+  };
+  ['ab_kind','ab_base','ab_delta','ab_sd','ab_alpha','ab_power'].forEach(id => {
+    const el = $('#' + id);
+    el.addEventListener(el.tagName === 'SELECT' ? 'change' : 'input', id === 'ab_kind' ? sync : calc);
+  });
+  sync();
+}
+$('#abBtn').addEventListener('click', () => { renderAB(); openModal('abModal'); });
 
 /* ═══════════════════════════════════════════════════════════════
    10. 테마 · 저장 · 초기화
