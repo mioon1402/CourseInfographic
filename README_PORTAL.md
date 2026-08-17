@@ -7,7 +7,7 @@
 |---|---|
 | `portal.html` | 웹 화면 (GitHub Pages). 분석 종류와 옵션을 고르는 곳 |
 | `dap_engine.py` | **분석 엔진** — 12개 분석의 실제 파이썬 코드가 전부 여기 있습니다 |
-| `notebooks/*.ipynb` | 분석별 **실행용 노트북** 12개 (각 5KB). 엔진을 불러 3줄만 호출합니다 |
+| `notebooks/*.ipynb` | 분석별 **실행용 노트북** 24개 (각 5KB). 분석 12종 × (내 파일용 / 예제 데이터용) |
 | `analysis_portal.ipynb` | 분석을 직접 골라 쓰는 통합본 (예전 링크 호환용) |
 
 동작 방식은 이렇습니다. 포털에서 분석을 고르면 **그 분석 전용 노트북**이 Colab에서 열리고,
@@ -50,7 +50,7 @@ https://mioon1402.github.io/CourseInfographic/portal.html
 const NB = {
   owner: 'mioon1402',
   repo:  'CourseInfographic',
-  pathFor: id => `notebooks/${id}.ipynb`,   // 분석별 전용 노트북
+  pathFor: (id, demo) => `notebooks/${id}${demo ? '__demo' : ''}.ipynb`,
   probe:   'dap_engine.py',                  // 브랜치 확인용
   candidates: ['main', 'claude/all-in-one-data-analysis-portal-t73xwf'],
   ...
@@ -104,6 +104,9 @@ HTML 리포트는 **인터넷 없이도 열리고 그래프도 그대로 움직�
 다루는 도구에서는 그러지 않는 편이 안전하다고 판단했습니다.
 
 * **예제 데이터**는 코드로 만들어 내는 것이라 업로드가 아예 필요 없습니다.
+  포털에서 예제를 고르면 `notebooks/<분석>__demo.ipynb` (예제 전용 노트북)로 연결됩니다.
+  “예제로 연습”이라는 신호를 URL 로 보내면 Colab 이 못 읽는 경우가 있어, 아예 **다른 노트북**으로
+  연결해 전달 실패 자체가 생기지 않게 했습니다.
 * **내 파일**은 Colab에서 같은 파일을 한 번 더 선택해 주셔야 합니다.
   (파일 선택 창에서 그대로 고르시면 됩니다)
 
@@ -229,9 +232,10 @@ elif MODULE_ID == "my_module":
 
 **③ 실행용 노트북 만들기**
 
-`notebooks/my_module.ipynb` 를 기존 것 하나 복사해 만들고, 1단계 셀의
-`dap.bootstrap("...")` 안 이름만 바꾸면 됩니다. (노트북에는 분석 코드가 없어
-사실상 이름만 다릅니다)
+`notebooks/my_module.ipynb` 와 `notebooks/my_module__demo.ipynb` 를 기존 것에서
+복사해 만들고, 1단계 셀의 `dap.bootstrap("...")` 안 이름만 바꾸면 됩니다.
+(노트북에는 분석 코드가 없어 사실상 이름만 다릅니다. `__demo` 쪽은 2단계
+`데이터_가져오기` 기본값이 **예제 데이터로 연습** 으로 되어 있습니다)
 
 사용 가능한 도구:
 

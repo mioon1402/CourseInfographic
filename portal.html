@@ -549,7 +549,9 @@ const NB = {
   repo:  'CourseInfographic',
   // 분석마다 전용 노트북이 있습니다. 파일이 작아(약 5KB) 열자마자 실행되고,
   // 고른 분석에 필요한 라이브러리만 설치합니다.
-  pathFor: id => `notebooks/${id}.ipynb`,
+  // 예제 모드는 URL 로 전달하면 Colab 이 못 읽는 경우가 있어,
+  // 아예 '예제 전용 노트북'으로 연결합니다. (전달 실패가 있을 수 없음)
+  pathFor: (id, demo) => `notebooks/${id}${demo ? '__demo' : ''}.ipynb`,
   probe: 'dap_engine.py',        // 브랜치 확인용 (항상 있는 파일)
   candidates: ['main', 'claude/all-in-one-data-analysis-portal-t73xwf'],
   branch: null, verified: false
@@ -1495,7 +1497,7 @@ function buildToken(){
 function buildUrl(){
   const q = buildParams();
   q.set('cfg', buildToken());
-  const path = NB.pathFor(state.moduleId);
+  const path = NB.pathFor(state.moduleId, state.useDemo);
   return `https://colab.research.google.com/github/${NB.owner}/${NB.repo}/blob/${NB.branch}/${path}?${q.toString()}`;
 }
 
