@@ -9,7 +9,7 @@ GitHub Pages 포털에서 고른 분석을 Google Colab 에서 실행하는 실�
     dap.run_and_report()           # 분석 실행 + 리포트 저장
 
 분석 로직을 고치고 싶으면 이 파일만 수정하시면 됩니다.
-새 분석 추가 방법은 README_PORTAL.md 5번 항목을 참고하세요.
+새 분석 추가 방법은 README.md 5번 항목을 참고하세요.
 """
 import base64
 import difflib

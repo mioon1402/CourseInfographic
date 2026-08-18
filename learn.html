@@ -253,14 +253,6 @@ main{padding-top:22px;min-width:0}
 .ds .mod-link{font-size:12.5px;text-decoration:none;color:var(--accent-ink);background:var(--accent-wash);
   border:1px solid color-mix(in srgb,var(--accent) 28%,transparent);border-radius:999px;padding:6px 12px}
 
-.res-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:10px}
-.res{display:flex;align-items:center;gap:10px;background:var(--surface);border:1px solid var(--border);
-  border-radius:10px;padding:12px 14px;text-decoration:none;color:inherit;font-size:13.5px;
-  transition:border-color .15s,transform .12s}
-.res:hover{border-color:var(--accent);transform:translateY(-1px)}
-.res .no{width:26px;height:26px;border-radius:7px;background:var(--accent-wash);color:var(--accent-ink);
-  display:grid;place-items:center;font-size:12px;font-weight:700;flex:none}
-
 .footer{grid-column:1/-1;margin-top:20px;padding-top:22px;border-top:1px solid var(--border);
   color:var(--muted);font-size:12.5px;text-align:center;line-height:1.9}
 </style>
@@ -416,17 +408,6 @@ function datasetsHTML(){
     </div>`;
 }
 
-function resourcesHTML(){
-  return `<p style="font-size:14px;color:var(--text-2);margin-bottom:14px">
-      아래 자료는 파이썬 코드와 함께 시계열 분석 개념을 설명합니다.
-      포털이 대신 실행해 주는 계산을 <b>직접 이해하고 싶을 때</b> 보시면 좋습니다.</p>
-    <div class="res-grid">
-      ${RESOURCES.map(([n, title]) => `
-        <a class="res" href="${encodeURI(RES_FILES[n])}">
-          <span class="no">${n}</span><span>${esc(title)}</span></a>`).join('')}
-    </div>`;
-}
-
 function render(){
   let n = 0, html = '', toc = '';
   CURRICULUM.forEach(ch => {
@@ -444,7 +425,6 @@ function render(){
     if (ch.cases) html += casesHTML();
     if (ch.cards) html += cardsHTML();
     if (ch.datasets) html += datasetsHTML();
-    if (ch.resources) html += resourcesHTML();
     html += quizHTML(ch.id);
     html += `</section>`;
     toc += `<li class="ch"><a href="#${ch.id}">${ch.icon} ${esc(ch.num)}. ${esc(ch.title)}</a>
