@@ -93,6 +93,16 @@ code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:.9em;
 .path .badge{position:absolute;top:-10px;right:18px;background:var(--pc);color:#fff;
   font-size:11px;font-weight:700;border-radius:999px;padding:3px 11px}
 
+.strip{display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin-top:16px;
+  background:var(--surface);border:1px solid var(--border);border-radius:14px;
+  padding:15px 20px;text-decoration:none;color:inherit;box-shadow:var(--shadow)}
+.strip:hover{border-color:var(--border-strong);background:var(--surface-2)}
+.strip .ic{font-size:22px;flex:none}
+.strip .txt{flex:1;min-width:220px;text-align:left}
+.strip b{font-size:14.5px;display:block;margin-bottom:2px}
+.strip span{font-size:13px;color:var(--text-2);line-height:1.6}
+.strip .go{margin-left:auto;font-size:13px;font-weight:700;color:var(--accent);white-space:nowrap}
+
 /* 섹션 */
 .sec{margin-top:64px}
 .sec-head{text-align:center;margin-bottom:26px}
@@ -158,6 +168,7 @@ code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:.9em;
     </a>
     <div class="sp"></div>
     <a class="nav-link hide-sm" href="learn.html">배우기</a>
+    <a class="nav-link hide-sm" href="cheatsheet.html">치트시트</a>
     <a class="nav-link hide-sm" href="portal.html">분석하기</a>
     <button class="icon-btn" id="themeBtn" type="button" title="화면 밝기 전환" aria-label="화면 밝기 전환">🌗</button>
   </div>
@@ -200,6 +211,16 @@ code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:.9em;
         <span class="arrow">분석하러 가기 →</span>
       </a>
     </div>
+
+    <a class="strip" href="cheatsheet.html">
+      <span class="ic" aria-hidden="true">🖨</span>
+      <span class="txt">
+        <b>데이터 분석 치트시트 — 인쇄해서 책상에 두세요</b>
+        <span>어떤 분석을 돌릴지, 나온 숫자가 좋은 건지, 이 결론을 말해도 되는지.
+              매번 막히는 세 가지를 한눈에 볼 수 있게 정리했습니다.</span>
+      </span>
+      <span class="go">A4 4장 · 보러 가기 →</span>
+    </a>
   </section>
 
   <section class="sec">

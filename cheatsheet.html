@@ -1,0 +1,631 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>데이터 분석 치트시트 — 올인원 데이터 분석 포털</title>
+<meta name="description" content="분석 고르기 · 숫자 읽는 기준 · 수식 요약 · 함정 점검. 인쇄해서 책상에 두고 쓰는 한 장짜리 요약.">
+<style>
+:root{
+  color-scheme: light;
+  --bg:#f9f9f7; --surface:#fcfcfb; --surface-2:#f2f2ee; --surface-3:#e9e9e3;
+  --border:rgba(11,11,11,.12); --border-strong:rgba(11,11,11,.22);
+  --text:#0b0b0b; --text-2:#52514e; --muted:#898781;
+  --accent:#2a78d6; --accent-ink:#184f95; --accent-wash:rgba(42,120,214,.10);
+  --good:#0ca30c; --good-ink:#046b04; --good-wash:rgba(12,163,12,.09);
+  --warn:#e08800; --warn-ink:#8a5400; --warn-wash:rgba(224,136,0,.10);
+  --crit:#d03b3b; --crit-ink:#961f1f; --crit-wash:rgba(208,59,59,.09);
+  --math:#4a3aa7; --math-wash:rgba(74,58,167,.09);
+  --shadow:0 1px 2px rgba(11,11,11,.05), 0 8px 24px rgba(11,11,11,.06);
+  --radius:14px;
+}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){
+  color-scheme: dark;
+  --bg:#0d0d0d; --surface:#1a1a19; --surface-2:#222220; --surface-3:#2c2c2a;
+  --border:rgba(255,255,255,.12); --border-strong:rgba(255,255,255,.24);
+  --text:#fff; --text-2:#c3c2b7; --muted:#898781;
+  --accent:#3987e5; --accent-ink:#9ec5f4; --accent-wash:rgba(57,135,229,.16);
+  --good:#0ca30c; --good-ink:#5fd35f; --good-wash:rgba(12,163,12,.14);
+  --warn:#fab219; --warn-ink:#fab219; --warn-wash:rgba(250,178,25,.14);
+  --crit:#e66767; --crit-ink:#e66767; --crit-wash:rgba(230,103,103,.14);
+  --math:#9085e9; --math-wash:rgba(144,133,233,.14);
+  --shadow:0 1px 2px rgba(0,0,0,.4), 0 8px 24px rgba(0,0,0,.35);
+}}
+:root[data-theme="dark"]{
+  color-scheme: dark;
+  --bg:#0d0d0d; --surface:#1a1a19; --surface-2:#222220; --surface-3:#2c2c2a;
+  --border:rgba(255,255,255,.12); --border-strong:rgba(255,255,255,.24);
+  --text:#fff; --text-2:#c3c2b7; --muted:#898781;
+  --accent:#3987e5; --accent-ink:#9ec5f4; --accent-wash:rgba(57,135,229,.16);
+  --good:#0ca30c; --good-ink:#5fd35f; --good-wash:rgba(12,163,12,.14);
+  --warn:#fab219; --warn-ink:#fab219; --warn-wash:rgba(250,178,25,.14);
+  --crit:#e66767; --crit-ink:#e66767; --crit-wash:rgba(230,103,103,.14);
+  --math:#9085e9; --math-wash:rgba(144,133,233,.14);
+  --shadow:0 1px 2px rgba(0,0,0,.4), 0 8px 24px rgba(0,0,0,.35);
+}
+*,*::before,*::after{box-sizing:border-box}
+html{scroll-behavior:smooth;scroll-padding-top:76px}
+body{margin:0;background:var(--bg);color:var(--text);
+  font-family:system-ui,-apple-system,'Segoe UI','Apple SD Gothic Neo','Malgun Gothic',sans-serif;
+  font-size:14.5px;line-height:1.7;word-break:keep-all}
+h1,h2,h3,h4{margin:0;line-height:1.35;letter-spacing:-.01em}
+p{margin:0}
+a{color:var(--accent);text-underline-offset:3px}
+button{font:inherit;color:inherit}
+code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:.9em;
+  background:var(--surface-2);border:1px solid var(--border);border-radius:5px;padding:1px 5px}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:6px}
+
+/* ── 상단바 ───────────────────────────────────────────── */
+.topbar{position:sticky;top:0;z-index:50;background:color-mix(in srgb,var(--bg) 90%,transparent);
+  backdrop-filter:saturate(180%) blur(12px);border-bottom:1px solid var(--border)}
+.topbar-inner{max-width:1180px;margin:0 auto;padding:11px 20px;display:flex;align-items:center;gap:10px}
+.brand{display:flex;align-items:center;gap:10px;font-weight:700;font-size:15.5px;text-decoration:none;color:inherit}
+.brand-mark{width:29px;height:29px;border-radius:9px;flex:none;
+  background:linear-gradient(135deg,var(--accent),#e87ba4);display:grid;place-items:center;color:#fff;font-size:14px}
+.brand small{display:block;font-weight:500;font-size:11.5px;color:var(--muted)}
+.sp{flex:1}
+.nav-link{font-size:13.5px;color:var(--text-2);text-decoration:none;padding:7px 12px;border-radius:9px;white-space:nowrap}
+.nav-link:hover{background:var(--surface-2)}
+.nav-link.cta{background:var(--accent);color:#fff;font-weight:650;border:0;cursor:pointer}
+.nav-link.cta:hover{filter:brightness(1.08)}
+.icon-btn{background:var(--surface);border:1px solid var(--border);border-radius:9px;width:34px;height:34px;
+  display:grid;place-items:center;cursor:pointer;font-size:14px}
+.icon-btn:hover{background:var(--surface-2)}
+@media (max-width:760px){ .hide-sm{display:none} }
+
+.wrap{max-width:1180px;margin:0 auto;padding:0 20px 80px}
+
+/* ── 머리말 ───────────────────────────────────────────── */
+.hero{padding:36px 0 26px;max-width:760px}
+.hero h1{font-size:clamp(25px,4vw,35px);font-weight:700;margin-bottom:11px}
+.hero p{color:var(--text-2);font-size:15.5px}
+.hero-actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:20px}
+.btn{display:inline-flex;align-items:center;gap:7px;border-radius:10px;padding:9px 16px;
+  font-size:13.5px;font-weight:650;text-decoration:none;cursor:pointer;
+  background:var(--accent);color:#fff;border:1px solid transparent}
+.btn:hover{filter:brightness(1.08)}
+.btn.ghost{background:var(--surface);color:var(--text);border-color:var(--border);box-shadow:var(--shadow)}
+.btn.ghost:hover{background:var(--surface-2);filter:none}
+
+/* ── 시트 ─────────────────────────────────────────────── */
+.sheet{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);
+  padding:26px 28px 30px;margin-bottom:20px;box-shadow:var(--shadow);scroll-margin-top:76px}
+.sheet-head{display:flex;align-items:baseline;gap:11px;flex-wrap:wrap;
+  padding-bottom:12px;margin-bottom:18px;border-bottom:2px solid var(--border-strong)}
+.sheet-num{font-size:11.5px;font-weight:700;letter-spacing:.05em;color:var(--accent-ink);
+  background:var(--accent-wash);border-radius:999px;padding:3px 10px}
+.sheet-head h2{font-size:20.5px;font-weight:700}
+.sheet-head .sub{font-size:13px;color:var(--muted);flex:1;min-width:180px}
+
+h3.blk{font-size:14.5px;font-weight:700;margin:22px 0 9px;
+  padding-left:10px;border-left:3px solid var(--accent)}
+h3.blk:first-of-type{margin-top:0}
+.lead{font-size:13.5px;color:var(--text-2);margin-bottom:12px;max-width:78ch}
+
+/* 표 */
+.tbl{width:100%;border-collapse:collapse;font-size:13px;margin-bottom:6px}
+.tbl th,.tbl td{text-align:left;padding:7px 10px;border-bottom:1px solid var(--border);vertical-align:top}
+.tbl th{font-size:11.5px;font-weight:700;letter-spacing:.03em;color:var(--muted);
+  background:var(--surface-2);border-bottom:1px solid var(--border-strong);white-space:nowrap}
+.tbl tr:last-child td{border-bottom:0}
+.tbl td b{font-weight:650}
+.tbl .num{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;white-space:nowrap;font-size:12.5px}
+.tbl .mod{white-space:nowrap;font-weight:650}
+.tbl .mod a{text-decoration:none}
+.tbl .mod a:hover{text-decoration:underline}
+.scroll-x{overflow-x:auto;margin:0 -4px;padding:0 4px}
+
+/* 판정 배지 */
+.j{display:inline-block;font-size:11px;font-weight:700;border-radius:5px;padding:1.5px 7px;white-space:nowrap}
+.j.g{color:var(--good-ink);background:var(--good-wash)}
+.j.w{color:var(--warn-ink);background:var(--warn-wash)}
+.j.c{color:var(--crit-ink);background:var(--crit-wash)}
+.j.n{color:var(--text-2);background:var(--surface-3)}
+
+/* 수식 */
+.fx{font-family:'Cambria Math','Latin Modern Math',Cambria,'Times New Roman',serif;
+  font-size:15px;color:var(--math);white-space:nowrap}
+.tbl td .fx{font-size:14.5px}
+
+/* 흐름도 */
+.flow{display:grid;grid-template-columns:repeat(auto-fit,minmax(178px,1fr));gap:11px;margin-bottom:6px}
+.step{background:var(--surface-2);border:1px solid var(--border);border-radius:11px;padding:13px 15px}
+.step .n{font-size:11px;font-weight:700;color:var(--accent-ink);letter-spacing:.04em}
+.step > b{display:block;font-size:13.5px;margin:3px 0 4px}
+.step span{font-size:12.5px;color:var(--text-2);line-height:1.6}
+
+/* 체크리스트 */
+.checks{list-style:none;margin:0;padding:0;
+  display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:2px 22px}
+.checks li{position:relative;padding:5px 0 5px 26px;font-size:13px;border-bottom:1px dotted var(--border)}
+.checks li::before{content:"";position:absolute;left:2px;top:9.5px;width:12px;height:12px;
+  border:1.5px solid var(--border-strong);border-radius:3px}
+.checks li b{font-weight:650}
+.checks li i{font-style:normal;color:var(--muted);font-size:12.5px}
+
+/* 함정 카드 */
+.traps{display:grid;grid-template-columns:repeat(auto-fit,minmax(268px,1fr));gap:11px}
+.trap{background:var(--surface-2);border:1px solid var(--border);border-radius:11px;padding:13px 15px;
+  border-left:3px solid var(--crit)}
+.trap > b{display:block;font-size:13.5px;margin-bottom:4px}
+.trap p{font-size:12.5px;color:var(--text-2);line-height:1.62}
+.trap .fix{display:block;margin-top:6px;font-size:12.5px;color:var(--good-ink);font-weight:600}
+
+/* 말하기 표 */
+.say{width:100%;border-collapse:collapse;font-size:13px}
+.say th{width:50%;font-size:11.5px;font-weight:700;letter-spacing:.03em;padding:6px 11px;text-align:left}
+.say th.bad{color:var(--crit-ink);background:var(--crit-wash);border-radius:7px 0 0 0}
+.say th.good{color:var(--good-ink);background:var(--good-wash);border-radius:0 7px 0 0}
+.say td{padding:8px 11px;border-bottom:1px solid var(--border);vertical-align:top;line-height:1.62}
+.say td.bad{color:var(--text-2)}
+.say tr:last-child td{border-bottom:0}
+
+.tip{background:var(--accent-wash);border:1px solid var(--border);border-left:3px solid var(--accent);
+  border-radius:9px;padding:11px 14px;font-size:12.8px;color:var(--text-2);margin-top:14px;line-height:1.65}
+.tip b{color:var(--text)}
+
+.foot{text-align:center;color:var(--muted);font-size:12.5px;padding:34px 0 0;line-height:1.9}
+.foot a{color:var(--text-2)}
+
+/* ── 인쇄 ─────────────────────────────────────────────── */
+@page{ size:A4 portrait; margin:11mm 10mm; }
+@media print{
+  :root{
+    --bg:#fff; --surface:#fff; --surface-2:#f4f4f2; --surface-3:#e9e9e5;
+    --border:#d2d2cc; --border-strong:#9a9a94; --text:#000; --text-2:#333; --muted:#666;
+    --accent:#1c5fae; --accent-ink:#123f75; --accent-wash:#eaf1fb;
+    --good:#0a7d0a; --good-ink:#065106; --good-wash:#e8f5e8;
+    --warn:#a86400; --warn-ink:#7a4900; --warn-wash:#fbf1de;
+    --crit:#b32d2d; --crit-ink:#8a1f1f; --crit-wash:#fbeaea;
+    --math:#3a2d85; --math-wash:#eeecf8; --shadow:none;
+  }
+  /* 시트 한 장 = A4 한 쪽. 촘촘하지만 읽을 수 있는 크기로 맞췄습니다. */
+  html,body{background:#fff;font-size:8.2pt;line-height:1.34}
+  .topbar,.hero-actions,.foot,.noprint{display:none !important}
+  .wrap{max-width:none;padding:0}
+  .hero{padding:0 0 2.5mm;max-width:none}
+  .hero h1{font-size:13pt;margin-bottom:1mm}
+  .hero p{font-size:8pt}
+  .sheet{break-inside:avoid;break-after:page;border:0;border-radius:0;
+    padding:0;margin:0;box-shadow:none}
+  .sheet:last-of-type{break-after:auto}
+  .sheet-head{border-bottom:1.2pt solid #000;margin-bottom:2.4mm;padding-bottom:1.2mm;gap:2mm}
+  .sheet-head h2{font-size:12.5pt}
+  .sheet-head .sub{font-size:7.6pt}
+  .sheet-num{font-size:7.4pt;padding:1pt 6pt}
+  h3.blk{font-size:9.2pt;margin:3.2mm 0 1.4mm;padding-left:2mm;
+    border-left-width:2.4pt;break-after:avoid}
+  .lead{font-size:7.8pt;margin-bottom:1.2mm;line-height:1.4}
+  .tbl{font-size:7.7pt;margin-bottom:0}
+  .tbl th{font-size:7pt;padding:2pt 4pt}
+  .tbl td{padding:2.1pt 4pt;line-height:1.34}
+  .tbl tr{break-inside:avoid}
+  .tbl td i.dim{font-size:6.9pt}
+  .scroll-x{overflow:visible;margin:0;padding:0}
+  .fx{font-size:8.8pt}
+  .tbl td .fx{font-size:8.5pt}
+  .j{font-size:6.9pt;padding:0.5pt 4pt}
+  .step,.trap,.checks li,.tip,.say tr{break-inside:avoid}
+  .step,.trap{padding:2mm 2.4mm;border-radius:2mm}
+  .step .n{font-size:6.9pt}
+  .step > b,.trap > b{font-size:8.2pt;margin-bottom:0.6mm}
+  .step span,.trap p,.trap .fix,.checks li,.say td{font-size:7.6pt;line-height:1.4}
+  .checks li{padding:1.6pt 0 1.6pt 4.4mm}
+  .checks li::before{top:4pt;width:8pt;height:8pt}
+  .checks li i{font-size:7.2pt}
+  .say th{font-size:7.2pt;padding:2pt 4pt}
+  .say td{padding:2.4pt 4pt}
+  .tip{font-size:7.6pt;padding:1.8mm 2.4mm;margin-top:2.4mm;line-height:1.45}
+  .traps,.flow{gap:2mm}
+  .checks{gap:0 6mm}
+  a{color:#000;text-decoration:none}
+}
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <div class="topbar-inner">
+    <a class="brand" href="index.html">
+      <span class="brand-mark">📊</span>
+      <span>올인원 데이터 분석 포털<small>치트시트</small></span>
+    </a>
+    <span class="sp"></span>
+    <a class="nav-link hide-sm" href="learn.html">배우기</a>
+    <a class="nav-link hide-sm" href="portal.html?wizard=1">질문 만들기</a>
+    <button class="icon-btn" id="themeBtn" title="밝게 / 어둡게" aria-label="테마 전환">◐</button>
+    <button class="nav-link cta" id="printBtn">🖨 인쇄 · PDF 저장</button>
+  </div>
+</header>
+
+<div class="wrap">
+
+  <section class="hero">
+    <h1>데이터 분석 치트시트</h1>
+    <p>분석하다 막히는 지점은 늘 같습니다. <b>무엇을 돌릴지</b>, <b>나온 숫자가 좋은 건지</b>,
+       <b>이 결론을 말해도 되는지</b>. 그 세 가지를 네 장에 담았습니다.
+       인쇄해서 모니터 옆에 두고, 분석할 때마다 훑어보세요.</p>
+    <div class="hero-actions">
+      <button class="btn" id="printBtn2">🖨 인쇄하기 (A4 4장)</button>
+      <a class="btn ghost" href="learn.html">📘 자세한 설명은 배우기에서</a>
+      <a class="btn ghost" href="portal.html">🚀 바로 분석하기</a>
+    </div>
+  </section>
+
+  <!-- ══════════════ 1. 분석 고르기 ══════════════ -->
+  <section class="sheet" id="s1">
+    <div class="sheet-head">
+      <span class="sheet-num">SHEET 1</span>
+      <h2>어떤 분석을 돌릴까</h2>
+      <span class="sub">하고 싶은 말을 먼저 찾고, 그 줄의 분석을 고르세요</span>
+    </div>
+
+    <h3 class="blk">순서 — 이 흐름을 벗어나면 대부분 헛수고가 됩니다</h3>
+    <div class="flow">
+      <div class="step"><span class="n">STEP 1</span><b>질문 정하기</b>
+        <span>“매출을 올리고 싶다”는 질문이 아닙니다. <b>무엇을·얼마나·언제까지</b>가 들어가야 분석할 수 있습니다.</span></div>
+      <div class="step"><span class="n">STEP 2</span><b>데이터 믿을 수 있나</b>
+        <span>합치고(🧬) · 정의 맞추고(🔍) · 품질 보고(🧹). 여기를 건너뛰면 뒤가 전부 틀립니다.</span></div>
+      <div class="step"><span class="n">STEP 3</span><b>일단 살펴보기</b>
+        <span>요약(📋)과 상관관계(🔗)로 지형을 봅니다. 가설은 여기서 나옵니다.</span></div>
+      <div class="step"><span class="n">STEP 4</span><b>질문에 답하기</b>
+        <span>비교 · 예측 · 이상탐지 · 분류. 아래 표에서 고르세요.</span></div>
+      <div class="step"><span class="n">STEP 5</span><b>의심하기</b>
+        <span>다른 이유는 없나(🔀). 이 단계를 하는 사람이 전문가입니다.</span></div>
+    </div>
+
+    <h3 class="blk">질문 → 분석 대응표</h3>
+    <p class="lead">왼쪽에서 내 질문과 가장 비슷한 문장을 찾으세요. 분석 이름을 누르면 그 분석이 선택된 채로 포털이 열립니다.</p>
+    <div class="scroll-x">
+    <table class="tbl">
+      <thead><tr><th style="width:31%">내가 하고 싶은 질문</th><th style="width:27%">분석</th><th style="width:22%">꼭 필요한 컬럼</th><th>주의</th></tr></thead>
+      <tbody>
+        <tr><td>“자료가 여기저기 흩어져 있는데 어떻게 합치지?”</td>
+            <td class="mod">🧬 <a href="portal.html?mod=data_merge">여러 파일 합치기</a></td>
+            <td>공통 컬럼(날짜·라인·코드)</td><td>일치율이 낮으면 키가 잘못된 것입니다</td></tr>
+        <tr><td>“이 숫자들, 정말 같은 기준으로 잰 걸까?”</td>
+            <td class="mod">🔍 <a href="portal.html?mod=definition_check">정의 · 단위 점검</a></td>
+            <td>숫자 컬럼</td><td>중간에 기준이 바뀐 데이터가 가장 위험합니다</td></tr>
+        <tr><td>“이 데이터 그냥 써도 될까?”</td>
+            <td class="mod">🧹 <a href="portal.html?mod=data_quality">품질 진단 · 자동 정제</a></td>
+            <td>—</td><td>결측 30% 넘는 컬럼은 쓰지 마세요</td></tr>
+        <tr><td>“이 데이터, 일단 어떻게 생겼지?”</td>
+            <td class="mod">📋 <a href="portal.html?mod=eda_summary">자동 요약 리포트</a></td>
+            <td>—</td><td>가장 먼저 돌릴 분석입니다</td></tr>
+        <tr><td>“온도가 오르면 불량률도 오를까?”</td>
+            <td class="mod">🔗 <a href="portal.html?mod=eda_corr">상관관계 (Heatmap)</a></td>
+            <td>숫자 컬럼 2개 이상</td><td>상관이 인과는 아닙니다</td></tr>
+        <tr><td>“A라인이 B라인보다 정말 좋은 걸까?”</td>
+            <td class="mod">⚖️ <a href="portal.html?mod=compare_groups">그룹 간 차이 검정</a></td>
+            <td>그룹 + 숫자</td><td>차이의 <b>크기</b>도 함께 보세요</td></tr>
+        <tr><td>“차이가 났는데, 정말 그 이유 때문일까?”</td>
+            <td class="mod">🔀 <a href="portal.html?mod=confound_check">교란변수 · 층화 비교</a></td>
+            <td>그룹 + 숫자 (+ 의심 컬럼)</td><td>결론이 뒤집히는 일이 실제로 자주 있습니다</td></tr>
+        <tr><td>“다음 달 판매량은 얼마나 될까?”</td>
+            <td class="mod">🔮 <a href="portal.html?mod=ts_forecast">추세 · 계절성 예측</a></td>
+            <td>날짜 + 예측할 값</td><td>최소 2주기(주간이면 14주) 이상 필요</td></tr>
+        <tr><td>“매일 오르내리는데, 큰 흐름은 오르는 중일까?”</td>
+            <td class="mod">〰️ <a href="portal.html?mod=ts_smooth">평활화 · 트렌드 추출</a></td>
+            <td>날짜 + 값</td><td>예측이 아니라 <b>과거 해석</b>입니다</td></tr>
+        <tr><td>“어제 설비에서 이상한 신호가 있었을까?”</td>
+            <td class="mod">🚨 <a href="portal.html?mod=anomaly_iforest">이상치 감지</a></td>
+            <td>숫자 컬럼</td><td>“이상”은 <b>드물다</b>는 뜻이지 불량이 아닙니다</td></tr>
+        <tr><td>“우리 공정, 지금 정상인가?”</td>
+            <td class="mod">📐 <a href="portal.html?mod=spc_control">공정 관리도 (SPC)</a></td>
+            <td>측정값(숫자)</td><td>계속 늘어나는 값(매출)에는 쓰지 마세요</td></tr>
+        <tr><td>“어디부터 손대야 효과가 클까?”</td>
+            <td class="mod">📊 <a href="portal.html?mod=pareto">파레토 (80/20)</a></td>
+            <td>분류 컬럼</td><td>건수 말고 <b>비용·시간</b>으로도 한 번 더</td></tr>
+        <tr><td>“온도·습도·속도를 알면 수율이 몇 %일까?”</td>
+            <td class="mod">🎯 <a href="portal.html?mod=regress_rf">수치 예측 (회귀)</a></td>
+            <td>예측할 숫자 + 입력들</td><td>중요도는 <b>원인이 아닙니다</b></td></tr>
+        <tr><td>“이 조건이면 불량이 날까, 안 날까?”</td>
+            <td class="mod">🏷️ <a href="portal.html?mod=classify_xgb">상태 분류</a></td>
+            <td>결과(범주) + 입력들</td><td>불량이 5%면 정확도 95%는 의미 없습니다</td></tr>
+        <tr><td>“우리 고객(설비)은 몇 가지 유형으로 나뉠까?”</td>
+            <td class="mod">🧩 <a href="portal.html?mod=cluster_kmeans">자동 그룹핑</a></td>
+            <td>숫자 컬럼 2개 이상</td><td>나온 그룹에 <b>이름을 붙일 수 있어야</b> 성공</td></tr>
+      </tbody>
+    </table>
+    </div>
+
+    <div class="tip"><b>“무엇을 물어봐야 할지도 모르겠다”면</b> 포털의
+      <a href="portal.html?wizard=1">🧭 질문 만들기 마법사</a>를 쓰세요.
+      세 번 클릭하면 답할 수 있는 질문과 분석 순서를 만들어 줍니다.
+      원인을 확인해야 하는 상황이라면 그 전에 <b>🧪 A/B 설계 계산기</b>로 필요한 표본 수부터 계산하세요.</div>
+  </section>
+
+  <!-- ══════════════ 2. 숫자 읽기 ══════════════ -->
+  <section class="sheet" id="s2">
+    <div class="sheet-head">
+      <span class="sheet-num">SHEET 2</span>
+      <h2>나온 숫자, 좋은 건가 나쁜 건가</h2>
+      <span class="sub">기준선을 외울 필요는 없습니다. 이 표를 보세요</span>
+    </div>
+
+    <h3 class="blk">차이가 진짜인지 (검정)</h3>
+    <div class="scroll-x">
+    <table class="tbl">
+      <thead><tr><th style="width:15%">지표</th><th style="width:22%">구간</th><th style="width:15%">판정</th><th>이렇게 읽으세요</th></tr></thead>
+      <tbody>
+        <tr><td rowspan="3"><b>p값</b><br><i class="dim">우연일 확률</i></td>
+            <td class="num">p &lt; 0.01</td><td><span class="j g">매우 뚜렷</span></td>
+            <td>우연으로 이만한 차이가 날 확률이 1% 미만입니다</td></tr>
+        <tr><td class="num">0.01 ≤ p &lt; 0.05</td><td><span class="j g">유의</span></td>
+            <td>통상적 기준(5%)은 넘었습니다. 재현되는지 한 번 더 확인하세요</td></tr>
+        <tr><td class="num">p ≥ 0.05</td><td><span class="j n">판단 보류</span></td>
+            <td><b>“차이가 없다”가 아니라 “있다고 말할 근거가 부족하다”</b>입니다</td></tr>
+        <tr><td rowspan="4"><b>Cohen&nbsp;d</b><br><i class="dim">차이의 크기</i></td>
+            <td class="num">|d| &lt; 0.2</td><td><span class="j n">무시 가능</span></td>
+            <td rowspan="4">p값이 “있냐 없냐”라면 d는 <b>“얼마나 크냐”</b>입니다.<br>
+              데이터가 많으면 아주 작은 차이도 p&lt;0.05가 되므로 <b>반드시 함께</b> 보세요.<br>
+              <span class="fx">d = (x̄₁ − x̄₂) / s<sub>pooled</sub></span></td></tr>
+        <tr><td class="num">0.2 ~ 0.5</td><td><span class="j n">작음</span></td></tr>
+        <tr><td class="num">0.5 ~ 0.8</td><td><span class="j w">중간</span></td></tr>
+        <tr><td class="num">|d| ≥ 0.8</td><td><span class="j g">큼</span></td></tr>
+        <tr><td><b>η² (에타제곱)</b><br><i class="dim">그룹이 설명하는 비율</i></td>
+            <td class="num">0.01 / 0.06 / 0.14</td><td><span class="j n">작음·중간·큼</span></td>
+            <td>“전체 변동의 몇 %가 그룹 차이로 설명되나”. 3개 이상 그룹 비교(ANOVA)에서 봅니다</td></tr>
+        <tr><td><b>검정력</b><br><i class="dim">차이를 잡아낼 확률</i></td>
+            <td class="num">0.80 이상</td><td><span class="j g">권장</span></td>
+            <td>실험 <b>전에</b> 계산해야 의미가 있습니다. 부족하면 표본을 늘리세요</td></tr>
+      </tbody>
+    </table>
+    </div>
+
+    <h3 class="blk">관계와 예측의 세기</h3>
+    <div class="scroll-x">
+    <table class="tbl">
+      <thead><tr><th style="width:15%">지표</th><th style="width:22%">구간</th><th style="width:15%">판정</th><th>이렇게 읽으세요</th></tr></thead>
+      <tbody>
+        <tr><td rowspan="4"><b>상관계수 r</b><br><i class="dim">−1 ~ +1</i></td>
+            <td class="num">|r| &lt; 0.3</td><td><span class="j n">약함</span></td>
+            <td rowspan="2">점들이 넓게 흩어져 있습니다. 하나로 다른 하나를 짐작하기 어렵습니다</td></tr>
+        <tr><td class="num">0.3 ~ 0.5</td><td><span class="j n">보통</span></td></tr>
+        <tr><td class="num">0.5 ~ 0.7</td><td><span class="j w">뚜렷</span></td>
+            <td>경향이 보입니다. 다만 <b>제3의 변수</b>를 먼저 의심하세요</td></tr>
+        <tr><td class="num">|r| ≥ 0.7</td><td><span class="j g">강함</span></td>
+            <td>매우 강합니다. 혹시 <b>같은 것을 두 번 잰 건 아닌지</b> 확인하세요(매출 vs 수량)</td></tr>
+        <tr><td><b>r² (=r×r)</b></td><td class="num">r=0.7 → 49%</td><td><span class="j n">설명력</span></td>
+            <td>r이 0.7이어도 설명하는 건 <b>절반뿐</b>입니다. 나머지 51%는 다른 이유입니다</td></tr>
+        <tr><td rowspan="3"><b>R² (회귀)</b></td>
+            <td class="num">R² &lt; 0.3</td><td><span class="j c">예측 부적합</span></td>
+            <td>컬럼이 부족하거나 관계가 없습니다. 예측에 쓰지 마세요</td></tr>
+        <tr><td class="num">0.3 ~ 0.7</td><td><span class="j w">참고용</span></td>
+            <td>방향은 참고하되 숫자를 그대로 믿진 마세요</td></tr>
+        <tr><td class="num">R² ≥ 0.7</td><td><span class="j g">쓸 만함</span></td>
+            <td>단, <b>검증 데이터 기준</b>이어야 합니다. 학습 데이터 R²는 항상 높습니다</td></tr>
+        <tr><td rowspan="3"><b>MAPE</b><br><i class="dim">예측 오차율</i></td>
+            <td class="num">&lt; 10%</td><td><span class="j g">우수</span></td>
+            <td rowspan="3">“평균적으로 몇 % 빗나가나”. 100개 예측에 10 틀리면 10%.<br>
+              값이 0에 가까운 데이터에서는 MAPE가 폭발하니 MAE도 함께 보세요</td></tr>
+        <tr><td class="num">10 ~ 20%</td><td><span class="j w">실무 사용 가능</span></td></tr>
+        <tr><td class="num">&gt; 30%</td><td><span class="j c">예측 실패</span></td></tr>
+        <tr><td><b>실루엣</b><br><i class="dim">군집 품질</i></td>
+            <td class="num">0.5↑ / 0.25~0.5 / 0.25↓</td>
+            <td><span class="j g">뚜렷</span> <span class="j w">보통</span> <span class="j c">억지</span></td>
+            <td>0.25 아래면 데이터에 원래 그룹이 없는 것입니다. 개수를 바꿔 다시 보세요</td></tr>
+      </tbody>
+    </table>
+    </div>
+
+    <h3 class="blk">분류 · 품질</h3>
+    <div class="scroll-x">
+    <table class="tbl">
+      <thead><tr><th style="width:15%">지표</th><th style="width:22%">구간</th><th style="width:15%">판정</th><th>이렇게 읽으세요</th></tr></thead>
+      <tbody>
+        <tr><td><b>정확도</b></td><td class="num">— </td><td><span class="j c">함정</span></td>
+            <td>불량률 5%면 <b>전부 정상이라 찍어도 95%</b>입니다. 단독으로 쓰지 마세요</td></tr>
+        <tr><td><b>재현율</b><br><i class="dim">Recall</i></td><td class="num">놓치면 큰 손해일 때</td><td><span class="j g">이걸 보세요</span></td>
+            <td>실제 불량 100건 중 몇 건을 잡아냈나. 불량 유출이 치명적이면 최우선</td></tr>
+        <tr><td><b>정밀도</b><br><i class="dim">Precision</i></td><td class="num">헛걸음이 비쌀 때</td><td><span class="j g">이걸 보세요</span></td>
+            <td>불량이라 외친 100건 중 몇 건이 진짜였나. 재검사 비용이 크면 최우선</td></tr>
+        <tr><td><b>F1</b></td><td class="num">0.7 이상</td><td><span class="j g">균형</span></td>
+            <td>재현율과 정밀도의 조화평균. 둘 다 중요할 때 하나로 보는 값</td></tr>
+        <tr><td rowspan="3"><b>Cp / Cpk</b><br><i class="dim">공정능력</i></td>
+            <td class="num">Cpk ≥ 1.33</td><td><span class="j g">안정</span></td>
+            <td>규격을 여유 있게 만족합니다 (불량 약 63ppm 이하)</td></tr>
+        <tr><td class="num">1.0 ~ 1.33</td><td><span class="j w">아슬아슬</span></td>
+            <td>조금만 흔들려도 규격을 벗어납니다</td></tr>
+        <tr><td class="num">&lt; 1.0</td><td><span class="j c">불량 발생 중</span></td>
+            <td><b>Cp는 큰데 Cpk가 작다 = 산포는 괜찮은데 중심이 치우쳤다</b> → 중심만 맞추면 됩니다</td></tr>
+        <tr><td><b>결측치 비율</b></td><td class="num">5% / 30% / 50%</td>
+            <td><span class="j g">무시</span> <span class="j w">보정</span> <span class="j c">제외</span></td>
+            <td>빠진 값이 <b>한쪽에 몰려 있는지</b>가 비율보다 중요합니다</td></tr>
+      </tbody>
+    </table>
+    </div>
+
+    <div class="tip"><b>숫자 하나로 결론 내지 마세요.</b>
+      좋은 보고는 늘 세 개가 함께 갑니다 — <b>차이가 있나(p값)</b> · <b>얼마나 큰가(효과크기)</b> ·
+      <b>얼마나 확실한가(신뢰구간)</b>. 이 포털의 리포트는 세 가지를 항상 같이 내보냅니다.</div>
+  </section>
+
+  <!-- ══════════════ 3. 수식 ══════════════ -->
+  <section class="sheet" id="s3">
+    <div class="sheet-head">
+      <span class="sheet-num">SHEET 3</span>
+      <h2>수식 요약</h2>
+      <span class="sub">뜻과 함께 외우면 잊히지 않습니다 · 자세한 유도는 배우기 6장</span>
+    </div>
+
+    <h3 class="blk">퍼짐과 불확실성</h3>
+    <div class="scroll-x">
+    <table class="tbl">
+      <thead><tr><th style="width:20%">이름</th><th style="width:33%">수식</th><th>한 줄 뜻</th></tr></thead>
+      <tbody>
+        <tr><td>표준편차</td><td><span class="fx">s = √( Σ(xᵢ − x̄)² / (n − 1) )</span></td>
+            <td>평균에서 평균적으로 얼마나 떨어져 있나. <b>n−1</b>인 이유는 평균을 이미 써버려 자유도가 하나 줄었기 때문</td></tr>
+        <tr><td>z점수</td><td><span class="fx">z = (x − μ) / σ</span></td>
+            <td>“평균에서 표준편차 몇 개만큼 떨어졌나”. 단위가 다른 값을 비교할 때 씁니다</td></tr>
+        <tr><td>정규분포 눈금</td><td><span class="fx">μ±1σ ≈ 68% · μ±2σ ≈ 95% · μ±3σ ≈ 99.7%</span></td>
+            <td>관리도의 3σ 선이 여기서 나옵니다 (밖으로 나갈 확률 0.3%)</td></tr>
+        <tr><td>표준오차</td><td><span class="fx">SE = σ / √n</span></td>
+            <td><b>평균값</b>이 흔들리는 폭. 정밀도를 2배로 하려면 데이터가 <b>4배</b> 필요합니다</td></tr>
+        <tr><td>신뢰구간</td><td><span class="fx">x̄ ± t<sub>α/2,&nbsp;n−1</sub> · s/√n</span></td>
+            <td>“참값이 이 범위 안에 있을 것”. 구간이 0을 걸치면 차이가 있다고 못 합니다</td></tr>
+        <tr><td>필요 표본 수</td><td><span class="fx">n ≈ 2(z<sub>α/2</sub> + z<sub>β</sub>)² σ² / δ²</span></td>
+            <td>δ(찾고 싶은 차이)가 <b>절반</b>이 되면 필요한 표본은 <b>4배</b>가 됩니다</td></tr>
+      </tbody>
+    </table>
+    </div>
+
+    <h3 class="blk">관계와 모델</h3>
+    <div class="scroll-x">
+    <table class="tbl">
+      <thead><tr><th style="width:20%">이름</th><th style="width:33%">수식</th><th>한 줄 뜻</th></tr></thead>
+      <tbody>
+        <tr><td>공분산</td><td><span class="fx">cov = Σ(xᵢ − x̄)(yᵢ − ȳ) / (n − 1)</span></td>
+            <td>같이 커지면 +, 반대면 −. 단위에 휘둘려 크기 비교는 못 합니다</td></tr>
+        <tr><td>상관계수</td><td><span class="fx">r = cov(x,y) / (s<sub>x</sub> s<sub>y</sub>) = cos θ</span></td>
+            <td>공분산을 단위에서 해방시킨 값. 두 데이터 벡터가 이루는 <b>각도의 코사인</b>입니다</td></tr>
+        <tr><td>최소제곱 회귀</td><td><span class="fx">β̂ = (XᵀX)⁻¹ Xᵀy</span></td>
+            <td>오차 제곱합을 최소로 만드는 계수. y를 X가 만드는 평면에 <b>수직으로 투영</b>한 것</td></tr>
+        <tr><td>결정계수</td><td><span class="fx">R² = 1 − SS<sub>res</sub> / SS<sub>tot</sub></span></td>
+            <td>“평균으로 찍는 것보다 얼마나 나아졌나”. 0이면 평균과 같고 1이면 완벽</td></tr>
+        <tr><td>로지스틱 회귀</td><td><span class="fx">p = 1 / (1 + e<sup>−(β₀+β₁x)</sup>)</span></td>
+            <td>확률을 0~1 안에 가두는 S자 곡선. 계수는 <b>로그 오즈</b>의 변화량</td></tr>
+        <tr><td>교차엔트로피</td><td><span class="fx">L = −Σ [ y log p̂ + (1−y) log(1−p̂) ]</span></td>
+            <td>확신에 차서 틀리면 벌점이 급격히 커집니다 (log 0 → ∞)</td></tr>
+        <tr><td>지니 불순도</td><td><span class="fx">G = 1 − Σ pᵢ²</span></td>
+            <td>한 가지로만 모이면 0. 트리는 이 값이 가장 많이 줄어드는 질문을 고릅니다</td></tr>
+        <tr><td>정보이득</td><td><span class="fx">IG = H(부모) − Σ (nᵢ/n) H(자식)</span></td>
+            <td>질문 하나로 줄어든 혼잡도. 트리의 분기 기준</td></tr>
+        <tr><td>K-means 목적</td><td><span class="fx">min Σ<sub>k</sub> Σ<sub>x∈C<sub>k</sub></sub> ‖x − μ<sub>k</sub>‖²</span></td>
+            <td>각 점에서 자기 중심까지 거리 제곱의 합을 최소화. <b>거리 기반이라 표준화 필수</b></td></tr>
+        <tr><td>실루엣</td><td><span class="fx">s = (b − a) / max(a, b)</span></td>
+            <td>a=내 그룹과의 거리, b=가장 가까운 남의 그룹과의 거리. 1에 가까울수록 잘 나뉜 것</td></tr>
+        <tr><td>편향–분산</td><td><span class="fx">오차 = 편향² + 분산 + 잡음</span></td>
+            <td>모델을 단순하게 하면 편향↑, 복잡하게 하면 분산↑. <b>과적합의 정체</b>가 이 분산입니다</td></tr>
+      </tbody>
+    </table>
+    </div>
+
+    <h3 class="blk">시계열 · 공정</h3>
+    <div class="scroll-x">
+    <table class="tbl">
+      <thead><tr><th style="width:20%">이름</th><th style="width:33%">수식</th><th>한 줄 뜻</th></tr></thead>
+      <tbody>
+        <tr><td>가법 분해</td><td><span class="fx">yₜ = 추세ₜ + 계절성ₜ + 잔차ₜ</span></td>
+            <td>계절 폭이 값 크기에 따라 커지면 곱셈 분해(로그)를 쓰세요</td></tr>
+        <tr><td>자기상관 ACF</td><td><span class="fx">r<sub>k</sub> = Σ(yₜ − ȳ)(y<sub>t−k</sub> − ȳ) / Σ(yₜ − ȳ)²</span></td>
+            <td>k일 전 값과 얼마나 닮았나. 주간 주기가 있으면 k=7에서 봉우리가 섭니다</td></tr>
+        <tr><td>Prophet</td><td><span class="fx">y(t) = g(t) + s(t) + h(t) + εₜ</span></td>
+            <td>추세 + 계절성 + 휴일 + 잡음. 각각 따로 그려 보여주므로 해석이 쉽습니다</td></tr>
+        <tr><td>MAPE</td><td><span class="fx">MAPE = (100/n) Σ |yₜ − ŷₜ| / |yₜ|</span></td>
+            <td>퍼센트 오차의 평균. 실제값이 0 근처면 값이 폭발합니다</td></tr>
+        <tr><td>관리한계</td><td><span class="fx">UCL / LCL = x̄ ± 3σ</span></td>
+            <td>공정이 그대로일 때 99.7%가 이 안에 들어옵니다. 벗어나면 <b>원인이 생긴 것</b></td></tr>
+        <tr><td>공정능력</td><td><span class="fx">Cp = (USL − LSL)/6σ,&nbsp; Cpk = min(USL−μ, μ−LSL)/3σ</span></td>
+            <td>Cp는 <b>폭</b>만, Cpk는 <b>치우침</b>까지. 항상 Cpk ≤ Cp</td></tr>
+      </tbody>
+    </table>
+    </div>
+  </section>
+
+  <!-- ══════════════ 4. 함정 ══════════════ -->
+  <section class="sheet" id="s4">
+    <div class="sheet-head">
+      <span class="sheet-num">SHEET 4</span>
+      <h2>말하기 전에 확인할 것</h2>
+      <span class="sub">잘못된 분석보다 <b>잘못된 문장</b>이 더 큰 사고를 냅니다</span>
+    </div>
+
+    <h3 class="blk">분석 시작 전 체크리스트</h3>
+    <ul class="checks">
+      <li><b>첫 줄이 컬럼 이름인가</b> <i>— 제목 줄·병합 셀이 위에 있으면 안 됩니다</i></li>
+      <li><b>행 하나가 무엇인가 말할 수 있나</b> <i>— “설비 1대의 하루”처럼</i></li>
+      <li><b>숫자 컬럼에 글자가 섞이지 않았나</b> <i>— “측정불가”, “-”는 빈칸으로</i></li>
+      <li><b>날짜 형식이 하나로 통일됐나</b> <i>— 2026-01-05 / 26.1.5 혼용 금지</i></li>
+      <li><b>같은 뜻의 값이 다르게 적히지 않았나</b> <i>— A라인 / a라인 / A_line</i></li>
+      <li><b>단위가 도중에 바뀌지 않았나</b> <i>— g ↔ kg, 초 ↔ 분</i></li>
+      <li><b>기간이 충분한가</b> <i>— 시계열은 최소 2주기 이상</i></li>
+      <li><b>그룹별 개수가 너무 적진 않나</b> <i>— 한 그룹 30개 미만이면 조심</i></li>
+      <li><b>중복 행이 없나</b> <i>— 파일을 합쳤다면 특히</i></li>
+      <li><b>결과에 답이 미리 들어있진 않나</b> <i>— 불량 예측에 “불량사유” 컬럼 넣기</i></li>
+    </ul>
+
+    <h3 class="blk">결론 내리기 전 7가지 함정</h3>
+    <div class="traps">
+      <div class="trap"><b>1. 상관 ≠ 인과</b>
+        <p>아이스크림 판매와 익사 사고는 같이 늡니다. 원인은 <b>여름</b>입니다.</p>
+        <span class="fix">→ 🔀 교란변수 점검으로 제3의 변수를 확인하세요</span></div>
+      <div class="trap"><b>2. 심슨의 역설</b>
+        <p>전체로 보면 신형이 나쁜데, 온도대별로 나눠 보면 <b>모든 구간에서 신형이 좋을</b> 수 있습니다.</p>
+        <span class="fix">→ 나누어 봤을 때도 같은 결론인지 반드시 확인</span></div>
+      <div class="trap"><b>3. p값의 오해</b>
+        <p>p=0.03은 “가설이 맞을 확률 97%”가 아닙니다. <b>차이가 없다고 가정했을 때</b> 이런 결과가 나올 확률입니다.</p>
+        <span class="fix">→ 효과 크기와 신뢰구간을 함께 말하세요</span></div>
+      <div class="trap"><b>4. 많이 비교하면 뭐든 나온다</b>
+        <p>20개를 비교하면 아무 관계가 없어도 하나쯤은 p&lt;0.05가 나옵니다.</p>
+        <span class="fix">→ 보정(Bonferroni)을 쓰거나, 가설을 먼저 정하고 보세요</span></div>
+      <div class="trap"><b>5. 남은 것만 보고 있다</b>
+        <p>“퇴사자 설문”으로 만족도를 재면 이미 떠난 사람이 빠져 있습니다.</p>
+        <span class="fix">→ 이 데이터에 <b>누가 빠져 있는지</b> 먼저 물으세요</span></div>
+      <div class="trap"><b>6. 범위 밖 예측(외삽)</b>
+        <p>온도 20~30℃ 데이터로 만든 모델에 50℃를 넣으면 숫자는 나오지만 근거가 없습니다.</p>
+        <span class="fix">→ 학습 데이터의 범위를 벗어나면 예측하지 마세요</span></div>
+      <div class="trap"><b>7. 중요도 = 원인이 아님</b>
+        <p>모델이 “가장 많이 쓴 컬럼”일 뿐입니다. 결과와 함께 움직이는 <b>결과 쪽 변수</b>일 수도 있습니다.</p>
+        <span class="fix">→ 시간 순서를 확인하세요. 원인은 결과보다 먼저 옵니다</span></div>
+    </div>
+
+    <h3 class="blk">보고할 때의 문장</h3>
+    <p class="lead">같은 결과라도 어떻게 말하느냐에 따라 신뢰도가 갈립니다. 오른쪽처럼 쓰세요.</p>
+    <div class="scroll-x">
+    <table class="say">
+      <thead><tr><th class="bad">✕ 이렇게 말하면 위험합니다</th><th class="good">✓ 이렇게 말하세요</th></tr></thead>
+      <tbody>
+        <tr><td class="bad">“온도가 불량의 원인입니다”</td>
+            <td>“온도와 불량률이 함께 움직입니다(r=0.62). 인과 확인에는 온도만 바꾼 실험이 필요합니다”</td></tr>
+        <tr><td class="bad">“A라인이 B라인보다 좋습니다”</td>
+            <td>“A라인이 평균 2.3 높습니다(95% 신뢰구간 0.8~3.8, p=0.004). 실무적으로 의미 있는 크기입니다”</td></tr>
+        <tr><td class="bad">“차이가 없었습니다”</td>
+            <td>“차이가 있다고 볼 근거는 부족했습니다(p=0.21). 현재 표본으로는 3 이하의 차이는 잡아내기 어렵습니다”</td></tr>
+        <tr><td class="bad">“다음 달 매출은 1억 2천입니다”</td>
+            <td>“1억 1천~1억 3천으로 예상됩니다(과거 검증 오차 8%). 프로모션 같은 신규 요인은 반영돼 있지 않습니다”</td></tr>
+        <tr><td class="bad">“정확도 95%짜리 모델입니다”</td>
+            <td>“실제 불량 100건 중 87건을 잡아내고 13건을 놓칩니다. 정상을 불량이라 하는 헛걸음은 100건당 4건입니다”</td></tr>
+        <tr><td class="bad">“이상치 47건을 찾았습니다”</td>
+            <td>“평소와 다른 패턴 47건을 표시했습니다. 불량 여부는 현장 확인이 필요하며, 상위 10건부터 보시길 권합니다”</td></tr>
+      </tbody>
+    </table>
+    </div>
+
+    <div class="tip"><b>마지막 점검 한 문장.</b>
+      “이 결론이 틀렸다면, 가장 그럴듯한 이유는 무엇일까?” — 여기에 답할 수 있으면 보고해도 좋습니다.
+      답이 떠오르지 않는다면 아직 데이터를 충분히 보지 않은 것입니다.</div>
+  </section>
+
+  <div class="foot">
+    올인원 데이터 분석 포털 ·
+    <a href="index.html">홈</a> ·
+    <a href="learn.html">배우기</a> ·
+    <a href="portal.html">분석하기</a><br>
+    기준값은 통상적으로 쓰이는 관례입니다. 업종·공정에 따라 사내 기준이 있다면 그쪽을 따르세요.
+  </div>
+
+</div>
+
+<script>
+(function(){
+  const KEY = 'dap_theme';
+  const saved = localStorage.getItem(KEY);
+  if (saved) document.documentElement.setAttribute('data-theme', saved);
+  const btn = document.getElementById('themeBtn');
+  btn.addEventListener('click', () => {
+    const cur = document.documentElement.getAttribute('data-theme');
+    const isDark = cur ? cur === 'dark'
+                       : matchMedia('(prefers-color-scheme: dark)').matches;
+    const next = isDark ? 'light' : 'dark';
+    document.documentElement.setAttribute('data-theme', next);
+    localStorage.setItem(KEY, next);
+  });
+  const print = () => window.print();
+  document.getElementById('printBtn').addEventListener('click', print);
+  document.getElementById('printBtn2').addEventListener('click', print);
+})();
+</script>
+</body>
+</html>
