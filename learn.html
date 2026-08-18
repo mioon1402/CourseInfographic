@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>데이터 분석 배우기 — 올인원 데이터 분석 포털</title>
-<meta name="description" content="데이터를 한 번도 다뤄본 적 없는 분을 위한 데이터 분석 입문. 개념을 읽고, 그 자리에서 직접 확인하고, 바로 실습해 봅니다.">
+<meta name="description" content="데이터를 한 번도 다뤄본 적 없는 분부터, 수식으로 검증하고 싶은 분까지. 개념·수학·케이스·실습을 한곳에서.">
 <style>
 :root{
   color-scheme: light;
@@ -13,6 +13,7 @@
   --text:#0b0b0b; --text-2:#52514e; --muted:#898781;
   --accent:#2a78d6; --accent-ink:#184f95; --accent-wash:rgba(42,120,214,.10);
   --good:#0ca30c; --good-ink:#046b04; --warn:#e08800; --crit:#d03b3b;
+  --math:#4a3aa7; --math-wash:rgba(74,58,167,.10);
   --s1:#2a78d6; --s2:#eb6834; --s3:#1baf7a; --s8:#e34948;
   --shadow:0 1px 2px rgba(11,11,11,.05), 0 8px 24px rgba(11,11,11,.06);
   --shadow-lg:0 2px 4px rgba(11,11,11,.06), 0 16px 40px rgba(11,11,11,.10);
@@ -25,6 +26,7 @@
   --text:#fff; --text-2:#c3c2b7; --muted:#898781;
   --accent:#3987e5; --accent-ink:#9ec5f4; --accent-wash:rgba(57,135,229,.16);
   --good:#0ca30c; --good-ink:#5fd35f; --warn:#fab219; --crit:#e66767;
+  --math:#9085e9; --math-wash:rgba(144,133,233,.14);
   --s1:#3987e5; --s2:#d95926; --s3:#199e70; --s8:#e66767;
   --shadow:0 1px 2px rgba(0,0,0,.4), 0 8px 24px rgba(0,0,0,.35);
   --shadow-lg:0 2px 4px rgba(0,0,0,.5), 0 16px 40px rgba(0,0,0,.45);
@@ -36,6 +38,7 @@
   --text:#fff; --text-2:#c3c2b7; --muted:#898781;
   --accent:#3987e5; --accent-ink:#9ec5f4; --accent-wash:rgba(57,135,229,.16);
   --good:#0ca30c; --good-ink:#5fd35f; --warn:#fab219; --crit:#e66767;
+  --math:#9085e9; --math-wash:rgba(144,133,233,.14);
   --s1:#3987e5; --s2:#d95926; --s3:#199e70; --s8:#e66767;
   --shadow:0 1px 2px rgba(0,0,0,.4), 0 8px 24px rgba(0,0,0,.35);
   --shadow-lg:0 2px 4px rgba(0,0,0,.5), 0 16px 40px rgba(0,0,0,.45);
@@ -52,11 +55,11 @@ button{font:inherit;color:inherit}
 code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:.9em;
   background:var(--surface-2);border:1px solid var(--border);border-radius:5px;padding:1px 5px}
 :focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:6px}
+.dim{color:var(--muted)}
 
-/* 상단바 */
 .topbar{position:sticky;top:0;z-index:50;background:color-mix(in srgb,var(--bg) 90%,transparent);
   backdrop-filter:saturate(180%) blur(12px);border-bottom:1px solid var(--border)}
-.topbar-inner{max-width:1240px;margin:0 auto;padding:11px 20px;display:flex;align-items:center;gap:10px}
+.topbar-inner{max-width:1260px;margin:0 auto;padding:11px 20px;display:flex;align-items:center;gap:10px}
 .brand{display:flex;align-items:center;gap:10px;font-weight:700;font-size:15.5px;text-decoration:none;color:inherit}
 .brand-mark{width:29px;height:29px;border-radius:9px;flex:none;
   background:linear-gradient(135deg,var(--accent),#e87ba4);display:grid;place-items:center;color:#fff;font-size:14px}
@@ -65,24 +68,22 @@ code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:.9em;
 .nav-link{font-size:13.5px;color:var(--text-2);text-decoration:none;padding:7px 12px;border-radius:9px;white-space:nowrap}
 .nav-link:hover{background:var(--surface-2)}
 .nav-link.cta{background:var(--accent);color:#fff;font-weight:650}
-.nav-link.cta:hover{filter:brightness(1.08);background:var(--accent)}
+.nav-link.cta:hover{filter:brightness(1.08)}
 .icon-btn{background:var(--surface);border:1px solid var(--border);border-radius:9px;width:34px;height:34px;
   display:grid;place-items:center;cursor:pointer;font-size:14px}
 .icon-btn:hover{background:var(--surface-2)}
 @media (max-width:760px){ .hide-sm{display:none} }
 
-/* 레이아웃 */
-.wrap{max-width:1240px;margin:0 auto;padding:0 20px 90px;
-  display:grid;grid-template-columns:246px minmax(0,1fr);gap:34px;align-items:start}
-@media (max-width:940px){ .wrap{grid-template-columns:minmax(0,1fr)} .toc{display:none} }
+.wrap{max-width:1260px;margin:0 auto;padding:0 20px 90px;
+  display:grid;grid-template-columns:252px minmax(0,1fr);gap:34px;align-items:start}
+@media (max-width:980px){ .wrap{grid-template-columns:minmax(0,1fr)} .toc{display:none} }
 
-/* 목차 */
 .toc{position:sticky;top:74px;max-height:calc(100vh - 96px);overflow-y:auto;padding:22px 0 20px}
 .toc-title{font-size:11.5px;font-weight:700;letter-spacing:.06em;color:var(--muted);margin-bottom:10px}
 .toc ol{list-style:none;margin:0;padding:0}
-.toc .ch{margin-bottom:12px}
-.toc .ch > a{display:block;font-size:13.5px;font-weight:700;color:var(--text);text-decoration:none;
-  padding:5px 9px;border-radius:7px}
+.toc .ch{margin-bottom:11px}
+.toc .ch > a{display:flex;align-items:center;gap:7px;font-size:13.5px;font-weight:700;color:var(--text);
+  text-decoration:none;padding:5px 9px;border-radius:7px}
 .toc .ch > a:hover{background:var(--surface-2)}
 .toc .ls{list-style:none;margin:2px 0 0;padding:0 0 0 9px;border-left:2px solid var(--border)}
 .toc .ls a{display:block;font-size:12.5px;color:var(--text-2);text-decoration:none;padding:3.5px 9px;border-radius:6px}
@@ -90,8 +91,7 @@ code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:.9em;
 .toc .ls a.done{color:var(--good-ink)}
 .toc .ls a.done::before{content:"✓ ";font-weight:700}
 
-/* 히어로 */
-.hero{padding:38px 0 8px;grid-column:1/-1;max-width:820px}
+.hero{padding:38px 0 8px;grid-column:1/-1;max-width:880px}
 .hero h1{font-size:clamp(26px,4vw,38px);font-weight:700;margin-bottom:12px}
 .hero p{color:var(--text-2);font-size:16px}
 .hero-meta{display:flex;gap:9px;flex-wrap:wrap;margin-top:18px}
@@ -99,26 +99,33 @@ code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:.9em;
   padding:6px 14px;font-size:12.5px;color:var(--text-2);box-shadow:var(--shadow)}
 .progress-bar{height:7px;background:var(--surface-3);border-radius:99px;overflow:hidden;margin-top:20px;max-width:420px}
 .progress-bar i{display:block;height:100%;background:var(--good);width:0;transition:width .4s}
+.tracks{display:grid;grid-template-columns:repeat(auto-fit,minmax(228px,1fr));gap:12px;margin-top:22px}
+.track{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:15px 17px;
+  box-shadow:var(--shadow);text-decoration:none;color:inherit}
+.track:hover{border-color:var(--tc)}
+.track b{display:block;font-size:14px;margin-bottom:4px;color:var(--tc)}
+.track span{font-size:12.5px;color:var(--text-2);line-height:1.6}
 
-/* 본문 */
 main{padding-top:22px;min-width:0}
 .chapter{margin-bottom:46px;scroll-margin-top:78px}
 .ch-head{display:flex;align-items:baseline;gap:11px;margin-bottom:6px;flex-wrap:wrap}
 .ch-num{font-size:12px;font-weight:700;letter-spacing:.05em;color:var(--accent-ink);
   background:var(--accent-wash);border-radius:999px;padding:3px 10px}
 .ch-head h2{font-size:22px;font-weight:700}
-.ch-desc{color:var(--text-2);font-size:14px;margin-bottom:18px;max-width:70ch}
+.ch-badge{font-size:11px;font-weight:700;border-radius:999px;padding:3px 10px;
+  color:var(--math);background:var(--math-wash)}
+.ch-desc{color:var(--text-2);font-size:14px;margin-bottom:18px;max-width:72ch}
 
 .lesson{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);
   padding:22px 24px;margin-bottom:14px;box-shadow:var(--shadow);scroll-margin-top:78px}
 .lesson h3{font-size:17px;font-weight:700;margin-bottom:10px;display:flex;align-items:center;gap:9px;flex-wrap:wrap}
 .lesson h3 .n{font-size:12px;font-weight:700;color:var(--muted);background:var(--surface-2);
   border-radius:6px;padding:2px 7px;flex:none}
+.lesson.math h3 .n{color:#fff;background:var(--math)}
 .lesson p{margin-bottom:11px;color:var(--text);font-size:14.5px}
 .lesson p:last-child{margin-bottom:0}
-.lesson ul,.lesson ol{margin:0 0 11px;padding-left:22px;font-size:14.5px;color:var(--text)}
+.lesson ul,.lesson ol{margin:0 0 11px;padding-left:22px;font-size:14.5px}
 .lesson li{margin-bottom:5px}
-.lesson strong{font-weight:700}
 
 .ex{background:var(--surface-2);border-left:3px solid var(--accent);border-radius:0 9px 9px 0;
   padding:13px 16px;margin:12px 0;font-size:13.5px;color:var(--text-2);line-height:1.7}
@@ -130,6 +137,22 @@ main{padding-top:22px;min-width:0}
   border:1px solid color-mix(in srgb,var(--good) 35%,transparent);border-radius:10px;
   padding:12px 15px;margin:12px 0;font-size:13.5px;line-height:1.7}
 .keybox b{color:var(--good-ink)}
+
+.formula{font-family:'Cambria Math','STIX Two Math','Times New Roman',Georgia,serif;
+  font-size:19px;line-height:2;text-align:center;background:var(--math-wash);
+  border:1px solid color-mix(in srgb,var(--math) 30%,transparent);border-left:3px solid var(--math);
+  border-radius:0 10px 10px 0;padding:16px 18px;margin:14px 0;overflow-x:auto;color:var(--text)}
+.formula sub,.formula sup{font-size:.68em}
+.fnote{font-family:system-ui,-apple-system,sans-serif;font-size:12.5px;line-height:1.65;
+  color:var(--text-2);margin-top:9px;padding-top:9px;text-align:left;
+  border-top:1px dashed color-mix(in srgb,var(--math) 30%,transparent)}
+.symdef{background:var(--surface-2);border:1px solid var(--border);border-radius:10px;
+  padding:13px 16px;margin:12px 0}
+.symdef-t{font-size:11.5px;font-weight:700;letter-spacing:.04em;color:var(--muted);margin-bottom:8px}
+.symdef dl{margin:0;display:grid;grid-template-columns:auto 1fr;gap:7px 15px;align-items:baseline}
+.symdef dt{font-family:'Cambria Math','Times New Roman',Georgia,serif;font-size:16px;
+  font-weight:700;color:var(--math);white-space:nowrap}
+.symdef dd{margin:0;font-size:13px;color:var(--text-2);line-height:1.6}
 
 .try{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-top:14px;
   padding-top:13px;border-top:1px dashed var(--border)}
@@ -144,7 +167,6 @@ main{padding-top:22px;min-width:0}
 .done-btn[aria-pressed="true"]{background:color-mix(in srgb,var(--good) 14%,transparent);
   border-color:var(--good);color:var(--good-ink);font-weight:650}
 
-/* 인터랙티브 */
 .demo{background:var(--surface-2);border:1px solid var(--border);border-radius:11px;padding:16px;margin:14px 0}
 .demo-t{font-size:12.5px;font-weight:700;color:var(--muted);letter-spacing:.03em;margin-bottom:10px}
 .demo svg{display:block;width:100%;height:auto;overflow:visible}
@@ -156,21 +178,81 @@ main{padding-top:22px;min-width:0}
 .seg button{background:var(--surface);border:0;padding:7px 14px;font-size:13px;cursor:pointer}
 .seg button[aria-pressed="true"]{background:var(--accent);color:#fff;font-weight:650}
 
-/* 기법 카드 */
+.quiz{background:var(--surface);border:1px solid var(--accent);border-radius:var(--radius);
+  padding:20px 24px;margin:18px 0 14px;box-shadow:var(--shadow)}
+.quiz-h{font-size:15.5px;font-weight:700;margin-bottom:4px;display:flex;align-items:center;gap:8px}
+.quiz-sub{font-size:12.5px;color:var(--muted);margin-bottom:16px}
+.qitem{margin-bottom:18px}
+.qitem:last-of-type{margin-bottom:0}
+.qq{font-size:14.5px;font-weight:650;margin-bottom:9px}
+.qq .qn{color:var(--accent-ink);margin-right:5px}
+.qopts{display:flex;flex-direction:column;gap:7px}
+.qopt{text-align:left;background:var(--surface-2);border:1px solid var(--border);border-radius:9px;
+  padding:10px 14px;font-size:13.5px;cursor:pointer;transition:border-color .13s,background .13s}
+.qopt:hover:not([disabled]){border-color:var(--border-strong)}
+.qopt[data-state="ok"]{background:color-mix(in srgb,var(--good) 14%,transparent);
+  border-color:var(--good);font-weight:650}
+.qopt[data-state="no"]{background:color-mix(in srgb,var(--crit) 12%,transparent);border-color:var(--crit)}
+.qopt[disabled]{cursor:default}
+.qwhy{display:none;margin-top:9px;font-size:13px;line-height:1.7;background:var(--surface-2);
+  border-left:3px solid var(--accent);border-radius:0 8px 8px 0;padding:11px 14px;color:var(--text-2)}
+.qwhy.on{display:block}
+.qwhy b{color:var(--text)}
+.qscore{margin-top:14px;padding-top:13px;border-top:1px solid var(--border);
+  font-size:13.5px;font-weight:650;color:var(--text-2)}
+
+.case{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);
+  padding:22px 24px;margin-bottom:16px;box-shadow:var(--shadow);scroll-margin-top:78px}
+.case-h{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:6px}
+.case-h h3{font-size:17.5px;font-weight:700}
+.case-tag{font-size:11.5px;font-weight:700;color:var(--accent-ink);background:var(--accent-wash);
+  border-radius:999px;padding:3px 10px}
+.case-sit{font-size:14px;color:var(--text-2);background:var(--surface-2);border-radius:10px;
+  padding:13px 16px;margin:10px 0 16px;line-height:1.7}
+.case-sit b{color:var(--text)}
+.steps{position:relative;padding-left:30px}
+.steps::before{content:"";position:absolute;left:9px;top:6px;bottom:16px;width:2px;background:var(--border)}
+.step{position:relative;margin-bottom:16px}
+.step::before{content:"";position:absolute;left:-26px;top:5px;width:12px;height:12px;border-radius:50%;
+  background:var(--accent);border:2px solid var(--surface)}
+.step .st{font-size:14px;font-weight:700;margin-bottom:3px}
+.step .sv{font-size:13.5px;color:var(--text-2);line-height:1.7}
+.step .sv b{color:var(--text)}
+.step .sn{font-size:13.5px;line-height:1.7;margin-top:4px}
+.case-lesson{background:color-mix(in srgb,var(--good) 10%,transparent);
+  border:1px solid color-mix(in srgb,var(--good) 35%,transparent);border-radius:10px;
+  padding:13px 16px;margin-top:6px;font-size:13.5px;line-height:1.75}
+.case-lesson b{color:var(--good-ink)}
+
 .mod-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(268px,1fr));gap:12px}
 .mcard{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:16px 17px;
   box-shadow:var(--shadow);display:flex;flex-direction:column;gap:7px}
 .mcard h4{font-size:14.5px;font-weight:700;display:flex;align-items:center;gap:8px}
-.mcard .when{font-size:12.5px;color:var(--text-2);line-height:1.6}
-.mcard .read{font-size:12.5px;color:var(--text-2);line-height:1.6;
-  background:var(--surface-2);border-radius:8px;padding:9px 11px}
+.mcard .when,.mcard .read{font-size:12.5px;color:var(--text-2);line-height:1.6}
+.mcard .read{background:var(--surface-2);border-radius:8px;padding:9px 11px}
 .mcard .read b{color:var(--text)}
 .mcard .trap{font-size:12.5px;line-height:1.6;color:var(--crit)}
 .mcard a.go{margin-top:auto;font-size:12.5px;font-weight:650;text-decoration:none;
   color:var(--accent-ink);background:var(--accent-wash);border-radius:8px;padding:7px 11px;text-align:center}
 .mcard a.go:hover{background:color-mix(in srgb,var(--accent) 18%,transparent)}
 
-/* 심화 자료 */
+.ds-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:14px}
+.ds{background:var(--surface);border:1px solid var(--border);border-radius:13px;padding:18px 20px;
+  box-shadow:var(--shadow);display:flex;flex-direction:column;gap:8px}
+.ds h4{font-size:15.5px;font-weight:700;display:flex;align-items:center;gap:9px;flex-wrap:wrap}
+.ds .meta{font-size:11.5px;color:var(--muted);font-weight:600}
+.ds .desc{font-size:13.5px;color:var(--text-2);line-height:1.65}
+.ds .hid{background:var(--surface-2);border-radius:9px;padding:11px 13px;font-size:12.5px;
+  color:var(--text-2);line-height:1.7}
+.ds .hid b{color:var(--text)}
+.ds .hid .t{font-size:11.5px;font-weight:700;color:var(--muted);display:block;margin-bottom:5px}
+.ds .acts{display:flex;gap:8px;flex-wrap:wrap;margin-top:auto;padding-top:6px;align-items:center}
+.ds .dl{font-size:13px;font-weight:650;text-decoration:none;background:var(--accent);color:#fff;
+  border-radius:9px;padding:8px 14px}
+.ds .dl:hover{filter:brightness(1.08)}
+.ds .mod-link{font-size:12.5px;text-decoration:none;color:var(--accent-ink);background:var(--accent-wash);
+  border:1px solid color-mix(in srgb,var(--accent) 28%,transparent);border-radius:999px;padding:6px 12px}
+
 .res-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:10px}
 .res{display:flex;align-items:center;gap:10px;background:var(--surface);border:1px solid var(--border);
   border-radius:10px;padding:12px 14px;text-decoration:none;color:inherit;font-size:13.5px;
@@ -181,10 +263,6 @@ main{padding-top:22px;min-width:0}
 
 .footer{grid-column:1/-1;margin-top:20px;padding-top:22px;border-top:1px solid var(--border);
   color:var(--muted);font-size:12.5px;text-align:center;line-height:1.9}
-.tocbtn{display:none}
-@media (max-width:940px){
-  .tocbtn{display:inline-grid}
-}
 </style>
 </head>
 <body>
@@ -204,19 +282,23 @@ main{padding-top:22px;min-width:0}
 
 <div class="wrap">
   <section class="hero">
-    <h1>데이터를 한 번도 다뤄본 적 없어도 괜찮습니다.</h1>
-    <p>수식은 쓰지 않습니다. <strong>실무에서 실제로 틀리는 지점</strong>만 골라, 왜 그런지 눈으로 확인하고
-       바로 실습까지 이어지도록 만들었습니다. 순서대로 읽으시면 됩니다.</p>
-    <div class="hero-meta">
-      <span class="pill" id="pillCount">📘 강의 준비 중…</span>
-      <span class="pill">🖐️ 직접 만져보는 예제 3개</span>
-      <span class="pill">🔗 강의마다 실습 링크</span>
-      <span class="pill" id="pillTime">⏱️</span>
-    </div>
+    <h1>데이터가 처음인 분부터,<br>수식으로 검증하고 싶은 분까지.</h1>
+    <p>1~5장은 수식 없이 <strong>실무에서 실제로 틀리는 지점</strong>만 다룹니다.
+       6장부터는 그 뒤에 있는 <strong>실제 수학</strong>을 기호 하나씩 풀어서 설명합니다.
+       필요한 곳부터 보시면 됩니다.</p>
+    <div class="hero-meta" id="heroMeta"></div>
     <div class="progress-bar"><i id="progFill"></i></div>
     <p style="font-size:12.5px;color:var(--muted);margin-top:7px">
-      <span id="progText">0 / 21 강의 완료</span> · 읽은 강의는 자동으로 기억됩니다
+      <span id="progText">0 / 0 강의 완료</span> · 읽은 강의는 자동으로 기억됩니다
     </p>
+    <div class="tracks">
+      <a class="track" href="#ch1" style="--tc:var(--s3)">
+        <b>🌱 처음이신가요</b><span>1~5장을 순서대로. 수식은 하나도 나오지 않습니다.</span></a>
+      <a class="track" href="#ch6" style="--tc:var(--math)">
+        <b>📐 수학까지 보고 싶다면</b><span>6장. 평균의 정의부터 편향-분산 분해까지 14강.</span></a>
+      <a class="track" href="#ch7" style="--tc:var(--s2)">
+        <b>🗂️ 실전 흐름이 궁금하다면</b><span>7장 케이스 스터디. 처음부터 끝까지 따라가 봅니다.</span></a>
+    </div>
   </section>
 
   <nav class="toc" aria-label="목차">
@@ -232,419 +314,70 @@ main{padding-top:22px;min-width:0}
   </div>
 </div>
 
+<script src="learn-content.js"></script>
 <script>
 "use strict";
 const $ = (s, r=document) => r.querySelector(s);
 const $$ = (s, r=document) => Array.from(r.querySelectorAll(s));
 const esc = s => String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-
-/* 실습 링크: 해당 분석을 미리 골라 둔 채 포털을 엽니다. */
 const go = (mod, label) => `<a href="portal.html?mod=${mod}&demo=1">▶ ${esc(label)}</a>`;
 
-/* ═══════════════════════════════════════════════════════════════
-   교육 콘텐츠
-   ═══════════════════════════════════════════════════════════════ */
-const CURRICULUM = [
-{ id:'ch1', num:'1장', title:'시작하기 전에',
-  desc:'분석 도구를 켜기 전에, 데이터가 무엇인지부터 정리합니다. 여기서 어긋나면 뒤가 전부 어긋납니다.',
-  lessons:[
-  { id:'l1-1', title:'데이터 분석이 실제로 하는 일',
-    body:`<p>데이터는 <b>지나간 일의 기록</b>일 뿐입니다. 분석은 그 기록에서 되풀이되는 규칙을 찾아
-      <b>다음 결정을 조금 덜 틀리게</b> 만드는 일입니다. 정답을 알려주는 마법이 아닙니다.</p>
-      <p>그래서 분석 결과는 늘 이런 형태입니다. “<b>지금까지의 기록을 보면</b> 온도가 높을 때 불량이 늘었다.
-      따라서 <b>아마도</b> 온도를 낮추면 도움이 될 것이다.”</p>
-      <div class="ex"><b>분석으로 답할 수 없는 것</b><br>
-        · 과거에 한 번도 없던 일 (신제품 첫 출시 물량)<br>
-        · 기록되지 않은 것 (작업자의 컨디션, 원자재 미묘한 차이)<br>
-        · 가치 판단 (“불량률과 생산량 중 뭐가 더 중요한가”)</div>
-      <div class="keybox"><b>기억할 것</b> — 분석은 <b>판단을 대신해 주지 않고, 판단의 근거를 줍니다.</b></div>` },
-
-  { id:'l1-2', title:'표(테이블)의 구조 — 행 하나가 무엇인가',
-    body:`<p>분석하는 데이터는 거의 항상 <b>표</b> 형태입니다. 표에서 가장 중요한 질문은 하나입니다.
-      <b>“이 표의 한 줄(행)은 무엇 하나를 뜻하는가?”</b></p>
-      <ul>
-        <li><b>행(row)</b> — 하나의 사건·대상. 예: “2024년 1월 3일 A라인의 하루 기록”</li>
-        <li><b>열(column)</b> — 그 대상의 속성. 예: 생산량, 설비온도, 불량여부</li>
-      </ul>
-      <p>이게 흐릿하면 분석이 통째로 무의미해집니다. 어떤 행은 하루치, 어떤 행은 한 달치가 섞여 있으면
-      평균을 내도 뜻이 없습니다.</p>
-      <div class="ex"><b>좋은 예</b> — 한 행 = 하루 × 한 라인 (날짜, 라인, 생산량, 수율)<br>
-        <b>나쁜 예</b> — 어떤 행은 일별, 어떤 행은 월 합계, 맨 아래엔 총계 행까지 섞임</div>
-      <div class="warnbox">⚠️ 엑셀에서 흔한 실수: <b>맨 아래 “합계” 행</b>을 그대로 두고 올리는 것.
-        합계 행이 하나의 데이터처럼 계산돼 결과를 왜곡합니다. 지우고 올리세요.</div>` },
-
-  { id:'l1-3', title:'분석할 수 있는 파일 만들기 (CSV)',
-    body:`<p>포털은 <b>CSV</b> 파일을 받습니다. 엑셀에서 <b>[파일] → [다른 이름으로 저장] → 형식을
-      “CSV UTF-8(쉼표로 분리)”</b> 로 고르면 됩니다. 한글이 깨질까 걱정하지 않으셔도 됩니다 —
-      포털이 한국 엑셀 형식(cp949)도 자동으로 알아봅니다.</p>
-      <p>다음 다섯 가지만 지키면 대부분의 문제가 사라집니다.</p>
-      <ol>
-        <li><b>첫 줄은 컬럼 이름</b> — 제목이나 로고, 설명 줄이 위에 있으면 안 됩니다.</li>
-        <li><b>병합된 셀 없애기</b> — 표에서 병합 셀은 빈칸으로 바뀝니다.</li>
-        <li><b>한 칸에 한 값</b> — <code>25℃/60%</code> 처럼 두 값을 한 칸에 넣지 마세요.</li>
-        <li><b>숫자 칸에는 숫자만</b> — <code>측정불가</code>, <code>-</code>, <code>N/A</code> 는 그냥 <b>빈칸</b>으로 두세요.</li>
-        <li><b>한 시트에 표 하나</b> — 여러 표가 나란히 있으면 인식되지 않습니다.</li>
-      </ol>
-      <div class="keybox"><b>확신이 안 서면</b> 포털의 <b>데이터 품질 진단</b>을 먼저 돌려 보세요.
-        무엇이 잘못됐는지 점수와 목록으로 알려 줍니다.</div>`,
-    try:[['data_quality','데이터 품질 진단 해보기']] },
-]},
-
-{ id:'ch2', num:'2장', title:'숫자를 읽는 눈',
-  desc:'평균 하나만 보고 결정하다 사고가 납니다. 숫자 하나 뒤에 숨은 것을 보는 법입니다.',
-  lessons:[
-  { id:'l2-1', title:'평균의 함정 — 직접 확인해 보세요',
-    body:`<p>아래는 어느 팀 10명의 월급입니다. <b>맨 오른쪽 한 사람의 월급만</b> 슬라이더로 바꿔 보세요.
-      평균(파란 선)과 중앙값(초록 선)이 어떻게 다르게 움직이는지 보십시오.</p>
-      <div class="demo">
-        <div class="demo-t">팀원 10명의 월급 (만원)</div>
-        <svg id="meanSvg" viewBox="0 0 600 190" role="img" aria-label="평균과 중앙값 비교 그래프"></svg>
-        <div class="ctl">
-          <label for="meanSlider" style="flex:none">한 사람의 월급</label>
-          <input type="range" id="meanSlider" min="300" max="5000" step="50" value="400">
-          <span class="readout" id="meanOut"></span>
-        </div>
-      </div>
-      <p><b>평균</b>은 한 명의 극단값에 크게 끌려갑니다. <b>중앙값</b>(줄 세웠을 때 한가운데 값)은
-      거의 움직이지 않습니다.</p>
-      <div class="ex"><b>실무에서</b> — “우리 팀 평균 연봉은 높습니다”가 사실이어도, 대다수는 그보다 훨씬 적게
-        받을 수 있습니다. 처리시간·수리비·체류시간처럼 <b>한쪽으로 긴 꼬리가 있는 값</b>은 반드시
-        중앙값을 함께 보세요.</div>
-      <div class="keybox"><b>기억할 것</b> — 값이 한쪽으로 쏠려 있으면 <b>평균보다 중앙값</b>이 현실에 가깝습니다.</div>`,
-    try:[['eda_summary','내 데이터의 평균·중앙값 보기']] },
-
-  { id:'l2-2', title:'평균이 같아도 전혀 다른 데이터',
-    body:`<p>두 설비의 평균 수율이 똑같이 95%라고 해봅시다. 그런데 A설비는 매일 94~96%,
-      B설비는 어떤 날은 80%, 어떤 날은 100%입니다. 평균은 같지만 <b>완전히 다른 상황</b>입니다.</p>
-      <p>이 “들쭉날쭉한 정도”를 <b>표준편차</b>라고 부릅니다. 클수록 예측하기 어렵고 관리가 안 되는 상태입니다.</p>
-      <div class="ex"><b>왜 중요한가</b> — 평균 95%인 B설비는 언젠가 80%인 날이 또 옵니다.
-        고객 납기를 맞추려면 <b>평균이 아니라 나쁜 날 기준</b>으로 계획해야 합니다.</div>
-      <div class="keybox"><b>기억할 것</b> — 평균은 “보통 어디쯤”, 표준편차는 “얼마나 흔들리는지”.
-        <b>둘을 항상 같이 보세요.</b></div>`,
-    try:[['spc_control','공정이 얼마나 흔들리는지 보기']] },
-
-  { id:'l2-3', title:'이상치 — 지울 것인가, 봐야 할 것인가',
-    body:`<p>다른 값들과 동떨어진 값을 <b>이상치</b>라고 합니다. 초보자가 가장 많이 하는 실수는
-      <b>이상치를 발견하자마자 지우는 것</b>입니다.</p>
-      <ul>
-        <li><b>지워야 하는 이상치</b> — 입력 실수. 체온 <code>365</code>℃, 나이 <code>999</code>세.</li>
-        <li><b>절대 지우면 안 되는 이상치</b> — 진짜로 일어난 사건. 설비가 실제로 튄 그날의 기록.</li>
-      </ul>
-      <p>대부분의 경우 <b>이상치가 바로 우리가 찾던 것</b>입니다. 불량이 난 날, 사고가 난 순간이
-      이상치로 나타납니다. 그걸 지우면 분석할 이유 자체가 사라집니다.</p>
-      <div class="warnbox">⚠️ 판단이 안 서면 <b>지우지 말고 표시만</b> 하세요. 포털의 품질 진단에서
-        이상치 처리를 “표시만 하기”로 두는 것이 기본값인 이유입니다.</div>`,
-    try:[['anomaly_iforest','이상치 찾아보기']] },
-
-  { id:'l2-4', title:'비율의 함정 — 분모를 보세요',
-    body:`<p>“C라인 불량률 100%!” — 그런데 그날 C라인은 <b>2개만 생산</b>했고 2개가 불량이었습니다.
-      A라인은 10,000개 중 300개 불량으로 3%입니다. 어느 쪽이 더 급한 문제일까요?</p>
-      <p>비율은 <b>분모가 작으면 미친 듯이 흔들립니다.</b> 비율만 보고 순위를 매기면 거의 항상
-      “표본이 적은 것”이 1등이 됩니다.</p>
-      <div class="ex"><b>실무 규칙</b> — 비율을 볼 때는 <b>항상 건수를 옆에 같이</b> 두세요.
-        분모가 30 미만이면 비율을 신뢰하지 마세요.</div>
-      <div class="keybox"><b>기억할 것</b> — 퍼센트만 있는 표는 위험합니다. <b>분모(건수)를 요구하세요.</b></div>`,
-    try:[['pareto','건수 기준으로 우선순위 보기']] },
-
-  { id:'l2-5', title:'데이터가 적으면 아무 말도 할 수 없습니다',
-    body:`<p>동전을 4번 던져 앞면이 3번 나왔다고 “이 동전은 앞면이 잘 나온다”고 할 수 없습니다.
-      우연히 그럴 확률이 충분히 높기 때문입니다.</p>
-      <p>데이터 분석도 같습니다. <b>같은 데이터라도 개수가 적으면 결론을 못 냅니다.</b>
-      분석 도구는 데이터가 적어도 어떻게든 숫자를 뱉어내므로, 사람이 조심해야 합니다.</p>
-      <div class="ex"><b>대략의 기준</b><br>
-        · 그룹 비교: 각 그룹 최소 30건 (적을수록 큰 차이만 감지 가능)<br>
-        · 예측 모델: 최소 수백 건, 항목 수의 10배 이상<br>
-        · 시계열 예측: 계절 패턴을 보려면 최소 2주기 (연간 패턴 → 2년치)</div>
-      <div class="keybox"><b>기억할 것</b> — 결론이 안 나는 것도 정당한 결론입니다.
-        “<b>지금 데이터로는 알 수 없다</b>”고 말할 수 있어야 합니다.</div>` },
-]},
-
-{ id:'ch3', num:'3장', title:'관계를 읽는 눈',
-  desc:'“A 때문에 B다”라고 말하려면 무엇이 필요한지. 실무에서 가장 많은 오판이 나오는 영역입니다.',
-  lessons:[
-  { id:'l3-1', title:'상관관계란 무엇인가 — 직접 움직여 보세요',
-    body:`<p>두 값이 얼마나 함께 움직이는지를 <b>-1 ~ +1</b> 사이 숫자로 나타낸 것이 <b>상관계수</b>입니다.
-      슬라이더를 움직여 점들이 어떻게 변하는지 보세요.</p>
-      <div class="demo">
-        <div class="demo-t">설비온도(가로) 와 불량률(세로)</div>
-        <svg id="corrSvg" viewBox="0 0 600 260" role="img" aria-label="상관관계 산점도"></svg>
-        <div class="ctl">
-          <label for="corrSlider" style="flex:none">상관계수</label>
-          <input type="range" id="corrSlider" min="-100" max="100" step="5" value="70">
-          <span class="readout" id="corrOut"></span>
-        </div>
-      </div>
-      <ul>
-        <li><b>+1 에 가까움</b> — 하나가 오르면 다른 것도 같이 오름</li>
-        <li><b>0 근처</b> — 서로 상관없음 (점들이 구름처럼 퍼짐)</li>
-        <li><b>-1 에 가까움</b> — 하나가 오르면 다른 것은 내려감</li>
-      </ul>
-      <div class="warnbox">⚠️ 상관계수는 <b>직선 관계만</b> 잡아냅니다. “적당한 온도에서 가장 좋고 너무
-        낮거나 높으면 나쁜” U자 관계는 상관계수가 0에 가깝게 나옵니다. <b>그래프를 꼭 눈으로 보세요.</b></div>`,
-    try:[['eda_corr','내 데이터의 상관관계 보기']] },
-
-  { id:'l3-2', title:'상관관계는 인과관계가 아닙니다',
-    body:`<p>이 문장은 데이터 분석에서 가장 많이 인용되고, 가장 많이 무시됩니다.</p>
-      <p>아이스크림 판매량과 익사 사고는 강한 상관관계가 있습니다. 아이스크림이 익사를 부를까요?
-      아닙니다. <b>여름</b>이라는 제3의 원인이 둘 다를 끌어올린 것입니다.</p>
-      <p>A와 B가 함께 움직일 때 가능한 설명은 최소 네 가지입니다.</p>
-      <ol>
-        <li>A가 B의 원인이다</li>
-        <li>B가 A의 원인이다 <span style="color:var(--muted)">(방향이 반대일 수 있습니다)</span></li>
-        <li>C가 A와 B 둘 다의 원인이다 <span style="color:var(--muted)">(숨은 변수)</span></li>
-        <li>우연이다 <span style="color:var(--muted)">(항목을 많이 보면 반드시 생깁니다)</span></li>
-      </ol>
-      <div class="ex"><b>현장 예시</b> — “야근이 많은 날 불량이 늘었다” → 야근이 원인일 수도 있지만,
-        <b>납기가 급한 날</b>이라 야근도 하고 서두르다 불량도 난 것일 수 있습니다.</div>
-      <div class="keybox"><b>기억할 것</b> — 상관관계는 <b>“여기를 더 파봐라”는 힌트</b>이지 결론이 아닙니다.</div>` },
-
-  { id:'l3-3', title:'숨은 변수와 심슨의 역설 — 결론이 뒤집힙니다',
-    body:`<p>가장 무서운 함정입니다. <b>전체로 보면 A가 나쁜데, 조건별로 나눠 보면 A가 모든 구간에서 좋은</b>
-      경우가 실제로 생깁니다. 아래 버튼을 눌러 직접 확인해 보세요.</p>
-      <div class="demo">
-        <div class="demo-t">신형 설비 vs 구형 설비의 수율</div>
-        <svg id="simpsonSvg" viewBox="0 0 600 250" role="img" aria-label="심슨의 역설 예시"></svg>
-        <div class="ctl">
-          <div class="seg" role="group" aria-label="보기 방식">
-            <button type="button" id="simpAll" aria-pressed="true">전체로 보기</button>
-            <button type="button" id="simpSplit" aria-pressed="false">온도별로 나눠 보기</button>
-          </div>
-          <span class="readout" id="simpOut"></span>
-        </div>
-      </div>
-      <p>왜 이런 일이 생길까요? <b>신형 설비를 주로 어려운 고온 조건에 투입했기 때문</b>입니다.
-      조건이 불리하니 성적이 나빠 보였을 뿐, 같은 온도에서 비교하면 신형이 더 좋습니다.</p>
-      <div class="warnbox">⚠️ 이걸 모르고 “신형이 나쁘다”며 철수시키는 일이 현장에서 실제로 벌어집니다.
-        <b>비교할 때는 항상 “두 그룹의 조건이 같았나?”를 먼저 물으세요.</b></div>`,
-    try:[['confound_check','교란변수 점검 해보기']] },
-
-  { id:'l3-4', title:'p값 — 무엇을 말하고, 무엇을 말하지 않는가',
-    body:`<p>두 그룹의 평균이 다르게 나왔을 때, 그게 <b>진짜 차이인지 그냥 운인지</b> 판단하는 도구가
-      p값입니다.</p>
-      <p><b>p값 = 실제로는 차이가 없는데, 우연히 이만한 차이가 보일 확률.</b>
-      보통 0.05(5%)보다 작으면 “우연으로 보기 어렵다 = 진짜 차이”로 판단합니다.</p>
-      <div class="ex"><b>p = 0.03 의 뜻</b><br>
-        ✅ “차이가 없는데 이런 결과가 나올 확률이 3%다” → 우연치고는 드무니 진짜 차이로 보자<br>
-        ❌ “A가 옳을 확률이 97%다” (아님)<br>
-        ❌ “차이가 크다” (아님 — <b>크기는 p값이 말해주지 않습니다</b>)</div>
-      <p>데이터가 아주 많으면 <b>의미 없이 작은 차이도 p값이 작게</b> 나옵니다. 그래서 p값과 함께
-      <b>차이의 크기</b>를 반드시 봐야 합니다. 수율이 0.01%p 차이라면 통계적으로 유의해도 현장에선 무의미합니다.</p>
-      <div class="keybox"><b>기억할 것</b> — p값은 “<b>우연인가?</b>”에만 답합니다.
-        “<b>중요한가?</b>”는 사람이 판단합니다.</div>`,
-    try:[['compare_groups','그룹 차이 검정 해보기']] },
-]},
-
-{ id:'ch4', num:'4장', title:'시간을 읽는 눈',
-  desc:'날짜가 있는 데이터는 규칙이 다릅니다. 시계열에서만 통하는 사고방식입니다.',
-  lessons:[
-  { id:'l4-1', title:'시계열은 세 조각으로 되어 있습니다',
-    body:`<p>날짜별로 오르내리는 데이터는 보통 세 가지가 겹쳐 있습니다.</p>
-      <ul>
-        <li><b>추세</b> — 길게 보았을 때의 방향. 계속 늘고 있는지, 줄고 있는지.</li>
-        <li><b>계절성</b> — 일정한 주기로 반복되는 패턴. 주말마다 낮아지는 것, 여름마다 높아지는 것.</li>
-        <li><b>잡음</b> — 설명되지 않는 나머지 흔들림.</li>
-      </ul>
-      <p>이걸 분리해야 제대로 읽힙니다. “이번 주 매출이 지난주보다 낮다”가 나쁜 신호일까요?
-      <b>원래 매주 그 요일이 낮다면</b> 아무 일도 아닙니다.</p>
-      <div class="ex"><b>흔한 오해</b> — 전월 대비 감소를 보고 놀라는 경우. 2월은 날짜 수가 적어
-        거의 항상 1월보다 낮습니다. <b>작년 같은 달과 비교</b>하는 것이 맞습니다.</div>`,
-    try:[['ts_smooth','추세·계절 분리해 보기']] },
-
-  { id:'l4-2', title:'예측이 “맞았다”는 것의 의미',
-    body:`<p>예측은 하나의 숫자가 아니라 <b>범위</b>로 나옵니다. “다음 달 1,200개, 가능 범위 1,050~1,350”
-      같은 식입니다. 이 범위가 넓다는 것은 <b>확신이 덜하다</b>는 뜻입니다.</p>
-      <p>예측 정확도는 보통 <b>MAPE</b>(평균 오차율)로 봅니다. 과거 시점으로 돌아가 “그때 예측했다면
-      얼마나 맞았을까”를 계산한 값입니다.</p>
-      <div class="ex"><b>MAPE 읽는 법</b><br>
-        · 10% 미만 — 매우 우수, 실무에 바로 쓸 만함<br>
-        · 10~20% — 양호, 참고 지표로 충분<br>
-        · 20~50% — 방향성 참고용<br>
-        · 50% 이상 — 신뢰하기 어려움</div>
-      <div class="keybox"><b>기억할 것</b> — 계획을 세울 때는 예측값 하나가 아니라
-        <b>범위의 아래쪽(보수적인 경우)</b>도 함께 보세요.</div>`,
-    try:[['ts_forecast','미래 예측 해보기']] },
-
-  { id:'l4-3', title:'예측이 반드시 실패하는 순간',
-    body:`<p>예측 모델은 <b>“과거의 패턴이 앞으로도 계속된다”</b>는 가정 위에 서 있습니다.
-      이 가정이 깨지면 아무리 좋은 모델도 틀립니다.</p>
-      <ul>
-        <li>신제품 출시, 대형 거래처 이탈</li>
-        <li>설비 교체, 공정 변경</li>
-        <li>법·정책 변화, 예상치 못한 사건</li>
-      </ul>
-      <p>또 하나 — <b>너무 먼 미래를 예측하지 마세요.</b> 1년치 데이터로 3년 뒤를 예측하는 것은
-      의미가 없습니다. 대략 <b>가진 데이터 기간의 1/4 이내</b>가 안전합니다.</p>
-      <div class="warnbox">⚠️ 예측이 크게 빗나갔다면 모델을 탓하기 전에 <b>“과거에 없던 일이 있었나?”</b>를
-        먼저 확인하세요. 대부분 거기에 답이 있습니다.</div>` },
-]},
-
-{ id:'ch5', num:'5장', title:'예측 모델 이해하기',
-  desc:'기계학습이 무엇을 하는지, 그리고 왜 “정확도 99%”를 의심해야 하는지.',
-  lessons:[
-  { id:'l5-1', title:'모델은 왜 데이터를 나눠서 배우나',
-    body:`<p>모델을 만들 때는 데이터를 <b>학습용(보통 80%)</b>과 <b>검증용(20%)</b>으로 나눕니다.
-      학습용으로 배우게 하고, <b>한 번도 안 본</b> 검증용으로 시험을 칩니다.</p>
-      <p>왜 굳이 나눌까요? 배운 문제로 시험을 보면 누구나 100점이기 때문입니다. 실력을 알려면
-      <b>처음 보는 문제</b>로 시험해야 합니다.</p>
-      <div class="ex"><b>주의</b> — 시계열 데이터는 무작위로 나누면 안 됩니다.
-        미래 데이터로 배워 과거를 맞히는 꼴이 되기 때문입니다. 반드시 <b>시간 순서대로</b> 잘라야 합니다.
-        (포털의 시계열 예측은 자동으로 그렇게 합니다)</div>` },
-
-  { id:'l5-2', title:'과적합 — 답을 외운 모델',
-    body:`<p>학습 데이터에서는 성적이 완벽한데 새 데이터에서는 형편없는 상태를 <b>과적합</b>이라고 합니다.
-      문제를 이해한 게 아니라 <b>답을 통째로 외운</b> 학생과 같습니다.</p>
-      <p>이렇게 알아챕니다.</p>
-      <ul>
-        <li>학습 성적 99%, 검증 성적 60% → 명백한 과적합</li>
-        <li>데이터는 100건인데 항목이 50개 → 외우기 쉬운 조건</li>
-        <li>결과가 “너무 완벽함” → 대개 뭔가 잘못됐습니다</li>
-      </ul>
-      <div class="warnbox">⚠️ 가장 흔한 원인은 <b>정답이 입력에 섞여 든 경우</b>입니다.
-        예: 불량 여부를 예측하는데 “불량 사유” 컬럼이 입력에 들어가 있음. 당연히 100% 맞힙니다.
-        결과가 지나치게 좋으면 <b>입력 컬럼부터 확인</b>하세요.</div>`,
-    try:[['regress_rf','예측 모델 만들어 보기']] },
-
-  { id:'l5-3', title:'“중요도가 높다”는 원인이라는 뜻이 아닙니다',
-    body:`<p>모델이 알려주는 <b>변수 중요도</b>는 “이 항목을 가리면 예측이 얼마나 나빠지는가”를 뜻합니다.
-      <b>예측에 유용하다</b>는 말이지, <b>원인이다</b>는 말이 아닙니다.</p>
-      <div class="ex"><b>예시</b> — 화재 규모를 예측하는데 “출동한 소방차 수”가 가장 중요한 변수로 나옵니다.
-        소방차가 화재를 키운 걸까요? 큰 불이라 많이 출동한 것입니다.</div>
-      <p>그래서 중요도 상위 항목은 <b>“여기를 조사해 보라”는 목록</b>으로 쓰고,
-      실제로 바꾸기 전에는 소규모 시험으로 확인해야 합니다.</p>
-      <div class="keybox"><b>기억할 것</b> — 중요도 → 가설. 가설 → 실험. 실험 → 결론.
-        <b>중간을 건너뛰지 마세요.</b></div>`,
-    try:[['classify_xgb','판정 근거 항목 보기']] },
-]},
-
-{ id:'ch6', num:'6장', title:'분석별 사용 설명서',
-  desc:'포털의 15가지 분석을 언제 쓰고, 결과를 어떻게 읽고, 무엇을 조심할지 한 장씩 정리했습니다.',
-  lessons:[] },
-
-{ id:'ch7', num:'7장', title:'심화 자료 — 시계열 인포그래픽',
-  desc:'시계열 분석을 더 깊이 보고 싶은 분을 위한 자료입니다. 파이썬 코드와 함께 개념을 설명합니다.',
-  lessons:[] },
-];
-
-/* 6장 — 분석 기법 카드 */
-const MODCARDS = [
-{ g:'데이터 준비', items:[
-  { id:'data_merge', icon:'🧬', name:'여러 파일 합치기',
-    when:'설비로그·생산실적·검사결과가 각각 다른 파일로 있을 때',
-    read:'<b>일치율</b>을 가장 먼저 보세요. 90% 아래면 뭔가 어긋난 것입니다.',
-    trap:'날짜가 한쪽은 생산일, 다른 쪽은 검사일이면 붙여도 의미가 없습니다.' },
-  { id:'definition_check', icon:'🔍', name:'정의·단위 일관성 점검',
-    when:'여러 라인·기간의 데이터를 한 표로 모아 비교하기 전에',
-    read:'“확인 질문” 목록을 <b>현장 담당자에게 그대로</b> 물어보세요.',
-    trap:'여기서 아무것도 안 나와도 정의가 맞다는 보장은 아닙니다.' },
-  { id:'data_quality', icon:'🧹', name:'데이터 품질 진단·정제',
-    when:'데이터를 처음 받았을 때, 결과가 이상할 때',
-    read:'가장 낮은 점수 항목부터 고치세요. 완전성 → 유일성 순으로 영향이 큽니다.',
-    trap:'이상치 “제거”를 함부로 켜지 마세요. 기본값(표시만)이 안전합니다.' },
-]},
-{ g:'전체 파악', items:[
-  { id:'eda_summary', icon:'📋', name:'데이터 자동 요약',
-    when:'무엇부터 할지 모르겠을 때. 언제나 첫 번째로.',
-    read:'결측 비율과 “값이 하나뿐인 컬럼”을 먼저 확인하세요.',
-    trap:'왜도(치우침)가 큰 컬럼은 평균이 아니라 중앙값으로 보세요.' },
-  { id:'eda_corr', icon:'🔗', name:'상관관계 히트맵',
-    when:'무엇이 무엇과 관련 있는지 후보를 찾을 때',
-    read:'|상관계수| 0.7 이상이면 강한 관계. 0.9 이상이면 사실상 같은 정보입니다.',
-    trap:'상관은 인과가 아닙니다. U자 관계는 잡아내지 못합니다.' },
-]},
-{ g:'비교·검정', items:[
-  { id:'compare_groups', icon:'⚖️', name:'그룹 간 차이 비교',
-    when:'A라인과 B라인 중 어느 쪽이 나은지 판단할 때',
-    read:'p값(우연일 확률)과 <b>차이의 크기</b>를 함께 보세요.',
-    trap:'유의하다고 중요한 건 아닙니다. 데이터가 많으면 사소한 차이도 유의해집니다.' },
-  { id:'confound_check', icon:'🔀', name:'교란변수 점검·층화 비교',
-    when:'그룹 차이를 발견했는데 정말 그 그룹 때문인지 확인할 때',
-    read:'조건을 맞춘 뒤에도 차이가 남는지 보세요. 방향이 뒤집히면 심슨의 역설입니다.',
-    trap:'기록되지 않은 요인은 여전히 확인할 수 없습니다.' },
-]},
-{ g:'시간 흐름', items:[
-  { id:'ts_smooth', icon:'〰️', name:'평활화·트렌드 추출',
-    when:'매일 오르내려서 큰 흐름이 안 보일 때',
-    read:'계절성 강도가 40% 넘으면 반복 패턴이 뚜렷 → 예측이 잘 됩니다.',
-    trap:'평활선은 과거 정리일 뿐, 미래를 알려주지 않습니다.' },
-  { id:'ts_forecast', icon:'🔮', name:'미래 예측 (Prophet)',
-    when:'다음 달 수요·물량을 미리 알아야 할 때',
-    read:'MAPE 10% 미만이면 우수. 예측 범위의 아래쪽도 함께 보세요.',
-    trap:'가진 데이터 기간의 1/4 이상 먼 미래는 예측하지 마세요.' },
-]},
-{ g:'감시·품질', items:[
-  { id:'anomaly_iforest', icon:'🚨', name:'이상치 감지',
-    when:'평소와 다른 기록을 자동으로 찾아내고 싶을 때',
-    read:'“원인 항목 분석”에서 어느 항목이 튀었는지 확인하세요.',
-    trap:'이상점수가 높다고 불량은 아닙니다. 실제 기록과 대조하세요.' },
-  { id:'spc_control', icon:'📐', name:'공정 관리도 (SPC)',
-    when:'수율·치수처럼 일정 수준을 유지해야 하는 값을 감시할 때',
-    read:'Cpk 1.33 이상이면 우수. 관리한계는 규격과 다른 개념입니다.',
-    trap:'매출·생산량처럼 계속 늘어나는 값에는 쓰지 마세요. (포털이 경고합니다)' },
-  { id:'pareto', icon:'📊', name:'파레토 분석',
-    when:'개선할 게 많아서 무엇부터 할지 정해야 할 때',
-    read:'상위 몇 개가 80%를 차지하는지 보세요. 거기부터 손대면 됩니다.',
-    trap:'비율이 아니라 <b>건수</b> 기준으로 보세요. (분모의 함정)' },
-]},
-{ g:'예측 모델', items:[
-  { id:'regress_rf', icon:'🎯', name:'수치 예측 (Random Forest)',
-    when:'여러 조건으로 결과 숫자를 맞히고 싶을 때',
-    read:'설명력 R²가 50% 넘으면 쓸 만합니다. 학습/검증 성적 차이도 보세요.',
-    trap:'중요도는 원인이 아닙니다. 정답이 입력에 섞이지 않았는지 확인하세요.' },
-  { id:'classify_xgb', icon:'🏷️', name:'상태 분류 (XGBoost)',
-    when:'정상/불량처럼 상태를 판정하고 싶을 때',
-    read:'불균형 데이터에서는 정확도 대신 <b>검출률</b>을 보세요.',
-    trap:'불량 1%인 데이터에서 “전부 정상”이라 해도 정확도 99%입니다.' },
-  { id:'cluster_kmeans', icon:'🧩', name:'군집화 (K-Means)',
-    when:'대상을 몇 가지 유형으로 나눠 보고 싶을 때',
-    read:'실루엣 0.5 이상이면 뚜렷하게 나뉜 것입니다.',
-    trap:'정답이 없는 분석입니다. 나온 그룹이 실무적으로 말이 되는지 봐야 합니다.' },
-]},
-];
-
-/* 7장 — 기존 시계열 인포그래픽 */
-const RESOURCES = [
- [0,'시계열 데이터 개요'], [1,'시계열 데이터 첫걸음'], [2,'Python 튜토리얼 환경 설정'],
- [3,'시계열 데이터 인덱스 설정 및 활용'], [4,'탐색적 데이터 분석(EDA)'],
- [5,'EDA Part 2: 기간별 변화율 분석'], [6,'시각화 및 상관관계 분석'],
- [7,'데이터 조작: 결측값 처리 & 핵심 문법'], [8,'시계열 인덱스 및 특징 공학'],
- [9,'계절 분해'], [10,'계절성 시각화'], [11,'계절 분해 (심화)'],
- [12,'자기 상관(Autocorrelation)'], [13,'자기 상관 · 편자기 상관'],
- [14,'편자기 상관(PACF)'], [15,'편자기 상관(PACF) 분석 및 적용'],
-];
-const RES_FILES = {
-  0:'0_시계열 데이터.html', 1:'1_시계열 데이터 첫걸음.html', 2:'2_Python 튜토리얼 환경 설정.html',
-  3:'3_시계열 데이터 인덱스 설정 및 활용.html', 4:'4_시계열 데이터 탐색적 데이터 분석(EDA).html',
-  5:'5_시계열 데이터 EDA Part 2: 기간별 변화율 분석.html',
-  6:'6_시계열 데이터 시각화 및 상관관계 분석.html',
-  7:'7_시계열 데이터 조작: 결측값 처리 & 핵심 문법.html',
-  8:'8_시계열 인덱스 및 특징 공학.html', 9:'9_시계열 데이터 계절 분해.html',
-  10:'10_시계열 데이터 계절성 시각화.html', 11:'11_시계열 데이터 계절 분해.html',
-  12:'12_시계열 데이터 자기 상관(Autocorrelation).html',
-  13:'13_시계열 데이터 자기 상관,편자기 상관.html',
-  14:'14_시계열 데이터 편자기 상관(PACF).html',
-  15:'15_시계열 데이터 편자기 상관(PACF) 분석 및 적용.html',
-};
-
-/* ═══════════════════════════════════════════════════════════════
-   렌더링
-   ═══════════════════════════════════════════════════════════════ */
 let DONE = new Set();
 try{ DONE = new Set(JSON.parse(localStorage.getItem('dap_learn_done') || '[]')); }catch(_){}
 const saveDone = () => { try{ localStorage.setItem('dap_learn_done', JSON.stringify([...DONE])); }catch(_){} };
 
-function lessonHTML(l, idx){
+function lessonHTML(l, idx, isMath){
   const tries = (l.try || []).map(([m, label]) => go(m, label)).join('');
-  return `<article class="lesson" id="${l.id}">
+  return `<article class="lesson${isMath ? ' math' : ''}" id="${l.id}">
     <h3><span class="n">${idx}</span> ${esc(l.title)}</h3>
     ${l.body}
     <div class="try">
-      ${tries ? `<span class="try-label">바로 해보기</span>${tries}` : '<span class="try-label">개념 강의</span>'}
+      ${tries ? `<span class="try-label">바로 해보기</span>${tries}`
+              : `<span class="try-label">${isMath ? '수학 강의' : '개념 강의'}</span>`}
       <button type="button" class="done-btn" data-done="${l.id}" aria-pressed="false">읽음 표시</button>
     </div>
   </article>`;
 }
 
-function modCardsHTML(){
+function quizHTML(chId){
+  const qs = QUIZ[chId];
+  if (!qs) return '';
+  return `<div class="quiz" data-quiz="${chId}">
+    <div class="quiz-h">✅ 확인 문제</div>
+    <div class="quiz-sub">답을 고르면 바로 채점되고 해설이 나옵니다. 틀려도 괜찮습니다 — 해설이 핵심입니다.</div>
+    ${qs.map((q, i) => `
+      <div class="qitem" data-qi="${i}">
+        <div class="qq"><span class="qn">Q${i + 1}.</span>${esc(q.q)}</div>
+        <div class="qopts">
+          ${q.opts.map((o, j) => `<button type="button" class="qopt" data-o="${j}">${esc(o)}</button>`).join('')}
+        </div>
+        <div class="qwhy"></div>
+      </div>`).join('')}
+    <div class="qscore"></div>
+  </div>`;
+}
+
+function casesHTML(){
+  return CASES.map(c => `
+    <div class="case" id="${c.id}">
+      <div class="case-h"><span style="font-size:22px">${c.icon}</span>
+        <h3>${esc(c.title)}</h3>
+        <span class="case-tag">${esc(c.who)}</span>
+        <span class="case-tag">📄 ${esc(c.data)}</span></div>
+      <div class="case-sit"><b>상황</b> — ${esc(c.situation)}</div>
+      <div class="steps">
+        ${c.steps.map((s, i) => `
+          <div class="step">
+            <div class="st">${i + 1}. ${esc(s.t)}</div>
+            <div class="sv"><b>본 것</b> — ${s.saw}</div>
+            <div class="sn">↳ ${s.next}</div>
+          </div>`).join('')}
+      </div>
+      <div class="case-lesson"><b>이 사례가 말해주는 것</b> — ${c.lesson}</div>
+    </div>`).join('');
+}
+
+function cardsHTML(){
   return MODCARDS.map(g => `
     <h3 style="font-size:15px;font-weight:700;margin:22px 0 10px">${esc(g.g)}</h3>
     <div class="mod-grid">
@@ -657,6 +390,27 @@ function modCardsHTML(){
           <a class="go" href="portal.html?mod=${m.id}&demo=1">예제로 바로 해보기 →</a>
         </div>`).join('')}
     </div>`).join('');
+}
+
+function datasetsHTML(){
+  return `<p style="font-size:14px;color:var(--text-2);margin-bottom:16px">
+      내려받아 포털에 올리면 그대로 분석됩니다. 각 데이터에는 <b>배울 거리가 일부러 심어져</b> 있으니,
+      아래 “숨겨 둔 학습 포인트”를 확인하고 직접 찾아보세요.</p>
+    <div class="ds-grid">
+      ${DATASETS.map(d => `
+        <div class="ds">
+          <h4><span>${d.icon}</span> ${esc(d.name)}</h4>
+          <div class="meta">${esc(d.domain)} · ${esc(d.size)}</div>
+          <div class="desc">${esc(d.desc)}</div>
+          <div class="hid"><span class="t">🔎 숨겨 둔 학습 포인트</span>
+            ${d.hidden.map(h => `· ${h}`).join('<br>')}</div>
+          <div class="acts">
+            <a class="dl" href="datasets/${encodeURIComponent(d.file)}" download>⬇️ 내려받기</a>
+            ${d.mods.map(([id, label]) =>
+              `<a class="mod-link" href="portal.html?mod=${id}">${esc(label)}</a>`).join('')}
+          </div>
+        </div>`).join('')}
+    </div>`;
 }
 
 function resourcesHTML(){
@@ -673,27 +427,45 @@ function resourcesHTML(){
 function render(){
   let n = 0, html = '', toc = '';
   CURRICULUM.forEach(ch => {
+    const isMath = ch.id === 'ch6';
     html += `<section class="chapter" id="${ch.id}">
-      <div class="ch-head"><span class="ch-num">${esc(ch.num)}</span><h2>${esc(ch.title)}</h2></div>
+      <div class="ch-head"><span class="ch-num">${esc(ch.num)}</span><h2>${ch.icon} ${esc(ch.title)}</h2>
+      ${isMath ? '<span class="ch-badge">심화 · 건너뛰어도 됩니다</span>' : ''}</div>
       <p class="ch-desc">${esc(ch.desc)}</p>`;
     let ls = '';
-    if (ch.id === 'ch6') html += modCardsHTML();
-    else if (ch.id === 'ch7') html += resourcesHTML();
-    else ch.lessons.forEach(l => {
+    ch.lessons.forEach(l => {
       n++;
-      html += lessonHTML(l, n);
+      html += lessonHTML(l, n, isMath);
       ls += `<li><a href="#${l.id}" data-toc="${l.id}">${esc(l.title)}</a></li>`;
     });
+    if (ch.cases) html += casesHTML();
+    if (ch.cards) html += cardsHTML();
+    if (ch.datasets) html += datasetsHTML();
+    if (ch.resources) html += resourcesHTML();
+    html += quizHTML(ch.id);
     html += `</section>`;
-    toc += `<li class="ch"><a href="#${ch.id}">${esc(ch.num)}. ${esc(ch.title)}</a>
+    toc += `<li class="ch"><a href="#${ch.id}">${ch.icon} ${esc(ch.num)}. ${esc(ch.title)}</a>
       ${ls ? `<ul class="ls">${ls}</ul>` : ''}</li>`;
   });
   $('#content').innerHTML = html;
   $('#tocList').innerHTML = toc;
-  const nCards = MODCARDS.reduce((s, g) => s + g.items.length, 0);
-  $('#pillCount').textContent = `📘 ${CURRICULUM.length}개 장 · ${n}개 강의 · 기법 카드 ${nCards}장`;
-  $('#pillTime').textContent = `⏱️ 약 ${Math.round(n * 2)}분`;
 
+  const nMath = CURRICULUM.find(c => c.id === 'ch6').lessons.length;
+  $('#heroMeta').innerHTML = [
+    `📘 ${CURRICULUM.length}개 장 · ${n}개 강의`,
+    `📐 수학 ${nMath}강`,
+    `✅ 확인 문제 ${Object.values(QUIZ).flat().length}문항`,
+    `🗂️ 케이스 ${CASES.length}건`,
+    `💾 연습 데이터 ${DATASETS.length}종`,
+    `🖐️ 만져보는 예제 3개`,
+  ].map(t => `<span class="pill">${t}</span>`).join('');
+
+  bindDone();
+  bindQuiz();
+  updateProgress();
+}
+
+function bindDone(){
   $$('[data-done]').forEach(b => {
     const id = b.dataset.done;
     const set = on => {
@@ -708,7 +480,38 @@ function render(){
       set(DONE.has(id)); saveDone(); updateProgress();
     });
   });
-  updateProgress();
+}
+
+function bindQuiz(){
+  $$('[data-quiz]').forEach(box => {
+    const qs = QUIZ[box.dataset.quiz];
+    const answered = new Map();
+    $$('.qitem', box).forEach(item => {
+      const qi = Number(item.dataset.qi), q = qs[qi], why = $('.qwhy', item);
+      $$('.qopt', item).forEach(btn => {
+        btn.addEventListener('click', () => {
+          if (answered.has(qi)) return;
+          const pick = Number(btn.dataset.o), correct = pick === q.a;
+          answered.set(qi, correct);
+          $$('.qopt', item).forEach((b2, j) => {
+            b2.disabled = true;
+            if (j === q.a) b2.dataset.state = 'ok';
+            else if (j === pick) b2.dataset.state = 'no';
+          });
+          why.innerHTML = `<b>${correct ? '정답입니다.'
+            : '아쉽습니다 — 정답은 “' + esc(q.opts[q.a]) + '”.'}</b> ${esc(q.why)}`;
+          why.classList.add('on');
+          const right = [...answered.values()].filter(Boolean).length;
+          $('.qscore', box).textContent =
+            `${answered.size} / ${qs.length} 문항 풀이 · 정답 ${right}개` +
+            (answered.size === qs.length
+              ? (right === qs.length ? ' — 완벽합니다! 다음 장으로 넘어가세요.'
+                                     : ' — 틀린 문항의 해설을 다시 읽어 보세요.')
+              : '');
+        });
+      });
+    });
+  });
 }
 
 function updateProgress(){
@@ -718,9 +521,7 @@ function updateProgress(){
   $('#progText').textContent = `${done} / ${total} 강의 완료`;
 }
 
-/* ═══════════════════════════════════════════════════════════════
-   인터랙티브 예제
-   ═══════════════════════════════════════════════════════════════ */
+/* ═══════════════ 인터랙티브 예제 3종 ═══════════════ */
 const SVGNS = 'http://www.w3.org/2000/svg';
 function el(tag, attrs){
   const e = document.createElementNS(SVGNS, tag);
@@ -729,7 +530,6 @@ function el(tag, attrs){
 }
 function css(v){ return getComputedStyle(document.documentElement).getPropertyValue(v).trim(); }
 
-/* ① 평균 vs 중앙값 */
 const SALARY = [320, 340, 360, 380, 400, 420, 450, 480, 520];
 function drawMean(){
   const svg = $('#meanSvg');
@@ -762,10 +562,10 @@ function drawMean(){
   };
   mark(mean, css('--s1'), '평균', 0);
   mark(mid, css('--s3'), '중앙값', 26);
-  $('#meanOut').textContent = `${extra.toLocaleString()}만원 · 평균 ${Math.round(mean).toLocaleString()} / 중앙값 ${Math.round(mid).toLocaleString()}`;
+  $('#meanOut').textContent =
+    `${extra.toLocaleString()}만원 · 평균 ${Math.round(mean).toLocaleString()} / 중앙값 ${Math.round(mid).toLocaleString()}`;
 }
 
-/* ② 상관계수 */
 let corrSeed = 12345;
 function rnd(){ corrSeed = (corrSeed * 1103515245 + 12345) % 2147483648; return corrSeed / 2147483648; }
 function gauss(){ let s = 0; for (let i = 0; i < 6; i++) s += rnd(); return (s - 3) / 1.1; }
@@ -774,8 +574,7 @@ function drawCorr(){
   if (!svg) return;
   const r = Number($('#corrSlider').value) / 100;
   corrSeed = 12345;
-  const W = 600, H = 260, P = 42;
-  const pts = [];
+  const W = 600, H = 260, P = 42, pts = [];
   for (let i = 0; i < 90; i++){
     const a = gauss(), b = gauss();
     pts.push([a, r * a + Math.sqrt(Math.max(0, 1 - r * r)) * b]);
@@ -801,28 +600,29 @@ function drawCorr(){
   const word = Math.abs(r) >= 0.7 ? '강한 관계' : Math.abs(r) >= 0.4 ? '뚜렷한 관계'
              : Math.abs(r) >= 0.2 ? '약한 관계' : '거의 관계 없음';
   const dir = r > 0.08 ? '같이 오름' : r < -0.08 ? '반대로 움직임' : '';
-  $('#corrOut').textContent = `r = ${r.toFixed(2)} · ${word}${dir ? ' · ' + dir : ''}`;
+  $('#corrOut').textContent =
+    `r = ${r.toFixed(2)} · ${word}${dir ? ' · ' + dir : ''} · r² = ${(r * r * 100).toFixed(0)}% 설명`;
 }
 
-/* ③ 심슨의 역설 */
 let simpSplit = false;
 function drawSimpson(){
   const svg = $('#simpsonSvg');
   if (!svg) return;
   const W = 600, H = 250, P = 46;
   svg.innerHTML = '';
+  const scale = v => (v - 88) / 10 * (H - P - 40);
   const bar = (x, y, w, h, color, label, val) => {
     svg.appendChild(el('rect', { x, y, width:w, height:h, fill:color, rx:4 }));
     const t = el('text', { x:x + w/2, y:y - 8, 'text-anchor':'middle', 'font-size':12.5,
       'font-weight':700, fill:css('--text') });
     t.textContent = val; svg.appendChild(t);
-    const l = el('text', { x:x + w/2, y:H - 22, 'text-anchor':'middle', 'font-size':11.5, fill:css('--muted') });
-    l.textContent = label; svg.appendChild(l);
+    if (label){
+      const l = el('text', { x:x + w/2, y:H - 22, 'text-anchor':'middle', 'font-size':11.5, fill:css('--muted') });
+      l.textContent = label; svg.appendChild(l);
+    }
   };
-  const scale = v => (v - 88) / 10 * (H - P - 40);
   svg.appendChild(el('line', { x1:P-10, y1:H-40, x2:W-P+10, y2:H-40,
     stroke:css('--border-strong'), 'stroke-width':1 }));
-
   if (!simpSplit){
     bar(140, H - 40 - scale(94.4), 90, scale(94.4), css('--s1'), '구형 설비', '94.4');
     bar(370, H - 40 - scale(92.9), 90, scale(92.9), css('--s2'), '신형 설비', '92.9');
@@ -832,13 +632,11 @@ function drawSimpson(){
     svg.appendChild(t);
     $('#simpOut').textContent = '결론: 신형이 나쁘다?';
   } else {
-    const groups = [['저온', 96.6, 97.1], ['중온', 94.3, 96.2], ['고온', 91.0, 92.7]];
-    groups.forEach(([name, oldV, newV], i) => {
+    [['저온', 96.6, 97.1], ['중온', 94.3, 96.2], ['고온', 91.0, 92.7]].forEach(([name, o, nv], i) => {
       const x0 = 90 + i * 165;
-      bar(x0, H - 40 - scale(oldV), 52, scale(oldV), css('--s1'), '', oldV.toFixed(1));
-      bar(x0 + 58, H - 40 - scale(newV), 52, scale(newV), css('--s2'), '', newV.toFixed(1));
-      const l = el('text', { x:x0 + 55, y:H - 22, 'text-anchor':'middle', 'font-size':11.5,
-        fill:css('--muted') });
+      bar(x0, H - 40 - scale(o), 52, scale(o), css('--s1'), '', o.toFixed(1));
+      bar(x0 + 58, H - 40 - scale(nv), 52, scale(nv), css('--s2'), '', nv.toFixed(1));
+      const l = el('text', { x:x0 + 55, y:H - 22, 'text-anchor':'middle', 'font-size':11.5, fill:css('--muted') });
       l.textContent = name + ' 구간'; svg.appendChild(l);
     });
     const t = el('text', { x:W/2, y:26, 'text-anchor':'middle', 'font-size':13.5,
@@ -847,17 +645,15 @@ function drawSimpson(){
     svg.appendChild(t);
     $('#simpOut').textContent = '결론: 신형이 좋다!';
   }
-  const legend = [['구형 설비', css('--s1')], ['신형 설비', css('--s2')]];
-  legend.forEach(([name, color], i) => {
-    svg.appendChild(el('rect', { x:W - 150 + i * 0, y:44 + i * 20, width:11, height:11, fill:color, rx:2 }));
+  [['구형 설비', css('--s1')], ['신형 설비', css('--s2')]].forEach(([name, color], i) => {
+    svg.appendChild(el('rect', { x:W - 150, y:44 + i * 20, width:11, height:11, fill:color, rx:2 }));
     const t = el('text', { x:W - 134, y:54 + i * 20, 'font-size':11.5, fill:css('--text-2') });
     t.textContent = name; svg.appendChild(t);
   });
 }
 
-/* ═══════════════════════════════════════════════════════════════
-   초기화
-   ═══════════════════════════════════════════════════════════════ */
+function redraw(){ drawMean(); drawCorr(); drawSimpson(); }
+
 render();
 $('#meanSlider').addEventListener('input', drawMean);
 $('#corrSlider').addEventListener('input', drawCorr);
@@ -869,7 +665,7 @@ $('#simpSplit').addEventListener('click', () => {
   simpSplit = true; $('#simpAll').setAttribute('aria-pressed','false');
   $('#simpSplit').setAttribute('aria-pressed','true'); drawSimpson();
 });
-drawMean(); drawCorr(); drawSimpson();
+redraw();
 
 $('#themeBtn').addEventListener('click', () => {
   const cur = document.documentElement.getAttribute('data-theme');
@@ -877,11 +673,11 @@ $('#themeBtn').addEventListener('click', () => {
   const next = cur ? (cur === 'dark' ? 'light' : 'dark') : (sysDark ? 'light' : 'dark');
   document.documentElement.setAttribute('data-theme', next);
   try{ localStorage.setItem('dap_theme', next); }catch(_){}
-  drawMean(); drawCorr(); drawSimpson();
+  redraw();
 });
 try{
   const saved = localStorage.getItem('dap_theme');
-  if (saved){ document.documentElement.setAttribute('data-theme', saved); drawMean(); drawCorr(); drawSimpson(); }
+  if (saved){ document.documentElement.setAttribute('data-theme', saved); redraw(); }
 }catch(_){}
 </script>
 </body>
